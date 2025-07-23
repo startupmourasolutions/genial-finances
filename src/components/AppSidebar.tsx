@@ -57,9 +57,9 @@ export function AppSidebar() {
 
   const getNavClasses = (path: string) => {
     const isActiveItem = isActive(path)
-    return `transition-smooth ${
+    return `transition-smooth rounded-lg mx-2 ${
       isActiveItem 
-        ? "bg-brand-orange-light text-brand-orange border-r-2 border-brand-orange font-medium" 
+        ? "bg-brand-orange text-white shadow-lg font-medium" 
         : "text-muted-foreground hover:bg-muted hover:text-foreground"
     }`
   }
@@ -85,17 +85,17 @@ export function AppSidebar() {
           <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2">
             Menu Principal
           </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
+          <SidebarGroupContent className="space-y-2">
+            <SidebarMenu className="space-y-1">
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="h-11">
                     <NavLink 
                       to={item.path} 
                       className={getNavClasses(item.path)}
                     >
-                      <item.icon className="w-4 h-4" />
-                      {!collapsed && <span>{item.text}</span>}
+                      <item.icon className="w-5 h-5" />
+                      {!collapsed && <span className="ml-3">{item.text}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

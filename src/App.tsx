@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ProfileSelector } from "@/components/ProfileSelector";
 import Dashboard from "./pages/Dashboard";
+import Receitas from "./pages/Receitas";
+import Despesas from "./pages/Despesas";
 import Transacoes from "./pages/Transacoes";
 import Metas from "./pages/Metas";
 import Categorias from "./pages/Categorias";
@@ -25,7 +27,7 @@ const App = () => (
             <AppSidebar />
             <div className="flex-1 flex flex-col">
               <header className="bg-surface border-b border-border">
-                <div className="flex items-center h-16 px-4">
+                <div className="flex items-center h-16 px-6">
                   <SidebarTrigger className="mr-4" />
                   <ProfileSelector 
                     profiles={["Pessoal", "Empresarial"]} 
@@ -36,6 +38,8 @@ const App = () => (
               <main className="flex-1 overflow-auto">
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
+                  <Route path="/receitas" element={<Receitas />} />
+                  <Route path="/despesas" element={<Despesas />} />
                   <Route path="/transacoes" element={<Transacoes />} />
                   <Route path="/metas" element={<Metas />} />
                   <Route path="/categorias" element={<Categorias />} />
