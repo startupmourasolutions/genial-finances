@@ -12,6 +12,10 @@ import Despesas from "./pages/Despesas";
 import Transacoes from "./pages/Transacoes";
 import Metas from "./pages/Metas";
 import Categorias from "./pages/Categorias";
+import Dividas from "./pages/Dividas";
+import Relatorios from "./pages/Relatorios";
+import Mercado from "./pages/Mercado";
+import Veiculos from "./pages/Veiculos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +47,10 @@ const App = () => (
                   <Route path="/transacoes" element={<Transacoes />} />
                   <Route path="/metas" element={<Metas />} />
                   <Route path="/categorias" element={<Categorias />} />
+                  <Route path="/dividas" element={<Dividas />} />
+                  <Route path="/relatorios" element={<Relatorios />} />
+                  <Route path="/mercado" element={<Mercado />} />
+                  <Route path="/veiculos" element={<Veiculos />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
