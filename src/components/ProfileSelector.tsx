@@ -1,7 +1,10 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Building, User } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Building, User, LogOut } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+import { TrialBadge } from "@/components/TrialBadge"
+import { NotificationBell } from "@/components/NotificationBell"
 
 interface ProfileSelectorProps {
   profiles: string[]
@@ -9,6 +12,7 @@ interface ProfileSelectorProps {
 }
 
 export function ProfileSelector({ profiles, userInitial }: ProfileSelectorProps) {
+  const { profile, signOut } = useAuth()
   const [selectedProfile, setSelectedProfile] = useState(profiles[0])
 
   const toggleProfile = () => {
@@ -25,6 +29,7 @@ export function ProfileSelector({ profiles, userInitial }: ProfileSelectorProps)
         <h1 className="text-2xl font-semibold text-foreground">
           Dashboard {selectedProfile}
         </h1>
+        <TrialBadge />
       </div>
       
       <div className="flex items-center gap-4">
@@ -41,9 +46,24 @@ export function ProfileSelector({ profiles, userInitial }: ProfileSelectorProps)
           <span className="font-medium">{selectedProfile}</span>
         </Button>
         
+        <NotificationBell />
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={signOut}
+          className="hover-scale transition-smooth"
+          title="Sair"
+        >
+          <LogOut className="w-4 h-4" />
+        </Button>
+        
         <Avatar className="w-10 h-10 hover-scale transition-smooth">
+          {profile?.profile_image_url && (
+            <AvatarImage src={profile.profile_image_url} alt="Profile" />
+          )}
           <AvatarFallback className="bg-brand-orange text-white font-medium">
-            {userInitial}
+            {profile?.full_name?.charAt(0).toUpperCase() || userInitial}
           </AvatarFallback>
         </Avatar>
       </div>
