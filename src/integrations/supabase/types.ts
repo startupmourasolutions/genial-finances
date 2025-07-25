@@ -14,7 +14,176 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clients: {
+        Row: {
+          client_type: Database["public"]["Enums"]["client_type"]
+          company_name: string | null
+          created_at: string
+          id: string
+          monthly_fee: number | null
+          profile_id: string
+          subscription_active: boolean | null
+          subscription_end_date: string | null
+          subscription_plan: string | null
+          subscription_start_date: string | null
+          trial_end_date: string | null
+          trial_start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_type?: Database["public"]["Enums"]["client_type"]
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          monthly_fee?: number | null
+          profile_id: string
+          subscription_active?: boolean | null
+          subscription_end_date?: string | null
+          subscription_plan?: string | null
+          subscription_start_date?: string | null
+          trial_end_date?: string | null
+          trial_start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_type?: Database["public"]["Enums"]["client_type"]
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          monthly_fee?: number | null
+          profile_id?: string
+          subscription_active?: boolean | null
+          subscription_end_date?: string | null
+          subscription_plan?: string | null
+          subscription_start_date?: string | null
+          trial_end_date?: string | null
+          trial_start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean | null
+          title: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean | null
+          title: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          account_status: Database["public"]["Enums"]["account_status"]
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string | null
+          profile_image_url: string | null
+          updated_at: string
+          user_id: string
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Insert: {
+          account_status?: Database["public"]["Enums"]["account_status"]
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          profile_image_url?: string | null
+          updated_at?: string
+          user_id: string
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Update: {
+          account_status?: Database["public"]["Enums"]["account_status"]
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          profile_image_url?: string | null
+          updated_at?: string
+          user_id?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: []
+      }
+      super_administrators: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          permissions: Json | null
+          profile_id: string
+          role: Database["public"]["Enums"]["super_admin_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          permissions?: Json | null
+          profile_id: string
+          role?: Database["public"]["Enums"]["super_admin_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          permissions?: Json | null
+          profile_id?: string
+          role?: Database["public"]["Enums"]["super_admin_role"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "super_administrators_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "super_administrators_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +192,10 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      account_status: "active" | "inactive" | "trial" | "expired"
+      client_type: "personal" | "business"
+      super_admin_role: "guest" | "administrator" | "super_administrator"
+      user_type: "super_administrator" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +322,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      account_status: ["active", "inactive", "trial", "expired"],
+      client_type: ["personal", "business"],
+      super_admin_role: ["guest", "administrator", "super_administrator"],
+      user_type: ["super_administrator", "client"],
+    },
   },
 } as const
