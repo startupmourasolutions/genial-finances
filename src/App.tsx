@@ -123,6 +123,44 @@ function App() {
                     </DashboardLayout>
                   </ProtectedRoute>
                 } />
+                
+                {/* Rotas do Super Administrador */}
+                <Route path="/admin/administradores" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Administradores />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/leads" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Leads />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/clientes" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <AdminClientes />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/faturas" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Faturas />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/configuracoes" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Configuracoes />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </SidebarProvider>

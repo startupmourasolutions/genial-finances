@@ -50,23 +50,46 @@ export default function Administradores() {
 
   const fetchAdministrators = async () => {
     try {
-      const { data, error } = await supabase
+      // Primeiro buscar os super administradores
+      const { data: admins, error: adminsError } = await supabase
         .from('super_administrators')
-        .select(`
-          id,
-          role,
-          created_at,
-          profile:profile_id(
-            full_name,
-            email,
-            phone,
-            profile_image_url,
-            account_status
-          )
-        `);
+        .select('id, role, created_at, profile_id');
 
-      if (error) throw error;
-      setAdministrators(data || []);
+      if (adminsError) throw adminsError;
+
+      // Depois buscar os perfis correspondentes
+      const profileIds = admins?.map(admin => admin.profile_id) || [];
+      
+      if (profileIds.length === 0) {
+        setAdministrators([]);
+        return;
+      }
+
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, phone, profile_image_url, account_status')
+        .in('id', profileIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combinar os dados
+      const combinedData = admins?.map(admin => {
+        const profile = profiles?.find(p => p.id === admin.profile_id);
+        return {
+          id: admin.id,
+          role: admin.role,
+          created_at: admin.created_at,
+          profile: profile || {
+            full_name: '',
+            email: '',
+            phone: '',
+            profile_image_url: '',
+            account_status: 'inactive'
+          }
+        };
+      }) || [];
+
+      setAdministrators(combinedData);
     } catch (error) {
       console.error('Erro ao buscar administradores:', error);
       toast({
