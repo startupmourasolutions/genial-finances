@@ -73,10 +73,10 @@ export default function Index() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen w-full bg-background">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-orange-50/30 dark:to-orange-950/20">
-        <div className="container mx-auto px-4 py-20">
+      <section className="relative w-full overflow-hidden bg-gradient-to-br from-background via-background to-orange-50/30 dark:to-orange-950/20">
+        <div className="w-full max-w-none px-6 py-20 lg:px-8">
           <div className="text-center space-y-6">
             <Badge variant="secondary" className="px-4 py-2 text-sm font-medium">
               🚀 Novo: Dashboard com IA integrada
@@ -120,8 +120,8 @@ export default function Index() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
+      <section className="w-full py-20 bg-muted/30">
+        <div className="w-full max-w-none px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Recursos que transformam sua vida financeira
@@ -146,8 +146,8 @@ export default function Index() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      <section className="w-full py-20">
+        <div className="w-full max-w-none px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Escolha o plano ideal para você
@@ -200,8 +200,8 @@ export default function Index() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-orange-600 to-orange-700 text-white">
-        <div className="container mx-auto px-4 text-center">
+      <section className="w-full py-20 bg-gradient-to-r from-orange-600 to-orange-700 text-white">
+        <div className="w-full max-w-none px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Pronto para transformar suas finanças?
           </h2>
@@ -218,8 +218,8 @@ export default function Index() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-muted/30">
-        <div className="container mx-auto px-4 text-center">
+      <footer className="w-full py-12 bg-muted/30">
+        <div className="w-full max-w-none px-6 lg:px-8 text-center">
           <div className="mb-8">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-700 bg-clip-text text-transparent">
               Gênio Financeiro
