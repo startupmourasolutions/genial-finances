@@ -347,6 +347,10 @@ export type Database = {
         Args: { "": unknown }
         Returns: unknown
       }
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       ivfflat_bit_support: {
         Args: { "": unknown }
         Returns: unknown
