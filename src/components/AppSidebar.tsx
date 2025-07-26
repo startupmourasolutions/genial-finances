@@ -12,8 +12,14 @@ import {
   ShoppingCart,
   Car,
   UserCircle,
-  LogOut
+  LogOut,
+  Users,
+  UserCheck,
+  Receipt,
+  Settings
 } from "lucide-react"
+
+import { useAuth } from "@/hooks/useAuth"
 
 import {
   Sidebar,
@@ -29,7 +35,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-const navItems = [
+const clientNavItems = [
   { id: "dashboard", text: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "receitas", text: "Receitas", icon: ArrowUpCircle, path: "/receitas" },
   { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" },
@@ -42,6 +48,15 @@ const navItems = [
   { id: "veiculos", text: "Veículos", icon: Car, path: "/veiculos" }
 ]
 
+const superAdminNavItems = [
+  { id: "dashboard", text: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  { id: "administradores", text: "Administradores", icon: UserCheck, path: "/admin/administradores" },
+  { id: "leads", text: "Leads", icon: Users, path: "/admin/leads" },
+  { id: "clientes", text: "Clientes", icon: Users, path: "/admin/clientes" },
+  { id: "faturas", text: "Faturas", icon: Receipt, path: "/admin/faturas" },
+  { id: "configuracoes", text: "Configurações", icon: Settings, path: "/admin/configuracoes" }
+]
+
 const footerItems = [
   { id: "perfil", text: "Perfil", icon: UserCircle, path: "/perfil" },
   { id: "sair", text: "Sair", icon: LogOut, path: "/logout" }
@@ -49,9 +64,17 @@ const footerItems = [
 
 export function AppSidebar() {
   const { state } = useSidebar()
+  const { profile } = useAuth()
   const location = useLocation()
   const currentPath = location.pathname
   const collapsed = state === "collapsed"
+
+  // Verifica se é super administrador
+  const isSuperAdmin = profile?.user_type === 'super_administrator'
+  
+  // Seleciona os itens de navegação baseado no tipo de usuário
+  const navItems = isSuperAdmin ? superAdminNavItems : clientNavItems
+  const menuLabel = isSuperAdmin ? "Super Administrador" : "Área do Cliente"
 
   const isActive = (path: string) => currentPath === path
 
@@ -83,7 +106,7 @@ export function AppSidebar() {
       <SidebarContent className="px-2 py-4">
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2">
-            Menu Principal
+            {menuLabel}
           </SidebarGroupLabel>
           <SidebarGroupContent className="space-y-2">
             <SidebarMenu className="space-y-1">

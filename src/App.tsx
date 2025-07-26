@@ -19,6 +19,11 @@ import Veiculos from "./pages/Veiculos";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Administradores from "./pages/admin/Administradores";
+import Leads from "./pages/admin/Leads";
+import AdminClientes from "./pages/admin/AdminClientes";
+import Faturas from "./pages/admin/Faturas";
+import Configuracoes from "./pages/admin/Configuracoes";
 
 const queryClient = new QueryClient();
 
