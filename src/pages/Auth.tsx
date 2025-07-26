@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAuth } from '@/hooks/useAuth'
+import { toast } from '@/hooks/use-toast'
 import { Eye, EyeOff, LogIn, UserPlus, Mail, ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -39,17 +40,27 @@ export default function Auth() {
     e.preventDefault()
     
     if (signupPassword !== signupConfirmPassword) {
-      return // Add validation toast here
+      toast({
+        title: "Erro",
+        description: "As senhas não coincidem",
+        variant: "destructive",
+      })
+      return
     }
     
-    await signUp(
+    const { error } = await signUp(
       signupEmail, 
       signupPassword, 
       fullName, 
-      userType,
-      userType === 'client' ? clientType : undefined,
-      userType === 'client' && clientType === 'business' ? companyName : undefined
+      'client', // Sempre cliente para cadastros pela tela pública
+      clientType,
+      clientType === 'business' ? companyName : undefined
     )
+    
+    if (!error) {
+      // Fazer login automático após cadastro
+      await signIn(signupEmail, signupPassword)
+    }
   }
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -179,47 +190,30 @@ export default function Auth() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="user-type">Tipo de Usuário</Label>
-                    <Select value={userType} onValueChange={(value: 'client' | 'super_administrator') => setUserType(value)}>
+                    <Label htmlFor="client-type">Tipo de Conta</Label>
+                    <Select value={clientType} onValueChange={(value: 'personal' | 'business') => setClientType(value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o tipo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="client">Cliente</SelectItem>
-                        <SelectItem value="super_administrator">Super Administrador</SelectItem>
+                        <SelectItem value="personal">Pessoal</SelectItem>
+                        <SelectItem value="business">Empresarial</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {userType === 'client' && (
-                    <>
-                      <div className="space-y-2">
-                        <Label htmlFor="client-type">Tipo de Conta</Label>
-                        <Select value={clientType} onValueChange={(value: 'personal' | 'business') => setClientType(value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione o tipo" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="personal">Pessoal</SelectItem>
-                            <SelectItem value="business">Empresarial</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {clientType === 'business' && (
-                        <div className="space-y-2">
-                          <Label htmlFor="company-name">Nome da Empresa</Label>
-                          <Input
-                            id="company-name"
-                            type="text"
-                            placeholder="Nome da sua empresa"
-                            value={companyName}
-                            onChange={(e) => setCompanyName(e.target.value)}
-                            required
-                          />
-                        </div>
-                      )}
-                    </>
+                  {clientType === 'business' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="company-name">Nome da Empresa</Label>
+                      <Input
+                        id="company-name"
+                        type="text"
+                        placeholder="Nome da sua empresa"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        required
+                      />
+                    </div>
                   )}
                   
                   <div className="space-y-2">

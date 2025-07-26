@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/sidebar"
 
 const navItems = [
-  { id: "dashboard", text: "Dashboard", icon: LayoutDashboard, path: "/" },
+  { id: "dashboard", text: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "receitas", text: "Receitas", icon: ArrowUpCircle, path: "/receitas" },
   { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" },
   { id: "transacoes", text: "Transações", icon: Repeat, path: "/transacoes" },

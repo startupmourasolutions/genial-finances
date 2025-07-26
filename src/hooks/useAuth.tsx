@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('profiles')
         .select(`
           *,
-          super_administrators(*),
+          super_administrators!super_administrators_profile_id_fkey(*),
           clients(*)
         `)
         .eq('user_id', userId)
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: "Login realizado com sucesso!",
           description: "Bem-vindo de volta.",
         })
-        window.location.href = '/'
+        window.location.href = '/dashboard'
       }
       
       return { error: null }

@@ -48,28 +48,76 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route
-                  path="/dashboard/*"
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout>
-                        <Routes>
-                          <Route index element={<Dashboard />} />
-                          <Route path="receitas" element={<Receitas />} />
-                          <Route path="despesas" element={<Despesas />} />
-                          <Route path="transacoes" element={<Transacoes />} />
-                          <Route path="metas" element={<Metas />} />
-                          <Route path="categorias" element={<Categorias />} />
-                          <Route path="dividas" element={<Dividas />} />
-                          <Route path="relatorios" element={<Relatorios />} />
-                          <Route path="mercado" element={<Mercado />} />
-                          <Route path="veiculos" element={<Veiculos />} />
-                          <Route path="*" element={<NotFound />} />
-                        </Routes>
-                      </DashboardLayout>
-                    </ProtectedRoute>
-                  }
-                />
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Dashboard />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/receitas" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Receitas />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/despesas" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Despesas />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/transacoes" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Transacoes />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/categorias" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Categorias />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/metas" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Metas />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/dividas" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Dividas />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/relatorios" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Relatorios />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/mercado" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Mercado />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/veiculos" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Veiculos />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </SidebarProvider>
