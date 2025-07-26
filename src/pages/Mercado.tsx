@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Plus, Filter, BarChart3, Table as TableIcon, ShoppingCart, Calendar, DollarSign, TrendingUp } from "lucide-react"
+import { Plus, Filter, BarChart3, Table as TableIcon, ShoppingCart, Calendar, DollarSign, TrendingUp, Edit, Trash2 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts"
 
 const Mercado = () => {
@@ -260,8 +260,14 @@ const Mercado = () => {
                         </span>
                       </div>
                       <div className="flex gap-2 ml-4">
-                        <Button size="sm" variant="outline">Editar</Button>
-                        <Button size="sm" variant="destructive">Remover</Button>
+                        <Button size="sm" variant="outline" className="hover-scale">
+                          <Edit className="w-3 h-3 mr-1" />
+                          Editar
+                        </Button>
+                        <Button size="sm" variant="destructive" className="hover-scale">
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Remover
+                        </Button>
                       </div>
                     </div>
                   ))}

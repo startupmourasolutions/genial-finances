@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Plus, Filter, BarChart3, Table as TableIcon, Car, Fuel, Wrench, Calendar, DollarSign } from "lucide-react"
+import { Plus, Filter, BarChart3, Table as TableIcon, Car, Fuel, Wrench, Calendar, DollarSign, Edit, Trash2 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts"
 
 const Veiculos = () => {
@@ -92,11 +92,11 @@ const Veiculos = () => {
           <p className="text-muted-foreground">Gerencie gastos, manutenções e informações dos seus veículos</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline">
+          <Button variant="outline" className="hover-scale">
             <Plus className="w-4 h-4 mr-2" />
             Novo Gasto
           </Button>
-          <Button className="bg-brand-orange hover:bg-brand-orange/90">
+          <Button className="bg-brand-orange hover:bg-brand-orange/90 hover-scale">
             <Plus className="w-4 h-4 mr-2" />
             Novo Veículo
           </Button>
@@ -294,8 +294,14 @@ const Veiculos = () => {
                         </span>
                       </div>
                       <div className="flex gap-2 ml-4">
-                        <Button size="sm" variant="outline">Editar</Button>
-                        <Button size="sm" variant="destructive">Excluir</Button>
+                        <Button size="sm" variant="outline" className="hover-scale">
+                          <Edit className="w-3 h-3 mr-1" />
+                          Editar
+                        </Button>
+                        <Button size="sm" variant="destructive" className="hover-scale">
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Excluir
+                        </Button>
                       </div>
                     </div>
                   ))}

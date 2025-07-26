@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Plus, Filter, BarChart3, Table as TableIcon, AlertTriangle, Calendar, DollarSign } from "lucide-react"
+import { Plus, Filter, BarChart3, Table as TableIcon, AlertTriangle, Calendar, DollarSign, Edit, Trash2 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 
 const Dividas = () => {
@@ -229,8 +229,14 @@ const Dividas = () => {
                         </span>
                       </div>
                       <div className="flex gap-2 ml-4">
-                        <Button size="sm" variant="outline">Pagar</Button>
-                        <Button size="sm" variant="outline">Editar</Button>
+                        <Button size="sm" variant="default" className="hover-scale">Pagar</Button>
+                        <Button size="sm" variant="outline" className="hover-scale">
+                          <Edit className="w-3 h-3 mr-1" />
+                          Editar
+                        </Button>
+                        <Button size="sm" variant="destructive" className="hover-scale">
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
                       </div>
                     </div>
                   ))}

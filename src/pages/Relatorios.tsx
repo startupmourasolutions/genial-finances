@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Download, Filter, TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, LineChart } from "lucide-react"
+import { Download, Filter, TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, LineChart, FileText } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, LineChart as RechartsLineChart, Line, AreaChart, Area } from "recharts"
 
 const Relatorios = () => {
@@ -61,11 +61,11 @@ const Relatorios = () => {
           <p className="text-muted-foreground">Análise completa da sua situação financeira</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline">
-            <Download className="w-4 h-4 mr-2" />
+          <Button variant="outline" className="hover-scale">
+            <FileText className="w-4 h-4 mr-2" />
             Exportar PDF
           </Button>
-          <Button className="bg-brand-orange hover:bg-brand-orange/90">
+          <Button className="bg-brand-orange hover:bg-brand-orange/90 hover-scale">
             <Download className="w-4 h-4 mr-2" />
             Exportar Excel
           </Button>
