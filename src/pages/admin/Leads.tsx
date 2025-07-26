@@ -8,9 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Search, Edit, Trash2, Users, TrendingUp, UserCheck, Clock } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Users, TrendingUp, UserCheck, Clock, User, Calendar, Building } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
 
 interface Lead {
   id: string;
@@ -39,6 +40,7 @@ export default function Leads() {
     status: "novo",
     notes: ""
   });
+  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, leadId: '', leadName: '' });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -146,12 +148,12 @@ export default function Leads() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
     try {
       const { error } = await supabase
         .from('leads')
         .delete()
-        .eq('id', id);
+        .eq('id', deleteDialog.leadId);
 
       if (error) throw error;
       
@@ -159,6 +161,7 @@ export default function Leads() {
         title: "Sucesso",
         description: "Lead removido com sucesso"
       });
+      setDeleteDialog({ isOpen: false, leadId: '', leadName: '' });
       fetchLeads();
     } catch (error) {
       toast({
@@ -167,6 +170,10 @@ export default function Leads() {
         variant: "destructive"
       });
     }
+  };
+
+  const openDeleteDialog = (id: string, name: string) => {
+    setDeleteDialog({ isOpen: true, leadId: id, leadName: name });
   };
 
   const handleNewDialog = () => {
@@ -337,6 +344,7 @@ export default function Leads() {
         </Dialog>
       </div>
 
+
       {/* Cards de estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
@@ -436,16 +444,16 @@ export default function Leads() {
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <Button 
-                          variant="outline" 
+                          variant="ghost" 
                           size="sm"
                           onClick={() => handleEdit(lead)}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button 
-                          variant="outline" 
+                          variant="ghost" 
                           size="sm"
-                          onClick={() => handleDelete(lead.id)}
+                          onClick={() => openDeleteDialog(lead.id, lead.full_name)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -458,6 +466,14 @@ export default function Leads() {
           )}
         </CardContent>
       </Card>
+      
+      <DeleteConfirmationDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog({ isOpen: false, leadId: '', leadName: '' })}
+        onConfirm={handleDelete}
+        itemName={deleteDialog.leadName}
+        title="Excluir Lead"
+      />
     </div>
   );
 }

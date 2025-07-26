@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Search, Edit, Trash2, Eye, EyeOff, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
 
 interface Administrator {
   id: string;
@@ -43,6 +44,7 @@ export default function Administradores() {
     profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
   });
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, adminId: '', adminName: '' });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -197,12 +199,12 @@ export default function Administradores() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
     try {
       const { error } = await supabase
         .from('super_administrators')
         .delete()
-        .eq('id', id);
+        .eq('id', deleteDialog.adminId);
 
       if (error) throw error;
       
@@ -210,6 +212,7 @@ export default function Administradores() {
         title: "Sucesso",
         description: "Administrador removido com sucesso"
       });
+      setDeleteDialog({ isOpen: false, adminId: '', adminName: '' });
       fetchAdministrators();
     } catch (error) {
       toast({
@@ -218,6 +221,10 @@ export default function Administradores() {
         variant: "destructive"
       });
     }
+  };
+
+  const openDeleteDialog = (id: string, name: string) => {
+    setDeleteDialog({ isOpen: true, adminId: id, adminName: name });
   };
 
   const isFormValid = formData.fullName && formData.email && formData.password && formData.confirmPassword;
@@ -466,13 +473,13 @@ export default function Administradores() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button variant="ghost" size="sm">
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button 
-                          variant="outline" 
+                          variant="ghost" 
                           size="sm"
-                          onClick={() => handleDelete(admin.id)}
+                          onClick={() => openDeleteDialog(admin.id, admin.profile?.full_name)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -485,6 +492,14 @@ export default function Administradores() {
           )}
         </CardContent>
       </Card>
+      
+      <DeleteConfirmationDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog({ isOpen: false, adminId: '', adminName: '' })}
+        onConfirm={handleDelete}
+        itemName={deleteDialog.adminName}
+        title="Excluir Administrador"
+      />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Search, Edit, Trash2, Building, User, Camera, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
 
 interface Client {
   id: string;
@@ -37,7 +38,6 @@ export default function AdminClientes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -51,6 +51,8 @@ export default function AdminClientes() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, clientId: '', clientName: '' });
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -199,7 +201,7 @@ export default function AdminClientes() {
     }
   };
 
-  const handleEdit = (client: Client) => {
+  const handleEditClient = (client: Client) => {
     setEditingClient(client);
     setFormData({
       fullName: client.profile?.full_name || "",
@@ -215,12 +217,12 @@ export default function AdminClientes() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
     try {
       const { error } = await supabase
         .from('clients')
         .delete()
-        .eq('id', id);
+        .eq('id', deleteDialog.clientId);
 
       if (error) throw error;
       
@@ -228,6 +230,7 @@ export default function AdminClientes() {
         title: "Sucesso",
         description: "Cliente removido com sucesso"
       });
+      setDeleteDialog({ isOpen: false, clientId: '', clientName: '' });
       fetchClients();
     } catch (error) {
       toast({
@@ -236,6 +239,14 @@ export default function AdminClientes() {
         variant: "destructive"
       });
     }
+  };
+
+  const openDeleteDialog = (id: string, name: string) => {
+    setDeleteDialog({ isOpen: true, clientId: id, clientName: name });
+  };
+
+  const openEditDialog = (client: Client) => {
+    handleEditClient(client);
   };
 
   const handleNewDialog = () => {
@@ -528,16 +539,16 @@ export default function AdminClientes() {
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <Button 
-                          variant="outline" 
+                          variant="ghost" 
                           size="sm"
-                          onClick={() => handleEdit(client)}
+                          onClick={() => openEditDialog(client)}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button 
-                          variant="outline" 
+                          variant="ghost" 
                           size="sm"
-                          onClick={() => handleDelete(client.id)}
+                          onClick={() => openDeleteDialog(client.id, client.profile?.full_name || '')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -550,6 +561,15 @@ export default function AdminClientes() {
           )}
         </CardContent>
       </Card>
+      
+      <DeleteConfirmationDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog({ isOpen: false, clientId: '', clientName: '' })}
+        onConfirm={handleDelete}
+        itemName={deleteDialog.clientName}
+        title="Excluir Cliente"
+      />
+
     </div>
   );
 }
