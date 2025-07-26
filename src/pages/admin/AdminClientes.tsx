@@ -98,15 +98,77 @@ export default function AdminClientes() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Erro",
+        description: "As senhas não coincidem",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       if (editingClient) {
-        // Lógica para editar cliente existente
+        // Lógica para editar cliente existente - implementar depois
         toast({
           title: "Sucesso",
           description: "Cliente atualizado com sucesso"
         });
       } else {
-        // Lógica para criar novo cliente
+        // Criar usuário no auth
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              full_name: formData.fullName,
+              user_type: 'client'
+            }
+          }
+        });
+
+        if (authError) throw authError;
+
+        if (authData.user) {
+          // Aguardar um pouco para o trigger criar o profile
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Buscar o profile criado
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('user_id', authData.user.id)
+            .single();
+
+          if (profileError) throw profileError;
+
+          // Atualizar o profile com os dados do formulário
+          const { error: updateProfileError } = await supabase
+            .from('profiles')
+            .update({
+              full_name: formData.fullName,
+              phone: formData.phone,
+              profile_image_url: formData.profileImage,
+              account_status: formData.accountStatus as any,
+              user_type: 'client'
+            })
+            .eq('id', profileData.id);
+
+          if (updateProfileError) throw updateProfileError;
+
+          // Criar registro na tabela clients
+          const { error: clientError } = await supabase
+            .from('clients')
+            .insert({
+              profile_id: profileData.id,
+              client_type: formData.clientType as any,
+              company_name: formData.companyName || null
+            });
+
+          if (clientError) throw clientError;
+        }
+
         toast({
           title: "Sucesso",
           description: "Cliente criado com sucesso"
@@ -127,10 +189,11 @@ export default function AdminClientes() {
         profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
       });
       fetchClients();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erro ao salvar cliente:', error);
       toast({
         title: "Erro",
-        description: "Erro ao salvar cliente",
+        description: error.message || "Erro ao salvar cliente",
         variant: "destructive"
       });
     }
