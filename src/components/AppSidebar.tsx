@@ -57,6 +57,18 @@ const superAdminNavItems = [
   { id: "configuracoes", text: "Configurações", icon: Settings, path: "/admin/configuracoes" }
 ]
 
+const clientAreaItems = [
+  { id: "dividas", text: "Dívidas", icon: FileText, path: "/dividas" },
+  { id: "relatorios", text: "Relatórios", icon: PieChart, path: "/relatorios" },
+  { id: "mercado", text: "Mercado", icon: ShoppingCart, path: "/mercado" },
+  { id: "veiculos", text: "Veículos", icon: Car, path: "/veiculos" },
+  { id: "transacoes", text: "Transações", icon: Repeat, path: "/transacoes" },
+  { id: "metas", text: "Metas", icon: Target, path: "/metas" },
+  { id: "receitas", text: "Receitas", icon: ArrowUpCircle, path: "/receitas" },
+  { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" },
+  { id: "categorias", text: "Categorias", icon: Tag, path: "/categorias" }
+]
+
 const footerItems = [
   { id: "perfil", text: "Perfil", icon: UserCircle, path: "/perfil" },
   { id: "sair", text: "Sair", icon: LogOut, path: "/logout" }
@@ -74,7 +86,6 @@ export function AppSidebar() {
   
   // Seleciona os itens de navegação baseado no tipo de usuário
   const navItems = isSuperAdmin ? superAdminNavItems : clientNavItems
-  const menuLabel = isSuperAdmin ? "Super Administrador" : "Área do Cliente"
 
   const isActive = (path: string) => currentPath === path
 
@@ -104,28 +115,80 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2 py-4">
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2">
-            {menuLabel}
-          </SidebarGroupLabel>
-          <SidebarGroupContent className="space-y-2">
-            <SidebarMenu className="space-y-1">
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton asChild className="h-11">
-                    <NavLink 
-                      to={item.path} 
-                      className={getNavClasses(item.path)}
-                    >
-                      <item.icon className="w-5 h-5" />
-                      {!collapsed && <span className="ml-3">{item.text}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {isSuperAdmin ? (
+          <>
+            {/* Menu Super Administrador */}
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2">
+                Super Administrador
+              </SidebarGroupLabel>
+              <SidebarGroupContent className="space-y-2">
+                <SidebarMenu className="space-y-1">
+                  {superAdminNavItems.map((item) => (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton asChild className="h-11">
+                        <NavLink 
+                          to={item.path} 
+                          className={getNavClasses(item.path)}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {!collapsed && <span className="ml-3">{item.text}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+            
+            {/* Área do Cliente para Super Admin */}
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2">
+                Área do Cliente
+              </SidebarGroupLabel>
+              <SidebarGroupContent className="space-y-2">
+                <SidebarMenu className="space-y-1">
+                  {clientAreaItems.map((item) => (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton asChild className="h-11">
+                        <NavLink 
+                          to={item.path} 
+                          className={getNavClasses(item.path)}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {!collapsed && <span className="ml-3">{item.text}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </>
+        ) : (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2">
+              Área do Cliente
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="space-y-2">
+              <SidebarMenu className="space-y-1">
+                {navItems.map((item) => (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton asChild className="h-11">
+                      <NavLink 
+                        to={item.path} 
+                        className={getNavClasses(item.path)}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {!collapsed && <span className="ml-3">{item.text}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-border p-2">

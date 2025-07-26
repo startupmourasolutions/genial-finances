@@ -192,114 +192,151 @@ export default function Administradores() {
               Novo Administrador
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Cadastrar Novo Administrador</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="profileImage">Foto de Perfil</Label>
-                <Input
-                  id="profileImage"
-                  type="url"
-                  placeholder="URL da imagem"
-                  value={formData.profileImage}
-                  onChange={(e) => setFormData({...formData, profileImage: e.target.value})}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Nome Completo *</Label>
-                <Input
-                  id="fullName"
-                  required
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Celular</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha *</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-2 top-1/2 -translate-y-1/2"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </Button>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Cadastrar Novo Administrador</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Foto de Perfil */}
+                <div className="flex flex-col items-center space-y-2">
+                  <Label>Foto de Perfil</Label>
+                  <div className="relative">
+                    <Avatar className="w-24 h-24 cursor-pointer" onClick={() => document.getElementById('profileImageInput')?.click()}>
+                      <AvatarImage src={formData.profileImage || undefined} />
+                      <AvatarFallback className="text-2xl">
+                        {formData.fullName?.charAt(0) || '+'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <input
+                      id="profileImageInput"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            setFormData({...formData, profileImage: event.target?.result as string});
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => document.getElementById('profileImageInput')?.click()}
+                    >
+                      Alterar Foto
+                    </Button>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar Senha *</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                />
-              </div>
+                {/* Primeira linha - Nome e Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Nome Completo *</Label>
+                    <Input
+                      id="fullName"
+                      required
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="role">Perfil *</Label>
-                <Select value={formData.role} onValueChange={(value) => setFormData({...formData, role: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="guest">Convidado</SelectItem>
-                    <SelectItem value="administrator">Administrador</SelectItem>
-                    <SelectItem value="super_administrator">Super Administrador</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    />
+                  </div>
+                </div>
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="status"
-                  checked={formData.status}
-                  onCheckedChange={(checked) => setFormData({...formData, status: checked})}
-                />
-                <Label htmlFor="status">Ativo</Label>
-              </div>
+                {/* Segunda linha - Celular e Perfil */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Celular</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    />
+                  </div>
 
-              <Button type="submit" className="w-full" disabled={!isFormValid}>
-                Cadastrar Administrador
-              </Button>
-            </form>
-          </DialogContent>
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Perfil *</Label>
+                    <Select value={formData.role} onValueChange={(value) => setFormData({...formData, role: value})}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="guest">Convidado</SelectItem>
+                        <SelectItem value="administrator">Administrador</SelectItem>
+                        <SelectItem value="super_administrator">Super Administrador</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Terceira linha - Senha e Confirmar Senha */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Senha *</Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        required
+                        value={formData.password}
+                        onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirmar Senha *</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      required
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                {/* Status Toggle */}
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="status"
+                    checked={formData.status}
+                    onCheckedChange={(checked) => setFormData({...formData, status: checked})}
+                  />
+                  <Label htmlFor="status">Ativo</Label>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={!isFormValid}>
+                  Cadastrar Administrador
+                </Button>
+              </form>
+            </DialogContent>
         </Dialog>
       </div>
 
