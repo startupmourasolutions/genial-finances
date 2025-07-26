@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Search, Edit, Trash2, Building, User } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Plus, Search, Edit, Trash2, Building, User, Camera, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -41,13 +42,18 @@ export default function AdminClientes() {
     fullName: "",
     email: "",
     phone: "",
+    password: "",
+    confirmPassword: "",
     clientType: "personal",
     companyName: "",
     subscriptionPlan: "",
     subscriptionActive: false,
     monthlyFee: "",
-    accountStatus: "active"
+    accountStatus: "active",
+    profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -116,12 +122,15 @@ export default function AdminClientes() {
         fullName: "",
         email: "",
         phone: "",
+        password: "",
+        confirmPassword: "",
         clientType: "personal",
         companyName: "",
         subscriptionPlan: "",
         subscriptionActive: false,
         monthlyFee: "",
-        accountStatus: "active"
+        accountStatus: "active",
+        profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
       });
       fetchClients();
     } catch (error) {
@@ -139,12 +148,15 @@ export default function AdminClientes() {
       fullName: client.profile?.full_name || "",
       email: client.profile?.email || "",
       phone: client.profile?.phone || "",
+      password: "",
+      confirmPassword: "",
       clientType: client.client_type,
       companyName: client.company_name || "",
       subscriptionPlan: client.subscription_plan || "",
       subscriptionActive: client.subscription_active,
       monthlyFee: client.monthly_fee?.toString() || "",
-      accountStatus: client.profile?.account_status || "active"
+      accountStatus: client.profile?.account_status || "active",
+      profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
     });
     setIsDialogOpen(true);
   };
@@ -178,12 +190,15 @@ export default function AdminClientes() {
       fullName: "",
       email: "",
       phone: "",
+      password: "",
+      confirmPassword: "",
       clientType: "personal",
       companyName: "",
       subscriptionPlan: "",
       subscriptionActive: false,
       monthlyFee: "",
-      accountStatus: "active"
+      accountStatus: "active",
+      profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
     });
     setIsDialogOpen(true);
   };
@@ -211,57 +226,153 @@ export default function AdminClientes() {
               Novo Cliente
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>
                 {editingClient ? 'Editar Cliente' : 'Cadastrar Novo Cliente'}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Nome Completo *</Label>
-                <Input
-                  id="fullName"
-                  required
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Foto de Perfil */}
+              <div className="flex flex-col items-center space-y-2">
+                <Label>Foto de Perfil</Label>
+                <div className="relative">
+                  <Avatar className="w-32 h-32 cursor-pointer group" onClick={() => document.getElementById('clientProfileImageInput')?.click()}>
+                    <AvatarImage src={formData.profileImage} />
+                    <AvatarFallback className="text-3xl">
+                      {formData.fullName?.charAt(0) || '+'}
+                    </AvatarFallback>
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Camera className="w-8 h-8 text-white" />
+                    </div>
+                  </Avatar>
+                  <input
+                    id="clientProfileImageInput"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setFormData({...formData, profileImage: event.target?.result as string});
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                />
+              {/* Primeira linha - Nome e Email */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Nome Completo *</Label>
+                  <Input
+                    id="fullName"
+                    required
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone">Telefone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                />
+              {/* Segunda linha - Celular e Tipo de Cliente */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Celular</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="(00) 00000-0000"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      let value = e.target.value.replace(/\D/g, '');
+                      if (value.length <= 11) {
+                        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                        if (value.length <= 14) {
+                          value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                        }
+                      }
+                      setFormData({...formData, phone: value});
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="clientType">Tipo de Cliente</Label>
+                  <Select value={formData.clientType} onValueChange={(value) => setFormData({...formData, clientType: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="personal">Pessoa Física</SelectItem>
+                      <SelectItem value="business">Pessoa Jurídica</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="clientType">Tipo de Cliente</Label>
-                <Select value={formData.clientType} onValueChange={(value) => setFormData({...formData, clientType: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="personal">Pessoa Física</SelectItem>
-                    <SelectItem value="business">Pessoa Jurídica</SelectItem>
-                  </SelectContent>
-                </Select>
+              {/* Terceira linha - Senha e Confirmar Senha */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password">Senha *</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirmar Senha *</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
               </div>
 
+              {/* Nome da Empresa (condicional) */}
               {formData.clientType === "business" && (
                 <div className="space-y-2">
                   <Label htmlFor="companyName">Nome da Empresa</Label>
@@ -273,51 +384,61 @@ export default function AdminClientes() {
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="subscriptionPlan">Plano de Assinatura</Label>
-                <Input
-                  id="subscriptionPlan"
-                  value={formData.subscriptionPlan}
-                  onChange={(e) => setFormData({...formData, subscriptionPlan: e.target.value})}
-                  placeholder="Ex: Básico, Premium..."
-                />
+              {/* Quarta linha - Plano e Valor */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="subscriptionPlan">Plano de Assinatura</Label>
+                  <Input
+                    id="subscriptionPlan"
+                    value={formData.subscriptionPlan}
+                    onChange={(e) => setFormData({...formData, subscriptionPlan: e.target.value})}
+                    placeholder="Ex: Básico, Premium..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="monthlyFee">Valor Mensal (R$)</Label>
+                  <Input
+                    id="monthlyFee"
+                    type="number"
+                    step="0.01"
+                    value={formData.monthlyFee}
+                    onChange={(e) => setFormData({...formData, monthlyFee: e.target.value})}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="monthlyFee">Valor Mensal (R$)</Label>
-                <Input
-                  id="monthlyFee"
-                  type="number"
-                  step="0.01"
-                  value={formData.monthlyFee}
-                  onChange={(e) => setFormData({...formData, monthlyFee: e.target.value})}
-                />
+              {/* Status da Conta e Assinatura */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="accountStatus">Status da Conta</Label>
+                  <Select value={formData.accountStatus} onValueChange={(value) => setFormData({...formData, accountStatus: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Ativo</SelectItem>
+                      <SelectItem value="inactive">Inativo</SelectItem>
+                      <SelectItem value="suspended">Suspenso</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center space-x-2 mt-6">
+                  <Switch
+                    id="subscriptionActive"
+                    checked={formData.subscriptionActive}
+                    onCheckedChange={(checked) => setFormData({...formData, subscriptionActive: checked})}
+                  />
+                  <Label htmlFor="subscriptionActive">Assinatura Ativa</Label>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="subscriptionActive"
-                  checked={formData.subscriptionActive}
-                  onCheckedChange={(checked) => setFormData({...formData, subscriptionActive: checked})}
-                />
-                <Label htmlFor="subscriptionActive">Assinatura Ativa</Label>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="accountStatus">Status da Conta</Label>
-                <Select value={formData.accountStatus} onValueChange={(value) => setFormData({...formData, accountStatus: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Ativo</SelectItem>
-                    <SelectItem value="inactive">Inativo</SelectItem>
-                    <SelectItem value="suspended">Suspenso</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button type="submit" className="w-full">
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={!formData.fullName || !formData.email || !formData.password || !formData.confirmPassword}
+              >
                 {editingClient ? 'Atualizar Cliente' : 'Cadastrar Cliente'}
               </Button>
             </form>

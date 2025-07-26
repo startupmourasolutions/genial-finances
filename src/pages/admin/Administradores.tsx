@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus, Search, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, EyeOff, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -40,8 +40,9 @@ export default function Administradores() {
     confirmPassword: "",
     role: "guest",
     status: true,
-    profileImage: ""
+    profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
   });
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -130,7 +131,7 @@ export default function Administradores() {
           confirmPassword: "",
           role: "guest",
           status: true,
-          profileImage: ""
+          profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
         });
         fetchAdministrators();
       } catch (error) {
@@ -201,11 +202,14 @@ export default function Administradores() {
                 <div className="flex flex-col items-center space-y-2">
                   <Label>Foto de Perfil</Label>
                   <div className="relative">
-                    <Avatar className="w-24 h-24 cursor-pointer" onClick={() => document.getElementById('profileImageInput')?.click()}>
-                      <AvatarImage src={formData.profileImage || undefined} />
-                      <AvatarFallback className="text-2xl">
+                    <Avatar className="w-32 h-32 cursor-pointer group" onClick={() => document.getElementById('profileImageInput')?.click()}>
+                      <AvatarImage src={formData.profileImage} />
+                      <AvatarFallback className="text-3xl">
                         {formData.fullName?.charAt(0) || '+'}
                       </AvatarFallback>
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Camera className="w-8 h-8 text-white" />
+                      </div>
                     </Avatar>
                     <input
                       id="profileImageInput"
@@ -223,15 +227,6 @@ export default function Administradores() {
                         }
                       }}
                     />
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      className="mt-2"
-                      onClick={() => document.getElementById('profileImageInput')?.click()}
-                    >
-                      Alterar Foto
-                    </Button>
                   </div>
                 </div>
 
@@ -266,13 +261,23 @@ export default function Administradores() {
                     <Input
                       id="phone"
                       type="tel"
+                      placeholder="(00) 00000-0000"
                       value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      onChange={(e) => {
+                        let value = e.target.value.replace(/\D/g, '');
+                        if (value.length <= 11) {
+                          value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                          if (value.length <= 14) {
+                            value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                          }
+                        }
+                        setFormData({...formData, phone: value});
+                      }}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="role">Perfil *</Label>
+                    <Label htmlFor="role">Cargo *</Label>
                     <Select value={formData.role} onValueChange={(value) => setFormData({...formData, role: value})}>
                       <SelectTrigger>
                         <SelectValue />
@@ -312,13 +317,24 @@ export default function Administradores() {
 
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">Confirmar Senha *</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      required
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        required
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
@@ -362,7 +378,7 @@ export default function Administradores() {
                   <TableHead>Administrador</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Telefone</TableHead>
-                  <TableHead>Perfil</TableHead>
+                  <TableHead>Cargo</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Ações</TableHead>
                 </TableRow>

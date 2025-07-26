@@ -53,8 +53,7 @@ const superAdminNavItems = [
   { id: "administradores", text: "Administradores", icon: UserCheck, path: "/admin/administradores" },
   { id: "leads", text: "Leads", icon: Users, path: "/admin/leads" },
   { id: "clientes", text: "Clientes", icon: Users, path: "/admin/clientes" },
-  { id: "faturas", text: "Faturas", icon: Receipt, path: "/admin/faturas" },
-  { id: "configuracoes", text: "Configurações", icon: Settings, path: "/admin/configuracoes" }
+  { id: "faturas", text: "Faturas", icon: Receipt, path: "/admin/faturas" }
 ]
 
 const clientAreaItems = [
@@ -71,6 +70,7 @@ const clientAreaItems = [
 
 const footerItems = [
   { id: "perfil", text: "Perfil", icon: UserCircle, path: "/perfil" },
+  { id: "configuracoes", text: "Configurações", icon: Settings, path: "/admin/configuracoes" },
   { id: "sair", text: "Sair", icon: LogOut, path: "/logout" }
 ]
 
