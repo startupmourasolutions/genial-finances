@@ -46,9 +46,6 @@ export default function AdminClientes() {
     confirmPassword: "",
     clientType: "personal",
     companyName: "",
-    subscriptionPlan: "",
-    subscriptionActive: false,
-    monthlyFee: "",
     accountStatus: "active",
     profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
   });
@@ -126,9 +123,6 @@ export default function AdminClientes() {
         confirmPassword: "",
         clientType: "personal",
         companyName: "",
-        subscriptionPlan: "",
-        subscriptionActive: false,
-        monthlyFee: "",
         accountStatus: "active",
         profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
       });
@@ -152,9 +146,6 @@ export default function AdminClientes() {
       confirmPassword: "",
       clientType: client.client_type,
       companyName: client.company_name || "",
-      subscriptionPlan: client.subscription_plan || "",
-      subscriptionActive: client.subscription_active,
-      monthlyFee: client.monthly_fee?.toString() || "",
       accountStatus: client.profile?.account_status || "active",
       profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
     });
@@ -194,9 +185,6 @@ export default function AdminClientes() {
       confirmPassword: "",
       clientType: "personal",
       companyName: "",
-      subscriptionPlan: "",
-      subscriptionActive: false,
-      monthlyFee: "",
       accountStatus: "active",
       profileImage: "https://lmbltwldalrbyzgucfsx.supabase.co/storage/v1/object/public/profiles//profile.png"
     });
@@ -296,6 +284,7 @@ export default function AdminClientes() {
                   <Input
                     id="phone"
                     type="tel"
+                    maxLength={15}
                     placeholder="(00) 00000-0000"
                     value={formData.phone}
                     onChange={(e) => {
@@ -384,54 +373,19 @@ export default function AdminClientes() {
                 </div>
               )}
 
-              {/* Quarta linha - Plano e Valor */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="subscriptionPlan">Plano de Assinatura</Label>
-                  <Input
-                    id="subscriptionPlan"
-                    value={formData.subscriptionPlan}
-                    onChange={(e) => setFormData({...formData, subscriptionPlan: e.target.value})}
-                    placeholder="Ex: Básico, Premium..."
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="monthlyFee">Valor Mensal (R$)</Label>
-                  <Input
-                    id="monthlyFee"
-                    type="number"
-                    step="0.01"
-                    value={formData.monthlyFee}
-                    onChange={(e) => setFormData({...formData, monthlyFee: e.target.value})}
-                  />
-                </div>
-              </div>
-
-              {/* Status da Conta e Assinatura */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="accountStatus">Status da Conta</Label>
-                  <Select value={formData.accountStatus} onValueChange={(value) => setFormData({...formData, accountStatus: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Ativo</SelectItem>
-                      <SelectItem value="inactive">Inativo</SelectItem>
-                      <SelectItem value="suspended">Suspenso</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center space-x-2 mt-6">
-                  <Switch
-                    id="subscriptionActive"
-                    checked={formData.subscriptionActive}
-                    onCheckedChange={(checked) => setFormData({...formData, subscriptionActive: checked})}
-                  />
-                  <Label htmlFor="subscriptionActive">Assinatura Ativa</Label>
-                </div>
+              {/* Status da Conta */}
+              <div className="space-y-2">
+                <Label htmlFor="accountStatus">Status da Conta</Label>
+                <Select value={formData.accountStatus} onValueChange={(value) => setFormData({...formData, accountStatus: value})}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Ativo</SelectItem>
+                    <SelectItem value="inactive">Inativo</SelectItem>
+                    <SelectItem value="suspended">Suspenso</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <Button 

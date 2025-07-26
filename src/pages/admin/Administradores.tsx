@@ -261,6 +261,7 @@ export default function Administradores() {
                     <Input
                       id="phone"
                       type="tel"
+                      maxLength={15}
                       placeholder="(00) 00000-0000"
                       value={formData.phone}
                       onChange={(e) => {
