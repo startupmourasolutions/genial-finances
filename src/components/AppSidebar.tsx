@@ -40,10 +40,10 @@ const clientNavItems = [
   { id: "receitas", text: "Receitas", icon: ArrowUpCircle, path: "/receitas" },
   { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" },
   { id: "transacoes", text: "Transações", icon: Repeat, path: "/transacoes" },
+  { id: "categorias", text: "Categorias", icon: Tag, path: "/categorias" },
   { id: "dividas", text: "Dívidas", icon: FileText, path: "/dividas" },
   { id: "relatorios", text: "Relatórios", icon: PieChart, path: "/relatorios" },
   { id: "metas", text: "Metas", icon: Target, path: "/metas" },
-  { id: "mercado", text: "Mercado", icon: ShoppingCart, path: "/mercado" },
   { id: "veiculos", text: "Veículos", icon: Car, path: "/veiculos" }
 ]
 
@@ -58,9 +58,9 @@ const superAdminNavItems = [
 const clientAreaItems = [
   { id: "dividas", text: "Dívidas", icon: FileText, path: "/dividas" },
   { id: "relatorios", text: "Relatórios", icon: PieChart, path: "/relatorios" },
-  { id: "mercado", text: "Mercado", icon: ShoppingCart, path: "/mercado" },
   { id: "veiculos", text: "Veículos", icon: Car, path: "/veiculos" },
   { id: "transacoes", text: "Transações", icon: Repeat, path: "/transacoes" },
+  { id: "categorias", text: "Categorias", icon: Tag, path: "/categorias" },
   { id: "metas", text: "Metas", icon: Target, path: "/metas" },
   { id: "receitas", text: "Receitas", icon: ArrowUpCircle, path: "/receitas" },
   { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" }

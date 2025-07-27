@@ -104,9 +104,11 @@ export type Database = {
       }
       clients: {
         Row: {
+          can_upgrade: boolean | null
           client_type: Database["public"]["Enums"]["client_type"]
           company_name: string | null
           created_at: string
+          current_plan_id: string | null
           id: string
           monthly_fee: number | null
           profile_id: string
@@ -114,14 +116,17 @@ export type Database = {
           subscription_end_date: string | null
           subscription_plan: string | null
           subscription_start_date: string | null
+          subscription_status: string | null
           trial_end_date: string | null
           trial_start_date: string | null
           updated_at: string
         }
         Insert: {
+          can_upgrade?: boolean | null
           client_type?: Database["public"]["Enums"]["client_type"]
           company_name?: string | null
           created_at?: string
+          current_plan_id?: string | null
           id?: string
           monthly_fee?: number | null
           profile_id: string
@@ -129,14 +134,17 @@ export type Database = {
           subscription_end_date?: string | null
           subscription_plan?: string | null
           subscription_start_date?: string | null
+          subscription_status?: string | null
           trial_end_date?: string | null
           trial_start_date?: string | null
           updated_at?: string
         }
         Update: {
+          can_upgrade?: boolean | null
           client_type?: Database["public"]["Enums"]["client_type"]
           company_name?: string | null
           created_at?: string
+          current_plan_id?: string | null
           id?: string
           monthly_fee?: number | null
           profile_id?: string
@@ -144,6 +152,7 @@ export type Database = {
           subscription_end_date?: string | null
           subscription_plan?: string | null
           subscription_start_date?: string | null
+          subscription_status?: string | null
           trial_end_date?: string | null
           trial_start_date?: string | null
           updated_at?: string
@@ -574,6 +583,45 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          billing_period: string
+          created_at: string
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          max_users: number | null
+          max_vehicles: number | null
+          name: string
+          price: number
+        }
+        Insert: {
+          billing_period?: string
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_users?: number | null
+          max_vehicles?: number | null
+          name: string
+          price: number
+        }
+        Update: {
+          billing_period?: string
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_users?: number | null
+          max_vehicles?: number | null
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
       super_administrators: {
         Row: {
           created_at: string
@@ -736,42 +784,111 @@ export type Database = {
           },
         ]
       }
+      vehicle_maintenance: {
+        Row: {
+          client_id: string | null
+          completed_date: string | null
+          cost: number | null
+          created_at: string
+          current_km: number | null
+          description: string | null
+          due_date: string | null
+          due_km: number | null
+          id: string
+          notes: string | null
+          status: string
+          system_category: string | null
+          type: string
+          updated_at: string
+          user_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          completed_date?: string | null
+          cost?: number | null
+          created_at?: string
+          current_km?: number | null
+          description?: string | null
+          due_date?: string | null
+          due_km?: number | null
+          id?: string
+          notes?: string | null
+          status?: string
+          system_category?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+          vehicle_id: string
+        }
+        Update: {
+          client_id?: string | null
+          completed_date?: string | null
+          cost?: number | null
+          created_at?: string
+          current_km?: number | null
+          description?: string | null
+          due_date?: string | null
+          due_km?: number | null
+          id?: string
+          notes?: string | null
+          status?: string
+          system_category?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+          vehicle_id?: string
+        }
+        Relationships: []
+      }
       vehicles: {
         Row: {
+          acquisition_date: string | null
           brand: string | null
           client_id: string | null
+          color: string | null
           created_at: string
+          current_km: number | null
           fuel_type: string | null
           id: string
           model: string | null
           name: string
           plate: string | null
+          status: string | null
           updated_at: string
           user_id: string
           year: number | null
         }
         Insert: {
+          acquisition_date?: string | null
           brand?: string | null
           client_id?: string | null
+          color?: string | null
           created_at?: string
+          current_km?: number | null
           fuel_type?: string | null
           id?: string
           model?: string | null
           name: string
           plate?: string | null
+          status?: string | null
           updated_at?: string
           user_id: string
           year?: number | null
         }
         Update: {
+          acquisition_date?: string | null
           brand?: string | null
           client_id?: string | null
+          color?: string | null
           created_at?: string
+          current_km?: number | null
           fuel_type?: string | null
           id?: string
           model?: string | null
           name?: string
           plate?: string | null
+          status?: string | null
           updated_at?: string
           user_id?: string
           year?: number | null
