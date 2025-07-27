@@ -47,9 +47,14 @@ export function useExpenses() {
 
     try {
       setLoading(true)
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
+      if (clientError || !clientData) {
         setExpenses([])
         return
       }
@@ -64,7 +69,7 @@ export function useExpenses() {
             icon
           )
         `)
-        .eq('client_id', clientId)
+        .eq('client_id', clientData.id)
         .order('date', { ascending: false })
 
       if (error) throw error
@@ -81,9 +86,14 @@ export function useExpenses() {
     if (!user || !profile) return
 
     try {
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
+      if (clientError || !clientData) {
         setCategories([])
         return
       }
@@ -91,7 +101,7 @@ export function useExpenses() {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .eq('client_id', clientId)
+        .eq('client_id', clientData.id)
         .order('name', { ascending: true })
 
       if (error) throw error
@@ -109,9 +119,14 @@ export function useExpenses() {
     }
 
     try {
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
+      if (clientError || !clientData) {
         toast.error('Cliente não encontrado')
         return { error: 'Client not found' }
       }
@@ -121,7 +136,7 @@ export function useExpenses() {
         .insert([{
           ...expenseData,
           user_id: user.id,
-          client_id: clientId
+          client_id: clientData.id
         }])
         .select()
 

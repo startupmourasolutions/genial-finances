@@ -48,10 +48,15 @@ export function useTransactions() {
     if (!user || !profile) return
 
     try {
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
-        console.log('No client found for user')
+      if (clientError || !clientData) {
+        console.log('No client found for profile:', profile.id)
         setTransactions([])
         return
       }
@@ -66,7 +71,7 @@ export function useTransactions() {
             icon
           )
         `)
-        .eq('client_id', clientId)
+        .eq('client_id', clientData.id)
         .order('date', { ascending: false })
 
       if (error) throw error
@@ -86,10 +91,15 @@ export function useTransactions() {
     if (!user || !profile) return
 
     try {
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
-        console.log('No client found for user')
+      if (clientError || !clientData) {
+        console.log('No client found for profile:', profile.id)
         setCategories([])
         return
       }
@@ -97,7 +107,7 @@ export function useTransactions() {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .eq('client_id', clientId)
+        .eq('client_id', clientData.id)
         .order('name', { ascending: true })
 
       if (error) throw error
@@ -118,9 +128,14 @@ export function useTransactions() {
     }
 
     try {
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
+      if (clientError || !clientData) {
         toast({
           title: "Erro ao criar transação",
           description: "Cliente não encontrado",
@@ -134,7 +149,7 @@ export function useTransactions() {
         .insert([{
           ...transactionData,
           user_id: user.id,
-          client_id: clientId
+          client_id: clientData.id
         }])
         .select()
 

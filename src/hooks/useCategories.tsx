@@ -38,10 +38,15 @@ export function useCategories() {
     try {
       setLoading(true)
       
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
-        console.log('No client found for user')
+      if (clientError || !clientData) {
+        console.log('No client found for profile:', profile.id)
         setCategories([])
         return
       }
@@ -49,7 +54,7 @@ export function useCategories() {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .eq('client_id', clientId)
+        .eq('client_id', clientData.id)
         .order('name', { ascending: true })
 
       if (error) throw error
@@ -69,9 +74,14 @@ export function useCategories() {
     }
 
     try {
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
+      if (clientError || !clientData) {
         toast.error('Cliente não encontrado')
         return { error: 'Client not found' }
       }
@@ -82,7 +92,7 @@ export function useCategories() {
           ...categoryData,
           type: 'expense', // tipo padrão para compatibilidade - categorias são unificadas
           user_id: user.id,
-          client_id: clientId
+          client_id: clientData.id
         }])
         .select()
 

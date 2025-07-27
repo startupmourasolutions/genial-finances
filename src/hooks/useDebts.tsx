@@ -53,9 +53,14 @@ export function useDebts() {
 
     try {
       setLoading(true)
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
+      if (clientError || !clientData) {
         setDebts([])
         return
       }
@@ -63,7 +68,7 @@ export function useDebts() {
       const { data, error } = await supabase
         .from('debts')
         .select('*')
-        .eq('client_id', clientId)
+        .eq('client_id', clientData.id)
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -83,9 +88,14 @@ export function useDebts() {
     }
 
     try {
-      const clientId = profile?.clients?.[0]?.id
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
 
-      if (!clientId) {
+      if (clientError || !clientData) {
         toast.error('Cliente não encontrado')
         return { error: 'Client not found' }
       }
@@ -95,7 +105,7 @@ export function useDebts() {
         .insert([{
           ...debtData,
           user_id: user.id,
-          client_id: clientId,
+          client_id: clientData.id,
           remaining_amount: debtData.remaining_amount || debtData.total_amount,
           status: 'active',
           debt_type: debtData.debt_type || 'loan',
