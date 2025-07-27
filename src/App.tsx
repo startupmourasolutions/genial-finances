@@ -16,6 +16,7 @@ import Dividas from "./pages/Dividas";
 import Relatorios from "./pages/Relatorios";
 import Mercado from "./pages/Mercado";
 import Veiculos from "./pages/Veiculos";
+import Perfil from "./pages/Perfil";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -120,6 +121,13 @@ function App() {
                   <ProtectedRoute>
                     <DashboardLayout>
                       <Veiculos />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/perfil" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Perfil />
                     </DashboardLayout>
                   </ProtectedRoute>
                 } />
