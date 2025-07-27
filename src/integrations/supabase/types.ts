@@ -14,8 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      automation_events: {
+        Row: {
+          client_id: string
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          processed: boolean | null
+          processed_at: string | null
+          processing_result: Json | null
+          source_platform: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          processed?: boolean | null
+          processed_at?: string | null
+          processing_result?: Json | null
+          source_platform?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          processed?: boolean | null
+          processed_at?: string | null
+          processing_result?: Json | null
+          source_platform?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_events_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
+          client_id: string | null
           color: string | null
           created_at: string
           icon: string | null
@@ -26,6 +71,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          client_id?: string | null
           color?: string | null
           created_at?: string
           icon?: string | null
@@ -36,6 +82,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          client_id?: string | null
           color?: string | null
           created_at?: string
           icon?: string | null
@@ -45,7 +92,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       clients: {
         Row: {
@@ -105,6 +160,7 @@ export type Database = {
       }
       debts: {
         Row: {
+          client_id: string | null
           created_at: string
           description: string | null
           due_date: string | null
@@ -119,6 +175,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           description?: string | null
           due_date?: string | null
@@ -133,6 +190,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           description?: string | null
           due_date?: string | null
@@ -146,7 +204,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "debts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       documents: {
         Row: {
@@ -173,6 +239,7 @@ export type Database = {
         Row: {
           amount: number
           category_id: string | null
+          client_id: string | null
           created_at: string
           date: string
           description: string | null
@@ -184,6 +251,7 @@ export type Database = {
         Insert: {
           amount: number
           category_id?: string | null
+          client_id?: string | null
           created_at?: string
           date?: string
           description?: string | null
@@ -195,6 +263,7 @@ export type Database = {
         Update: {
           amount?: number
           category_id?: string | null
+          client_id?: string | null
           created_at?: string
           date?: string
           description?: string | null
@@ -211,10 +280,18 @@ export type Database = {
             referencedRelation: "categories"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "expenses_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
         ]
       }
       financial_goals: {
         Row: {
+          client_id: string | null
           created_at: string
           current_amount: number | null
           description: string | null
@@ -227,6 +304,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           current_amount?: number | null
           description?: string | null
@@ -239,6 +317,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           current_amount?: number | null
           description?: string | null
@@ -250,12 +329,21 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "financial_goals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       incomes: {
         Row: {
           amount: number
           category_id: string | null
+          client_id: string | null
           created_at: string
           date: string
           description: string | null
@@ -267,6 +355,7 @@ export type Database = {
         Insert: {
           amount: number
           category_id?: string | null
+          client_id?: string | null
           created_at?: string
           date?: string
           description?: string | null
@@ -278,6 +367,7 @@ export type Database = {
         Update: {
           amount?: number
           category_id?: string | null
+          client_id?: string | null
           created_at?: string
           date?: string
           description?: string | null
@@ -292,6 +382,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incomes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]
@@ -399,6 +496,7 @@ export type Database = {
       }
       notifications: {
         Row: {
+          client_id: string | null
           created_at: string
           id: string
           message: string
@@ -408,6 +506,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           id?: string
           message: string
@@ -417,6 +516,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           id?: string
           message?: string
@@ -425,7 +525,15 @@ export type Database = {
           type?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -515,6 +623,7 @@ export type Database = {
         Row: {
           amount: number
           category_id: string | null
+          client_id: string | null
           created_at: string
           date: string
           description: string | null
@@ -527,6 +636,7 @@ export type Database = {
         Insert: {
           amount: number
           category_id?: string | null
+          client_id?: string | null
           created_at?: string
           date?: string
           description?: string | null
@@ -539,6 +649,7 @@ export type Database = {
         Update: {
           amount?: number
           category_id?: string | null
+          client_id?: string | null
           created_at?: string
           date?: string
           description?: string | null
@@ -556,11 +667,19 @@ export type Database = {
             referencedRelation: "categories"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "transactions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
         ]
       }
       vehicle_expenses: {
         Row: {
           amount: number
+          client_id: string | null
           created_at: string
           date: string
           description: string | null
@@ -574,6 +693,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          client_id?: string | null
           created_at?: string
           date?: string
           description?: string | null
@@ -587,6 +707,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          client_id?: string | null
           created_at?: string
           date?: string
           description?: string | null
@@ -600,6 +721,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "vehicle_expenses_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "vehicle_expenses_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
@@ -611,6 +739,7 @@ export type Database = {
       vehicles: {
         Row: {
           brand: string | null
+          client_id: string | null
           created_at: string
           fuel_type: string | null
           id: string
@@ -623,6 +752,7 @@ export type Database = {
         }
         Insert: {
           brand?: string | null
+          client_id?: string | null
           created_at?: string
           fuel_type?: string | null
           id?: string
@@ -635,6 +765,7 @@ export type Database = {
         }
         Update: {
           brand?: string | null
+          client_id?: string | null
           created_at?: string
           fuel_type?: string | null
           id?: string
@@ -645,7 +776,59 @@ export type Database = {
           user_id?: string
           year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_integrations: {
+        Row: {
+          api_token: string | null
+          client_id: string
+          configuration: Json | null
+          created_at: string
+          id: string
+          integration_status: string | null
+          updated_at: string
+          webhook_url: string | null
+          whatsapp_number: string
+        }
+        Insert: {
+          api_token?: string | null
+          client_id: string
+          configuration?: Json | null
+          created_at?: string
+          id?: string
+          integration_status?: string | null
+          updated_at?: string
+          webhook_url?: string | null
+          whatsapp_number: string
+        }
+        Update: {
+          api_token?: string | null
+          client_id?: string
+          configuration?: Json | null
+          created_at?: string
+          id?: string
+          integration_status?: string | null
+          updated_at?: string
+          webhook_url?: string | null
+          whatsapp_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_integrations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -655,6 +838,10 @@ export type Database = {
       binary_quantize: {
         Args: { "": string } | { "": unknown }
         Returns: unknown
+      }
+      get_user_client_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       halfvec_avg: {
         Args: { "": number[] }
@@ -720,6 +907,15 @@ export type Database = {
           metadata: Json
           similarity: number
         }[]
+      }
+      process_automation_event: {
+        Args: {
+          p_client_id: string
+          p_event_type: string
+          p_event_data?: Json
+          p_source_platform?: string
+        }
+        Returns: string
       }
       sparsevec_out: {
         Args: { "": unknown }
