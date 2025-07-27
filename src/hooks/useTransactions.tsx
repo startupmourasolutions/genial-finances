@@ -34,18 +34,28 @@ export function useTransactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<any[]>([])
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { toast } = useToast()
 
   useEffect(() => {
-    if (user) {
+    if (user && profile) {
       fetchTransactions()
       fetchCategories()
     }
-  }, [user])
+  }, [user, profile])
 
   const fetchTransactions = async () => {
+    if (!user || !profile) return
+
     try {
+      const clientId = profile?.clients?.[0]?.id
+
+      if (!clientId) {
+        console.log('No client found for user')
+        setTransactions([])
+        return
+      }
+
       const { data, error } = await supabase
         .from('transactions')
         .select(`
@@ -56,7 +66,7 @@ export function useTransactions() {
             icon
           )
         `)
-        .eq('user_id', user?.id)
+        .eq('client_id', clientId)
         .order('date', { ascending: false })
 
       if (error) throw error
@@ -73,11 +83,22 @@ export function useTransactions() {
   }
 
   const fetchCategories = async () => {
+    if (!user || !profile) return
+
     try {
+      const clientId = profile?.clients?.[0]?.id
+
+      if (!clientId) {
+        console.log('No client found for user')
+        setCategories([])
+        return
+      }
+
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('client_id', clientId)
+        .order('name', { ascending: true })
 
       if (error) throw error
       setCategories(data || [])
@@ -87,12 +108,33 @@ export function useTransactions() {
   }
 
   const createTransaction = async (transactionData: CreateTransactionData) => {
+    if (!user || !profile) {
+      toast({
+        title: "Erro ao criar transação",
+        description: "Usuário não autenticado",
+        variant: "destructive"
+      })
+      return { success: false, error: 'User not authenticated' }
+    }
+
     try {
+      const clientId = profile?.clients?.[0]?.id
+
+      if (!clientId) {
+        toast({
+          title: "Erro ao criar transação",
+          description: "Cliente não encontrado",
+          variant: "destructive"
+        })
+        return { success: false, error: 'Client not found' }
+      }
+
       const { data, error } = await supabase
         .from('transactions')
         .insert([{
           ...transactionData,
-          user_id: user?.id
+          user_id: user.id,
+          client_id: clientId
         }])
         .select()
 
