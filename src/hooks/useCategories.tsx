@@ -16,7 +16,6 @@ interface Category {
 
 interface CreateCategoryData {
   name: string
-  type: 'income' | 'expense'
   color?: string
   icon?: string
 }
@@ -39,7 +38,6 @@ export function useCategories() {
         .from('categories')
         .select('*')
         .eq('user_id', user?.id)
-        .order('type', { ascending: true })
         .order('name', { ascending: true })
 
       if (error) throw error
@@ -61,6 +59,7 @@ export function useCategories() {
         .from('categories')
         .insert([{
           ...categoryData,
+          type: 'expense', // tipo padrão para compatibilidade
           user_id: user?.id
         }])
         .select()
