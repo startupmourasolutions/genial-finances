@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 interface Category {
   id: string
   user_id: string
+  client_id?: string
   name: string
   type: 'income' | 'expense'
   color?: string
@@ -23,63 +24,77 @@ interface CreateCategoryData {
 export function useCategories() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
-  const { user } = useAuth()
-  const { toast } = useToast()
+  const { user, profile } = useAuth()
 
   useEffect(() => {
-    if (user) {
+    if (user && profile) {
       fetchCategories()
     }
-  }, [user])
+  }, [user, profile])
 
   const fetchCategories = async () => {
+    if (!user || !profile) return
+
     try {
+      setLoading(true)
+      
+      const clientId = profile?.clients?.[0]?.id
+
+      if (!clientId) {
+        console.log('No client found for user')
+        setCategories([])
+        return
+      }
+
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('client_id', clientId)
         .order('name', { ascending: true })
 
       if (error) throw error
       setCategories((data as Category[]) || [])
     } catch (error: any) {
-      toast({
-        title: "Erro ao carregar categorias",
-        description: error.message,
-        variant: "destructive"
-      })
+      console.error('Error fetching categories:', error)
+      toast.error('Erro ao carregar categorias')
     } finally {
       setLoading(false)
     }
   }
 
   const createCategory = async (categoryData: CreateCategoryData) => {
+    if (!user || !profile) {
+      toast.error('Usuário não autenticado')
+      return { error: 'User not authenticated' }
+    }
+
     try {
+      const clientId = profile?.clients?.[0]?.id
+
+      if (!clientId) {
+        toast.error('Cliente não encontrado')
+        return { error: 'Client not found' }
+      }
+
       const { data, error } = await supabase
         .from('categories')
         .insert([{
           ...categoryData,
-          type: 'expense', // tipo padrão para compatibilidade
-          user_id: user?.id
+          type: 'expense', // tipo padrão para compatibilidade - categorias são unificadas
+          user_id: user.id,
+          client_id: clientId
         }])
         .select()
 
       if (error) throw error
 
-      toast({
-        title: "Categoria criada com sucesso!",
-        description: `${categoryData.name} foi adicionada.`
-      })
-
-      fetchCategories()
-      return { success: true, data }
+      toast.success('Categoria criada com sucesso!')
+      await fetchCategories()
+      return { data: data[0], error: null }
     } catch (error: any) {
-      toast({
-        title: "Erro ao criar categoria",
-        description: error.message,
-        variant: "destructive"
-      })
-      return { success: false, error }
+      console.error('Error creating category:', error)
+      toast.error('Erro ao criar categoria')
+      return { error: error.message }
     }
   }
 
@@ -94,20 +109,13 @@ export function useCategories() {
 
       if (error) throw error
 
-      toast({
-        title: "Categoria atualizada com sucesso!",
-        description: `${categoryData.name || 'Categoria'} foi atualizada.`
-      })
-
-      fetchCategories()
-      return { success: true, data }
+      toast.success('Categoria atualizada com sucesso!')
+      await fetchCategories()
+      return { data: data[0], error: null }
     } catch (error: any) {
-      toast({
-        title: "Erro ao atualizar categoria",
-        description: error.message,
-        variant: "destructive"
-      })
-      return { success: false, error }
+      console.error('Error updating category:', error)
+      toast.error('Erro ao atualizar categoria')
+      return { error: error.message }
     }
   }
 
@@ -121,20 +129,13 @@ export function useCategories() {
 
       if (error) throw error
 
-      toast({
-        title: "Categoria excluída com sucesso!",
-        description: "A categoria foi removida permanentemente."
-      })
-
-      fetchCategories()
-      return { success: true }
+      toast.success('Categoria excluída com sucesso!')
+      await fetchCategories()
+      return { error: null }
     } catch (error: any) {
-      toast({
-        title: "Erro ao excluir categoria",
-        description: error.message,
-        variant: "destructive"
-      })
-      return { success: false, error }
+      console.error('Error deleting category:', error)
+      toast.error('Erro ao excluir categoria')
+      return { error: error.message }
     }
   }
 

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 interface Income {
   id: string
   user_id: string
+  client_id?: string
   category_id?: string
   title: string
   amount: number
@@ -32,18 +33,27 @@ export function useIncomes() {
   const [incomes, setIncomes] = useState<Income[]>([])
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<any[]>([])
-  const { user } = useAuth()
-  const { toast } = useToast()
+  const { user, profile } = useAuth()
 
   useEffect(() => {
-    if (user) {
+    if (user && profile) {
       fetchIncomes()
       fetchCategories()
     }
-  }, [user])
+  }, [user, profile])
 
   const fetchIncomes = async () => {
+    if (!user || !profile) return
+
     try {
+      setLoading(true)
+      const clientId = profile?.clients?.[0]?.id
+
+      if (!clientId) {
+        setIncomes([])
+        return
+      }
+
       const { data, error } = await supabase
         .from('incomes')
         .select(`
@@ -54,63 +64,76 @@ export function useIncomes() {
             icon
           )
         `)
-        .eq('user_id', user?.id)
+        .eq('client_id', clientId)
         .order('date', { ascending: false })
 
       if (error) throw error
       setIncomes(data || [])
     } catch (error: any) {
-      toast({
-        title: "Erro ao carregar receitas",
-        description: error.message,
-        variant: "destructive"
-      })
+      console.error('Error fetching incomes:', error)
+      toast.error('Erro ao carregar receitas')
     } finally {
       setLoading(false)
     }
   }
 
   const fetchCategories = async () => {
+    if (!user || !profile) return
+
     try {
+      const clientId = profile?.clients?.[0]?.id
+
+      if (!clientId) {
+        setCategories([])
+        return
+      }
+
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .eq('user_id', user?.id)
-        .eq('type', 'income')
+        .eq('client_id', clientId)
+        .order('name', { ascending: true })
 
       if (error) throw error
       setCategories(data || [])
     } catch (error: any) {
       console.error('Error fetching categories:', error)
+      toast.error('Erro ao carregar categorias')
     }
   }
 
   const createIncome = async (incomeData: CreateIncomeData) => {
+    if (!user || !profile) {
+      toast.error('Usuário não autenticado')
+      return { error: 'User not authenticated' }
+    }
+
     try {
+      const clientId = profile?.clients?.[0]?.id
+
+      if (!clientId) {
+        toast.error('Cliente não encontrado')
+        return { error: 'Client not found' }
+      }
+
       const { data, error } = await supabase
         .from('incomes')
         .insert([{
           ...incomeData,
-          user_id: user?.id
+          user_id: user.id,
+          client_id: clientId
         }])
         .select()
 
       if (error) throw error
 
-      toast({
-        title: "Receita criada com sucesso!",
-        description: `${incomeData.title} foi adicionada.`
-      })
-
-      fetchIncomes()
-      return { success: true, data }
+      toast.success('Receita criada com sucesso!')
+      await fetchIncomes()
+      return { data: data[0], error: null }
     } catch (error: any) {
-      toast({
-        title: "Erro ao criar receita",
-        description: error.message,
-        variant: "destructive"
-      })
-      return { success: false, error }
+      console.error('Error creating income:', error)
+      toast.error('Erro ao criar receita')
+      return { error: error.message }
     }
   }
 
@@ -118,27 +141,23 @@ export function useIncomes() {
     try {
       const { data, error } = await supabase
         .from('incomes')
-        .update(incomeData)
+        .update({
+          ...incomeData,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', id)
         .eq('user_id', user?.id)
         .select()
 
       if (error) throw error
 
-      toast({
-        title: "Receita atualizada com sucesso!",
-        description: `${incomeData.title || 'Receita'} foi atualizada.`
-      })
-
-      fetchIncomes()
-      return { success: true, data }
+      toast.success('Receita atualizada com sucesso!')
+      await fetchIncomes()
+      return { data: data[0], error: null }
     } catch (error: any) {
-      toast({
-        title: "Erro ao atualizar receita",
-        description: error.message,
-        variant: "destructive"
-      })
-      return { success: false, error }
+      console.error('Error updating income:', error)
+      toast.error('Erro ao atualizar receita')
+      return { error: error.message }
     }
   }
 
@@ -152,20 +171,13 @@ export function useIncomes() {
 
       if (error) throw error
 
-      toast({
-        title: "Receita excluída com sucesso!",
-        description: "A receita foi removida permanentemente."
-      })
-
-      fetchIncomes()
-      return { success: true }
+      toast.success('Receita excluída com sucesso!')
+      await fetchIncomes()
+      return { error: null }
     } catch (error: any) {
-      toast({
-        title: "Erro ao excluir receita",
-        description: error.message,
-        variant: "destructive"
-      })
-      return { success: false, error }
+      console.error('Error deleting income:', error)
+      toast.error('Erro ao excluir receita')
+      return { error: error.message }
     }
   }
 
@@ -176,6 +188,7 @@ export function useIncomes() {
     createIncome,
     updateIncome,
     deleteIncome,
-    refreshIncomes: fetchIncomes
+    refreshIncomes: fetchIncomes,
+    refreshCategories: fetchCategories
   }
 }

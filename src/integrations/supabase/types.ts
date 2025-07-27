@@ -167,15 +167,61 @@ export type Database = {
           },
         ]
       }
+      custom_reports: {
+        Row: {
+          client_id: string | null
+          configuration: Json | null
+          created_at: string
+          date_range: Json | null
+          filters: Json | null
+          id: string
+          is_favorite: boolean | null
+          name: string
+          report_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          configuration?: Json | null
+          created_at?: string
+          date_range?: Json | null
+          filters?: Json | null
+          id?: string
+          is_favorite?: boolean | null
+          name: string
+          report_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string | null
+          configuration?: Json | null
+          created_at?: string
+          date_range?: Json | null
+          filters?: Json | null
+          id?: string
+          is_favorite?: boolean | null
+          name?: string
+          report_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       debts: {
         Row: {
           client_id: string | null
           created_at: string
+          creditor_name: string | null
+          debt_type: string | null
           description: string | null
           due_date: string | null
           id: string
           interest_rate: number | null
           monthly_payment: number | null
+          original_amount: number | null
+          payment_frequency: string | null
           remaining_amount: number
           status: string | null
           title: string
@@ -186,11 +232,15 @@ export type Database = {
         Insert: {
           client_id?: string | null
           created_at?: string
+          creditor_name?: string | null
+          debt_type?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
           interest_rate?: number | null
           monthly_payment?: number | null
+          original_amount?: number | null
+          payment_frequency?: string | null
           remaining_amount: number
           status?: string | null
           title: string
@@ -201,11 +251,15 @@ export type Database = {
         Update: {
           client_id?: string | null
           created_at?: string
+          creditor_name?: string | null
+          debt_type?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
           interest_rate?: number | null
           monthly_payment?: number | null
+          original_amount?: number | null
+          payment_frequency?: string | null
           remaining_amount?: number
           status?: string | null
           title?: string
@@ -300,7 +354,11 @@ export type Database = {
       }
       financial_goals: {
         Row: {
+          auto_contribution: boolean | null
+          category_id: string | null
           client_id: string | null
+          contribution_amount: number | null
+          contribution_frequency: string | null
           created_at: string
           current_amount: number | null
           description: string | null
@@ -313,7 +371,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          auto_contribution?: boolean | null
+          category_id?: string | null
           client_id?: string | null
+          contribution_amount?: number | null
+          contribution_frequency?: string | null
           created_at?: string
           current_amount?: number | null
           description?: string | null
@@ -326,7 +388,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          auto_contribution?: boolean | null
+          category_id?: string | null
           client_id?: string | null
+          contribution_amount?: number | null
+          contribution_frequency?: string | null
           created_at?: string
           current_amount?: number | null
           description?: string | null
@@ -723,6 +789,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_settings: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          currency: string | null
+          dashboard_layout: Json | null
+          date_format: string | null
+          id: string
+          language: string | null
+          notifications: Json | null
+          timezone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          currency?: string | null
+          dashboard_layout?: Json | null
+          date_format?: string | null
+          id?: string
+          language?: string | null
+          notifications?: Json | null
+          timezone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          currency?: string | null
+          dashboard_layout?: Json | null
+          date_format?: string | null
+          id?: string
+          language?: string | null
+          notifications?: Json | null
+          timezone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       vehicle_expenses: {
         Row: {
