@@ -61,29 +61,29 @@ const Categorias = () => {
             </p>
           ) : (
             categories.map((category) => (
-              <div key={category.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
-                <div className="flex items-center gap-3">
+              <div key={category.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div 
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg flex-shrink-0"
                     style={{ backgroundColor: `${category.color}20` }}
                   >
                     {category.icon}
                   </div>
-                  <div>
-                    <h4 className="font-medium text-foreground">{category.name}</h4>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-medium text-foreground truncate">{category.name}</h4>
+                    <p className="text-sm text-muted-foreground truncate">
                       Categoria de {type === 'RECEITA' ? 'receita' : 'despesa'}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                   <Badge 
                     variant="outline"
-                    className={`${type === 'RECEITA' ? 'border-success text-success' : 'border-destructive text-destructive'}`}
+                    className={`whitespace-nowrap ${type === 'RECEITA' ? 'border-success text-success' : 'border-destructive text-destructive'}`}
                   >
                     {type === 'RECEITA' ? 'Receita' : 'Despesa'}
                   </Badge>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 flex-shrink-0">
                     <Button 
                       size="sm" 
                       variant="outline" 

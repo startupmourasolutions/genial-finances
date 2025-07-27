@@ -168,11 +168,11 @@ const Despesas = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="alimentacao">Alimentação</SelectItem>
-                <SelectItem value="transporte">Transporte</SelectItem>
-                <SelectItem value="contas">Contas</SelectItem>
-                <SelectItem value="saude">Saúde</SelectItem>
-                <SelectItem value="lazer">Lazer</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Select>
@@ -213,52 +213,55 @@ const Despesas = () => {
               </div>
             ) : (
               expenses.map((expense) => (
-                <div key={expense.id} className="flex items-center justify-between p-4 bg-destructive/5 rounded-lg border border-destructive/20 hover:bg-destructive/10 transition-smooth">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full bg-destructive" />
-                      <div>
-                        <h4 className="font-medium text-foreground">{expense.title}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <p className="text-sm text-muted-foreground">
-                            {expense.categories?.name || 'Sem categoria'}
-                          </p>
-                          {expense.description && (
-                            <Badge variant="outline" className="text-xs">
-                              {expense.description}
-                            </Badge>
-                          )}
-                        </div>
+                <div key={expense.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-4 bg-destructive/5 rounded-lg border border-destructive/20 hover:bg-destructive/10 transition-smooth">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-3 h-3 rounded-full bg-destructive flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-medium text-foreground truncate">{expense.title}</h4>
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <p className="text-sm text-muted-foreground truncate">
+                          {expense.categories?.name || 'Sem categoria'}
+                        </p>
+                        {expense.description && (
+                          <Badge variant="outline" className="text-xs whitespace-nowrap">
+                            {expense.description.length > 20 
+                              ? `${expense.description.substring(0, 20)}...` 
+                              : expense.description
+                            }
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(expense.date).toLocaleDateString('pt-BR')}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-lg font-semibold text-destructive">
-                      - R$ {expense.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  <div className="flex gap-2 ml-4">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="hover-scale"
-                      onClick={() => handleEdit(expense)}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="destructive" 
-                      className="hover-scale"
-                      onClick={() => setDeleteId(expense.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                    <div className="text-left sm:text-center flex-shrink-0">
+                      <p className="text-sm text-muted-foreground whitespace-nowrap">
+                        {new Date(expense.date).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                    <div className="text-left sm:text-right flex-shrink-0">
+                      <span className="text-lg font-semibold text-destructive whitespace-nowrap">
+                        - R$ {expense.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="hover-scale h-8 w-8 p-0"
+                        onClick={() => handleEdit(expense)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        className="hover-scale h-8 w-8 p-0"
+                        onClick={() => setDeleteId(expense.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))

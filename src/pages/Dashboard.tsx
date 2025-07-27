@@ -19,10 +19,9 @@ export default function Dashboard() {
             <ArrowUpCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">R$ 5.234,50</div>
-            <p className="text-xs text-success flex items-center gap-1 mt-1">
-              <TrendingUp className="h-3 w-3" />
-              +12% vs mês anterior
+            <div className="text-2xl font-bold text-foreground">R$ 0,00</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Nenhuma receita cadastrada
             </p>
           </CardContent>
         </Card>
@@ -35,10 +34,9 @@ export default function Dashboard() {
             <ArrowDownCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">R$ 3.456,20</div>
-            <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-              <TrendingUp className="h-3 w-3 rotate-180" />
-              +8% vs mês anterior
+            <div className="text-2xl font-bold text-foreground">R$ 0,00</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Nenhuma despesa cadastrada
             </p>
           </CardContent>
         </Card>
@@ -51,10 +49,9 @@ export default function Dashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">R$ 1.778,30</div>
-            <p className="text-xs text-success flex items-center gap-1 mt-1">
-              <TrendingUp className="h-3 w-3" />
-              +4% vs mês anterior
+            <div className="text-2xl font-bold text-foreground">R$ 0,00</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Saldo atual
             </p>
           </CardContent>
         </Card>
@@ -67,9 +64,9 @@ export default function Dashboard() {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">3 de 5</div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              60% concluído
+            <div className="text-2xl font-bold text-foreground">0 de 0</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Nenhuma meta cadastrada
             </p>
           </CardContent>
         </Card>
