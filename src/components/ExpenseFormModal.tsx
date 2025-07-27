@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +32,20 @@ export function ExpenseFormModal({
     category_id: initialData?.category_id || ''
   })
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (open && !initialData) {
+      setFormData({
+        title: '',
+        amount: '',
+        description: '',
+        date: new Date().toISOString().split('T')[0],
+        category_id: ''
+      })
+    }
+  }, [open, initialData])
+
+  const isFormValid = formData.title.trim() && formData.amount && formData.date && formData.category_id
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -83,6 +97,9 @@ export function ExpenseFormModal({
               decimalsLimit={2}
               decimalSeparator=","
               groupSeparator="."
+              prefix="R$ "
+              allowDecimals={true}
+              allowNegativeValue={false}
               onValueChange={(value) => setFormData({ ...formData, amount: value || '' })}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               required
@@ -129,7 +146,7 @@ export function ExpenseFormModal({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading || !isFormValid}>
               {loading ? 'Salvando...' : mode === 'create' ? 'Criar' : 'Salvar'}
             </Button>
           </div>
