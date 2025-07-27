@@ -5,8 +5,6 @@ import { useCategories } from "@/hooks/useCategories"
 
 const Categorias = () => {
   const { categories, loading } = useCategories()
-  
-  console.log('Categorias component loaded successfully', { categories, loading })
 
   if (loading) {
     return <div className="p-8">Carregando categorias...</div>
