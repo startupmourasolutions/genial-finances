@@ -43,7 +43,7 @@ export function useCategories() {
         .order('name', { ascending: true })
 
       if (error) throw error
-      setCategories(data || [])
+      setCategories((data as Category[]) || [])
     } catch (error: any) {
       toast({
         title: "Erro ao carregar categorias",
