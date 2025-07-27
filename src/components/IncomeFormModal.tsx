@@ -122,15 +122,25 @@ export function IncomeFormModal({
           <div>
             <Label htmlFor="category">Categoria</Label>
             <Select value={formData.category_id} onValueChange={(value) => setFormData({ ...formData, category_id: value })}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
-              <SelectContent className="bg-background border-border z-50">
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
+              <SelectContent className="bg-background border z-[100] max-h-[200px] overflow-y-auto">
+                <div className="p-1">
+                  {categories.length === 0 ? (
+                    <div className="px-2 py-1 text-sm text-muted-foreground">Nenhuma categoria disponível</div>
+                  ) : (
+                    categories.map((category) => (
+                      <SelectItem 
+                        key={category.id} 
+                        value={category.id}
+                        className="cursor-pointer hover:bg-accent focus:bg-accent"
+                      >
+                        {category.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </div>
               </SelectContent>
             </Select>
           </div>
