@@ -41,7 +41,6 @@ const clientNavItems = [
   { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" },
   { id: "transacoes", text: "Transações", icon: Repeat, path: "/transacoes" },
   { id: "dividas", text: "Dívidas", icon: FileText, path: "/dividas" },
-  { id: "categorias", text: "Categorias", icon: Tag, path: "/categorias" },
   { id: "relatorios", text: "Relatórios", icon: PieChart, path: "/relatorios" },
   { id: "metas", text: "Metas", icon: Target, path: "/metas" },
   { id: "mercado", text: "Mercado", icon: ShoppingCart, path: "/mercado" },
@@ -64,8 +63,7 @@ const clientAreaItems = [
   { id: "transacoes", text: "Transações", icon: Repeat, path: "/transacoes" },
   { id: "metas", text: "Metas", icon: Target, path: "/metas" },
   { id: "receitas", text: "Receitas", icon: ArrowUpCircle, path: "/receitas" },
-  { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" },
-  { id: "categorias", text: "Categorias", icon: Tag, path: "/categorias" }
+  { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" }
 ]
 
 const footerItems = [
