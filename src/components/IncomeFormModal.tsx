@@ -47,6 +47,9 @@ export function IncomeFormModal({
 
   const isFormValid = formData.title.trim() && formData.amount && formData.date && formData.category_id
 
+  // Filtrar apenas categorias de receita
+  const incomeCategories = categories.filter(cat => cat.type === 'income')
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -127,18 +130,21 @@ export function IncomeFormModal({
               </SelectTrigger>
               <SelectContent className="bg-background border z-[100] max-h-[200px] overflow-y-auto">
                 <div className="p-1">
-                  {categories.length === 0 ? (
-                    <div className="px-2 py-1 text-sm text-muted-foreground">Nenhuma categoria disponível</div>
-                  ) : (
-                    categories.map((category) => (
-                      <SelectItem 
-                        key={category.id} 
-                        value={category.id}
-                        className="cursor-pointer hover:bg-accent focus:bg-accent"
-                      >
-                        {category.name}
-                      </SelectItem>
-                    ))
+                   {incomeCategories.length === 0 ? (
+                     <div className="px-2 py-1 text-sm text-muted-foreground">Nenhuma categoria de receita disponível</div>
+                   ) : (
+                     incomeCategories.map((category) => (
+                       <SelectItem 
+                         key={category.id} 
+                         value={category.id}
+                         className="cursor-pointer hover:bg-accent focus:bg-accent"
+                       >
+                         <div className="flex items-center gap-2">
+                           <span>{category.icon}</span>
+                           <span>{category.name}</span>
+                         </div>
+                       </SelectItem>
+                     ))
                   )}
                 </div>
               </SelectContent>

@@ -24,6 +24,7 @@ export function useCategories() {
   const fetchCategories = async () => {
     try {
       setLoading(true)
+      console.log('Fetching categories...')
       
       // Buscar todas as categorias (agora são globais/padrão)
       const { data, error } = await supabase
@@ -31,8 +32,11 @@ export function useCategories() {
         .select('*')
         .order('name', { ascending: true })
 
+      console.log('Categories response:', { data, error })
+      
       if (error) throw error
       setCategories((data as Category[]) || [])
+      console.log('Categories set:', data)
     } catch (error: any) {
       console.error('Error fetching categories:', error)
       toast.error('Erro ao carregar categorias')
