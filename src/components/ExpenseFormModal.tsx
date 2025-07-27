@@ -34,14 +34,26 @@ export function ExpenseFormModal({
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (open && !initialData) {
-      setFormData({
-        title: '',
-        amount: '',
-        description: '',
-        date: new Date().toISOString().split('T')[0],
-        category_id: ''
-      })
+    if (open) {
+      if (initialData) {
+        // Preencher formulário com dados para edição
+        setFormData({
+          title: initialData.title || '',
+          amount: initialData.amount?.toString() || '',
+          description: initialData.description || '',
+          date: initialData.date || new Date().toISOString().split('T')[0],
+          category_id: initialData.category_id || ''
+        })
+      } else {
+        // Limpar formulário para nova despesa
+        setFormData({
+          title: '',
+          amount: '',
+          description: '',
+          date: new Date().toISOString().split('T')[0],
+          category_id: ''
+        })
+      }
     }
   }, [open, initialData])
 
