@@ -125,7 +125,7 @@ export function IncomeFormModal({
               <SelectTrigger>
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border z-50">
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
