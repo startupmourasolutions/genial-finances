@@ -1,24 +1,51 @@
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Filter, TrendingDown, Calendar, ArrowDownCircle, AlertTriangle } from "lucide-react"
+import { Plus, Filter, TrendingDown, Calendar, ArrowDownCircle, AlertTriangle, Edit, Trash2 } from "lucide-react"
+import { useExpenses } from "@/hooks/useExpenses"
+import { ExpenseFormModal } from "@/components/ExpenseFormModal"
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 
 const Despesas = () => {
-  const despesas = [
-    { id: 1, description: "Supermercado Carrefour", category: "Alimentação", date: "2024-01-14", amount: 234.50, recurring: false, priority: "high" },
-    { id: 2, description: "Plano de Internet", category: "Contas", date: "2024-01-10", amount: 89.90, recurring: true, priority: "medium" },
-    { id: 3, description: "Combustível", category: "Transporte", date: "2024-01-13", amount: 120.00, recurring: false, priority: "high" },
-    { id: 4, description: "Academia", category: "Saúde", date: "2024-01-01", amount: 75.00, recurring: true, priority: "low" },
-    { id: 5, description: "Streaming Netflix", category: "Lazer", date: "2024-01-05", amount: 25.90, recurring: true, priority: "low" },
-    { id: 6, description: "Farmácia", category: "Saúde", date: "2024-01-11", amount: 45.30, recurring: false, priority: "high" }
-  ]
+  const { expenses, categories, loading, createExpense, updateExpense, deleteExpense } = useExpenses()
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editingExpense, setEditingExpense] = useState<any>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  const totalDespesas = despesas.reduce((sum, despesa) => sum + despesa.amount, 0)
-  const despesasRecorrentes = despesas.filter(d => d.recurring).length
-  const mediaDespesas = totalDespesas / despesas.length
-  const despesasUrgentes = despesas.filter(d => d.priority === "high").length
+  const totalDespesas = expenses.reduce((sum, expense) => sum + expense.amount, 0)
+  const mediaDespesas = expenses.length > 0 ? totalDespesas / expenses.length : 0
+
+  const handleEdit = (expense: any) => {
+    setEditingExpense(expense)
+    setModalOpen(true)
+  }
+
+  const handleCreate = () => {
+    setEditingExpense(null)
+    setModalOpen(true)
+  }
+
+  const handleSubmit = async (data: any) => {
+    if (editingExpense) {
+      return await updateExpense(editingExpense.id, data)
+    } else {
+      return await createExpense(data)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (deleteId) {
+      await deleteExpense(deleteId)
+      setDeleteId(null)
+    }
+  }
+
+  if (loading) {
+    return <div className="p-8">Carregando despesas...</div>
+  }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -48,7 +75,7 @@ const Despesas = () => {
           </h1>
           <p className="text-muted-foreground">Controle seus gastos e reduza custos</p>
         </div>
-        <Button className="bg-destructive hover:bg-destructive/90 hover-scale">
+        <Button onClick={handleCreate} className="bg-destructive hover:bg-destructive/90 hover-scale">
           <Plus className="w-4 h-4 mr-2" />
           Nova Despesa
         </Button>
@@ -68,7 +95,7 @@ const Despesas = () => {
               R$ {totalDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              +8% vs mês anterior
+              {expenses.length} despesas este mês
             </p>
           </CardContent>
         </Card>
@@ -76,14 +103,14 @@ const Despesas = () => {
         <Card className="shadow-card hover:shadow-lg transition-smooth">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Despesas Recorrentes
+              Total de Despesas
             </CardTitle>
             <Calendar className="h-4 w-4 text-brand-orange" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{despesasRecorrentes}</div>
+            <div className="text-2xl font-bold text-foreground">{expenses.length}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              de {despesas.length} despesas
+              despesas cadastradas
             </p>
           </CardContent>
         </Card>
@@ -100,7 +127,7 @@ const Despesas = () => {
               R$ {mediaDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              baseado em {despesas.length} gastos
+              baseado em {expenses.length} gastos
             </p>
           </CardContent>
         </Card>
@@ -108,14 +135,16 @@ const Despesas = () => {
         <Card className="shadow-card hover:shadow-lg transition-smooth">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Despesas Urgentes
+              Maior Despesa
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-500">{despesasUrgentes}</div>
+            <div className="text-2xl font-bold text-orange-500">
+              R$ {expenses.length > 0 ? Math.max(...expenses.map(e => e.amount)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              requerem atenção
+              despesa mais alta
             </p>
           </CardContent>
         </Card>
@@ -178,46 +207,82 @@ const Despesas = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {despesas.map((despesa) => (
-              <div key={despesa.id} className="flex items-center justify-between p-4 bg-destructive/5 rounded-lg border border-destructive/20 hover:bg-destructive/10 transition-smooth">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-destructive" />
-                    <div>
-                      <h4 className="font-medium text-foreground">{despesa.description}</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className="text-sm text-muted-foreground">{despesa.category}</p>
-                        {despesa.recurring && (
-                          <Badge variant="outline" className="text-xs border-destructive text-destructive">
-                            Recorrente
-                          </Badge>
-                        )}
-                        <Badge variant="outline" className={`text-xs ${getPriorityColor(despesa.priority)}`}>
-                          {getPriorityText(despesa.priority)}
-                        </Badge>
+            {expenses.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Nenhuma despesa cadastrada ainda.
+              </div>
+            ) : (
+              expenses.map((expense) => (
+                <div key={expense.id} className="flex items-center justify-between p-4 bg-destructive/5 rounded-lg border border-destructive/20 hover:bg-destructive/10 transition-smooth">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-destructive" />
+                      <div>
+                        <h4 className="font-medium text-foreground">{expense.title}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <p className="text-sm text-muted-foreground">
+                            {expense.categories?.name || 'Sem categoria'}
+                          </p>
+                          {expense.description && (
+                            <Badge variant="outline" className="text-xs">
+                              {expense.description}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(expense.date).toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg font-semibold text-destructive">
+                      - R$ {expense.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex gap-2 ml-4">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="hover-scale"
+                      onClick={() => handleEdit(expense)}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="destructive" 
+                      className="hover-scale"
+                      onClick={() => setDeleteId(expense.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(despesa.date).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="text-lg font-semibold text-destructive">
-                    - R$ {despesa.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="flex gap-2 ml-4">
-                  <Button size="sm" variant="outline" className="hover-scale">Editar</Button>
-                  <Button size="sm" variant="destructive" className="hover-scale">Excluir</Button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
+
+      <ExpenseFormModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        onSubmit={handleSubmit}
+        categories={categories}
+        initialData={editingExpense}
+        mode={editingExpense ? 'edit' : 'create'}
+      />
+
+      <DeleteConfirmationDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Excluir Despesa"
+        description="Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita."
+      />
     </div>
   )
 }
