@@ -83,25 +83,11 @@ export function useExpenses() {
   }
 
   const fetchCategories = async () => {
-    if (!user || !profile) return
-
     try {
-      // Buscar o client_id do usuário atual
-      const { data: clientData, error: clientError } = await supabase
-        .from('clients')
-        .select('id')
-        .eq('profile_id', profile.id)
-        .single()
-
-      if (clientError || !clientData) {
-        setCategories([])
-        return
-      }
-
+      // Buscar todas as categorias (agora são globais/padrão)
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .eq('client_id', clientData.id)
         .order('name', { ascending: true })
 
       if (error) throw error
