@@ -61,6 +61,14 @@ export default function AdminClientes() {
 
   const fetchClients = async () => {
     try {
+      console.log('Iniciando busca de clientes...');
+      
+      // Primeiro, vamos verificar se o usuário é super admin
+      const { data: adminCheck, error: adminError } = await supabase
+        .rpc('is_super_admin');
+      
+      console.log('Verificação de admin:', adminCheck, adminError);
+      
       const { data, error } = await supabase
         .from('clients')
         .select(`
@@ -83,13 +91,15 @@ export default function AdminClientes() {
         `)
         .order('created_at', { ascending: false });
 
+      console.log('Resultado da busca:', data, error);
+
       if (error) throw error;
       setClients(data || []);
     } catch (error) {
       console.error('Erro ao buscar clientes:', error);
       toast({
         title: "Erro",
-        description: "Erro ao carregar lista de clientes",
+        description: `Erro ao carregar lista de clientes: ${error.message}`,
         variant: "destructive"
       });
     } finally {
