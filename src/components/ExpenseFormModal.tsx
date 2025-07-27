@@ -92,7 +92,7 @@ export function ExpenseFormModal({
             <Label htmlFor="amount">Valor</Label>
             <CurrencyInput
               id="amount"
-              placeholder="0,00"
+              placeholder="R$ 0,00"
               value={formData.amount}
               decimalsLimit={2}
               decimalSeparator=","
@@ -100,6 +100,7 @@ export function ExpenseFormModal({
               prefix="R$ "
               allowDecimals={true}
               allowNegativeValue={false}
+              intlConfig={{ locale: 'pt-BR', currency: 'BRL' }}
               onValueChange={(value) => setFormData({ ...formData, amount: value || '' })}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               required
