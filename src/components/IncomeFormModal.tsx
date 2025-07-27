@@ -78,10 +78,9 @@ export function IncomeFormModal({
             <Label htmlFor="amount">Valor</Label>
             <CurrencyInput
               id="amount"
-              placeholder="R$ 0,00"
+              placeholder="0,00"
               value={formData.amount}
               decimalsLimit={2}
-              prefix="R$ "
               decimalSeparator=","
               groupSeparator="."
               onValueChange={(value) => setFormData({ ...formData, amount: value || '' })}

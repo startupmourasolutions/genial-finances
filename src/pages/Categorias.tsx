@@ -1,26 +1,49 @@
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Edit, Trash, Tag } from "lucide-react"
+import { useCategories } from "@/hooks/useCategories"
+import { CategoryFormModal } from "@/components/CategoryFormModal"
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 
 const Categorias = () => {
-  const incomeCategories = [
-    { id: 1, name: "Salário", icon: "💼", color: "#10B981", count: 12 },
-    { id: 2, name: "Freelance", icon: "💻", color: "#3B82F6", count: 8 },
-    { id: 3, name: "Investimentos", icon: "📈", color: "#8B5CF6", count: 5 },
-    { id: 4, name: "Vendas", icon: "🛒", color: "#F59E0B", count: 3 }
-  ]
+  const { categories, loading, createCategory, updateCategory, deleteCategory } = useCategories()
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<any>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  const expenseCategories = [
-    { id: 5, name: "Alimentação", icon: "🍽️", color: "#EF4444", count: 45 },
-    { id: 6, name: "Transporte", icon: "🚗", color: "#F97316", count: 32 },
-    { id: 7, name: "Moradia", icon: "🏠", color: "#06B6D4", count: 18 },
-    { id: 8, name: "Saúde", icon: "⚕️", color: "#EC4899", count: 12 },
-    { id: 9, name: "Educação", icon: "📚", color: "#8B5CF6", count: 8 },
-    { id: 10, name: "Lazer", icon: "🎮", color: "#84CC16", count: 22 },
-    { id: 11, name: "Roupas", icon: "👕", color: "#F59E0B", count: 7 },
-    { id: 12, name: "Tecnologia", icon: "💻", color: "#6366F1", count: 4 }
-  ]
+  const incomeCategories = categories.filter(cat => cat.type === 'income')
+  const expenseCategories = categories.filter(cat => cat.type === 'expense')
+
+  const handleEdit = (category: any) => {
+    setEditingCategory(category)
+    setModalOpen(true)
+  }
+
+  const handleCreate = () => {
+    setEditingCategory(null)
+    setModalOpen(true)
+  }
+
+  const handleSubmit = async (data: any) => {
+    if (editingCategory) {
+      return await updateCategory(editingCategory.id, data)
+    } else {
+      return await createCategory(data)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (deleteId) {
+      await deleteCategory(deleteId)
+      setDeleteId(null)
+    }
+  }
+
+  if (loading) {
+    return <div className="p-8">Carregando categorias...</div>
+  }
 
   const CategoryCard = ({ categories, title, type }: { categories: any[], title: string, type: 'RECEITA' | 'DESPESA' }) => (
     <Card className="shadow-card">
@@ -32,40 +55,56 @@ const Categorias = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {categories.map((category) => (
-            <div key={category.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
-              <div className="flex items-center gap-3">
-                <div 
-                  className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-                  style={{ backgroundColor: `${category.color}20` }}
-                >
-                  {category.icon}
+          {categories.length === 0 ? (
+            <p className="text-center text-muted-foreground py-4">
+              Nenhuma categoria encontrada
+            </p>
+          ) : (
+            categories.map((category) => (
+              <div key={category.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
+                    style={{ backgroundColor: `${category.color}20` }}
+                  >
+                    {category.icon}
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground">{category.name}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Categoria de {type === 'RECEITA' ? 'receita' : 'despesa'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-foreground">{category.name}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {category.count} transaç{category.count === 1 ? 'ão' : 'ões'}
-                  </p>
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    variant="outline"
+                    className={`${type === 'RECEITA' ? 'border-success text-success' : 'border-destructive text-destructive'}`}
+                  >
+                    {type === 'RECEITA' ? 'Receita' : 'Despesa'}
+                  </Badge>
+                  <div className="flex gap-1">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="h-8 w-8 p-0"
+                      onClick={() => handleEdit(category)}
+                    >
+                      <Edit className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                      onClick={() => setDeleteId(category.id)}
+                    >
+                      <Trash className="w-3 h-3" />
+                    </Button>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge 
-                  variant="outline"
-                  className={`${type === 'RECEITA' ? 'border-success text-success' : 'border-destructive text-destructive'}`}
-                >
-                  {type === 'RECEITA' ? 'Receita' : 'Despesa'}
-                </Badge>
-                <div className="flex gap-1">
-                  <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                    <Edit className="w-3 h-3" />
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-8 w-8 p-0 text-destructive hover:text-destructive">
-                    <Trash className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </CardContent>
     </Card>
@@ -78,7 +117,7 @@ const Categorias = () => {
           <h1 className="text-3xl font-bold text-foreground">Categorias</h1>
           <p className="text-muted-foreground">Organize suas receitas e despesas</p>
         </div>
-        <Button className="bg-brand-orange hover:bg-brand-orange/90">
+        <Button onClick={handleCreate} className="bg-brand-orange hover:bg-brand-orange/90">
           <Plus className="w-4 h-4 mr-2" />
           Nova Categoria
         </Button>
@@ -96,6 +135,22 @@ const Categorias = () => {
           type="DESPESA"
         />
       </div>
+
+      <CategoryFormModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        onSubmit={handleSubmit}
+        initialData={editingCategory}
+        mode={editingCategory ? 'edit' : 'create'}
+      />
+
+      <DeleteConfirmationDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Excluir Categoria"
+        description="Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita."
+      />
     </div>
   )
 }
