@@ -68,6 +68,7 @@ All colors MUST be HSL.
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
+    --surface: 222.2 84% 4.9%;
 
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
@@ -82,7 +83,7 @@ All colors MUST be HSL.
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 25%;
-    --muted-foreground: 210 40% 85%;
+    --muted-foreground: 210 40% 95%;
 
     --accent: 217.2 32.6% 25%;
     --accent-foreground: 210 40% 98%;
