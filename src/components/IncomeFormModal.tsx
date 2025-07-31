@@ -68,7 +68,7 @@ export function IncomeFormModal({
 
     const result = await onSubmit({
       ...formData,
-      amount: parseFloat(formData.amount)
+      amount: parseFloat(formData.amount.replace('R$ ', '').replace(',', '.'))
     })
 
     if (result.success) {
@@ -105,20 +105,21 @@ export function IncomeFormModal({
           
           <div>
             <Label htmlFor="amount">Valor</Label>
-            <CurrencyInput
+            <Input
               id="amount"
+              type="text"
               placeholder="R$ 0,00"
               value={formData.amount}
-              decimalsLimit={2}
-              decimalSeparator=","
-              groupSeparator="."
-              prefix="R$ "
-              allowDecimals={true}
-              allowNegativeValue={false}
-              disableGroupSeparators={false}
-              transformRawValue={(rawValue) => rawValue}
-              onValueChange={(value) => setFormData({ ...formData, amount: value || '' })}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              onChange={(e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value) {
+                  value = (parseInt(value) / 100).toFixed(2);
+                  value = value.replace('.', ',');
+                  value = 'R$ ' + value;
+                }
+                setFormData({ ...formData, amount: value });
+              }}
+              className="w-full"
               required
             />
           </div>
