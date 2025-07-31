@@ -68,7 +68,7 @@ export function IncomeFormModal({
 
     const result = await onSubmit({
       ...formData,
-      amount: parseFloat(formData.amount.replace('R$ ', '').replace(',', '.'))
+      amount: parseFloat(formData.amount.replace('R$ ', '').replace(/\./g, '').replace(',', '.'))
     })
 
     if (result.success) {
@@ -114,7 +114,9 @@ export function IncomeFormModal({
                 let value = e.target.value.replace(/\D/g, '');
                 if (value) {
                   value = (parseInt(value) / 100).toFixed(2);
-                  value = value.replace('.', ',');
+                  const parts = value.split('.');
+                  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                  value = parts.join(',');
                   value = 'R$ ' + value;
                 }
                 setFormData({ ...formData, amount: value });
