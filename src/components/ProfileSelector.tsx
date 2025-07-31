@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { TrialBadge } from "@/components/TrialBadge"
 import { NotificationBell } from "@/components/NotificationBell"
 import { ProfileDropdown } from "@/components/ProfileDropdown"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 interface ProfileSelectorProps {
   profiles: string[]
@@ -45,6 +46,8 @@ export function ProfileSelector({ profiles, userInitial }: ProfileSelectorProps)
           )}
           <span className="font-medium">{selectedProfile}</span>
         </Button>
+        
+        <ThemeToggle />
         
         <NotificationBell />
         
