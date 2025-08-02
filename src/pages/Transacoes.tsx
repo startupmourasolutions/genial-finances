@@ -1,9 +1,10 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Filter, Edit, Trash2 } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Plus, Filter, Edit, Trash2, TrendingUp, TrendingDown, ArrowUpCircle, ArrowDownCircle } from "lucide-react"
 import { useTransactions } from "@/hooks/useTransactions"
 import { TransactionFormModal } from "@/components/TransactionFormModal"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
@@ -14,6 +15,12 @@ const Transacoes = () => {
   const [editingTransaction, setEditingTransaction] = useState<any>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [defaultType, setDefaultType] = useState<'income' | 'expense'>('income')
+  
+  // Estados dos filtros
+  const [startDate, setStartDate] = useState<string>('')
+  const [endDate, setEndDate] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [selectedType, setSelectedType] = useState<string>('all')
 
   const handleEdit = (transaction: any) => {
     setEditingTransaction(transaction)
@@ -40,6 +47,23 @@ const Transacoes = () => {
       setDeleteId(null)
     }
   }
+
+  // Filtrar transações em tempo real
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((transaction) => {
+      // Filtro por data
+      if (startDate && new Date(transaction.date) < new Date(startDate)) return false
+      if (endDate && new Date(transaction.date) > new Date(endDate)) return false
+      
+      // Filtro por categoria
+      if (selectedCategory !== 'all' && transaction.category_id !== selectedCategory) return false
+      
+      // Filtro por tipo
+      if (selectedType !== 'all' && transaction.type !== selectedType) return false
+      
+      return true
+    })
+  }, [transactions, startDate, endDate, selectedCategory, selectedType])
 
   if (loading) {
     return <div className="p-8">Carregando transações...</div>
@@ -73,28 +97,39 @@ const Transacoes = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Input type="date" placeholder="Data inicial" />
-            <Input type="date" placeholder="Data final" />
-            <Select>
+            <Input 
+              type="date" 
+              placeholder="Data inicial" 
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+            <Input 
+              type="date" 
+              placeholder="Data final" 
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger>
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="receita">Receitas</SelectItem>
-                <SelectItem value="alimentacao">Alimentação</SelectItem>
-                <SelectItem value="transporte">Transporte</SelectItem>
-                <SelectItem value="contas">Contas</SelectItem>
+                <SelectItem value="all">Todas as Categorias</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            <Select>
+            <Select value={selectedType} onValueChange={setSelectedType}>
               <SelectTrigger>
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="RECEITA">Receitas</SelectItem>
-                <SelectItem value="DESPESA">Despesas</SelectItem>
+                <SelectItem value="all">Todos os Tipos</SelectItem>
+                <SelectItem value="income">Receitas</SelectItem>
+                <SelectItem value="expense">Despesas</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -107,23 +142,40 @@ const Transacoes = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {transactions.length === 0 ? (
+            {filteredTransactions.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                Nenhuma transação cadastrada ainda.
+                {transactions.length === 0 
+                  ? "Nenhuma transação cadastrada ainda." 
+                  : "Nenhuma transação encontrada com os filtros aplicados."
+                }
               </div>
             ) : (
-              transactions.map((transaction) => (
+              filteredTransactions.map((transaction) => (
                 <div key={transaction.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${
-                        transaction.type === 'income' ? 'bg-success' : 'bg-destructive'
-                      }`} />
-                      <div>
-                        <h4 className="font-medium text-foreground">{transaction.title}</h4>
+                      {transaction.type === 'income' ? (
+                        <ArrowUpCircle className="w-6 h-6 text-success" />
+                      ) : (
+                        <ArrowDownCircle className="w-6 h-6 text-destructive" />
+                      )}
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-medium text-foreground">{transaction.title}</h4>
+                          <Badge variant={transaction.type === 'income' ? 'default' : 'destructive'} className="text-xs">
+                            {transaction.type === 'income' ? (
+                              <><TrendingUp className="w-3 h-3 mr-1" />ENTRADA</>
+                            ) : (
+                              <><TrendingDown className="w-3 h-3 mr-1" />SAÍDA</>
+                            )}
+                          </Badge>
+                        </div>
                         <p className="text-sm text-muted-foreground">
                           {transaction.categories?.name || 'Sem categoria'}
                         </p>
+                        {transaction.description && (
+                          <p className="text-xs text-muted-foreground mt-1">{transaction.description}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -133,7 +185,7 @@ const Transacoes = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className={`text-lg font-semibold ${
+                    <span className={`text-xl font-bold ${
                       transaction.type === 'income' ? 'text-success' : 'text-destructive'
                     }`}>
                       {transaction.type === 'income' ? '+' : '-'}
