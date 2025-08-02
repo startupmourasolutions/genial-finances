@@ -36,11 +36,69 @@ export function useIncomes() {
   const { user, profile } = useAuth()
 
   useEffect(() => {
+    let cleanup: (() => void) | undefined
+
     if (user && profile) {
       fetchIncomes()
       fetchCategories()
+      
+      const initRealtime = async () => {
+        cleanup = await setupRealtimeSubscription()
+      }
+      
+      initRealtime()
+    }
+
+    return () => {
+      if (cleanup) cleanup()
     }
   }, [user, profile])
+
+  const setupRealtimeSubscription = async () => {
+    if (!user || !profile) return
+
+    try {
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
+
+      if (clientError || !clientData) return
+
+      // Configurar subscription para mudanças na tabela incomes
+      const channel = supabase
+        .channel('incomes-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'incomes',
+            filter: `client_id=eq.${clientData.id}`
+          },
+          (payload) => {
+            console.log('Realtime update incomes:', payload)
+            
+            if (payload.eventType === 'INSERT') {
+              toast.success(`Nova receita de R$ ${payload.new.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} foi registrada!`)
+            }
+            
+            // Recarregar as receitas para manter a lista atualizada
+            fetchIncomes()
+          }
+        )
+        .subscribe()
+
+      // Cleanup function será retornada no useEffect
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    } catch (error) {
+      console.error('Error setting up realtime subscription:', error)
+    }
+  }
 
   const fetchIncomes = async () => {
     if (!user || !profile) return
@@ -71,7 +129,7 @@ export function useIncomes() {
           )
         `)
         .eq('client_id', clientData.id)
-        .order('date', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       setIncomes(data || [])

@@ -36,11 +36,69 @@ export function useExpenses() {
   const { user, profile } = useAuth()
 
   useEffect(() => {
+    let cleanup: (() => void) | undefined
+
     if (user && profile) {
       fetchExpenses()
       fetchCategories()
+      
+      const initRealtime = async () => {
+        cleanup = await setupRealtimeSubscription()
+      }
+      
+      initRealtime()
+    }
+
+    return () => {
+      if (cleanup) cleanup()
     }
   }, [user, profile])
+
+  const setupRealtimeSubscription = async () => {
+    if (!user || !profile) return
+
+    try {
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .single()
+
+      if (clientError || !clientData) return
+
+      // Configurar subscription para mudanças na tabela expenses
+      const channel = supabase
+        .channel('expenses-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'expenses',
+            filter: `client_id=eq.${clientData.id}`
+          },
+          (payload) => {
+            console.log('Realtime update expenses:', payload)
+            
+            if (payload.eventType === 'INSERT') {
+              toast.success(`Nova despesa de R$ ${payload.new.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} foi registrada!`)
+            }
+            
+            // Recarregar as despesas para manter a lista atualizada
+            fetchExpenses()
+          }
+        )
+        .subscribe()
+
+      // Cleanup function será retornada no useEffect
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    } catch (error) {
+      console.error('Error setting up realtime subscription:', error)
+    }
+  }
 
   const fetchExpenses = async () => {
     if (!user || !profile) return
@@ -70,7 +128,7 @@ export function useExpenses() {
           )
         `)
         .eq('client_id', clientData.id)
-        .order('date', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       setExpenses(data || [])

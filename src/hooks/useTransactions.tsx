@@ -133,7 +133,7 @@ export function useTransactions() {
           )
         `)
         .eq('client_id', clientData.id)
-        .order('date', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       setTransactions((data as Transaction[]) || [])
