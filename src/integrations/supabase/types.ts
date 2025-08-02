@@ -99,6 +99,33 @@ export type Database = {
           },
         ]
       }
+      chats: {
+        Row: {
+          app: string | null
+          conversation_id: string | null
+          created_at: string | null
+          id: number
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          app?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: number
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          app?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: number
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           can_upgrade: boolean | null
@@ -109,6 +136,7 @@ export type Database = {
           id: string
           monthly_fee: number | null
           profile_id: string
+          ssesionID: string | null
           subscription_active: boolean | null
           subscription_end_date: string | null
           subscription_plan: string | null
@@ -127,6 +155,7 @@ export type Database = {
           id?: string
           monthly_fee?: number | null
           profile_id: string
+          ssesionID?: string | null
           subscription_active?: boolean | null
           subscription_end_date?: string | null
           subscription_plan?: string | null
@@ -145,6 +174,7 @@ export type Database = {
           id?: string
           monthly_fee?: number | null
           profile_id?: string
+          ssesionID?: string | null
           subscription_active?: boolean | null
           subscription_end_date?: string | null
           subscription_plan?: string | null
@@ -563,6 +593,24 @@ export type Database = {
           phone?: string | null
           status?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      n8n_chat_histories: {
+        Row: {
+          id: number
+          message: Json
+          session_id: string
+        }
+        Insert: {
+          id?: number
+          message: Json
+          session_id: string
+        }
+        Update: {
+          id?: number
+          message?: Json
+          session_id?: string
         }
         Relationships: []
       }
