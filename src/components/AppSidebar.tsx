@@ -44,7 +44,8 @@ const clientNavItems = [
   { id: "dividas", text: "Dívidas", icon: FileText, path: "/dividas" },
   { id: "relatorios", text: "Relatórios", icon: PieChart, path: "/relatorios" },
   { id: "metas", text: "Metas", icon: Target, path: "/metas" },
-  { id: "veiculos", text: "Veículos", icon: Car, path: "/veiculos" }
+  { id: "veiculos", text: "Veículos", icon: Car, path: "/veiculos" },
+  { id: "faturas", text: "Faturas", icon: Receipt, path: "/faturas" }
 ]
 
 const superAdminNavItems = [
@@ -66,9 +67,14 @@ const clientAreaItems = [
   { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" }
 ]
 
-const footerItems = [
+const getFooterItems = (isSuperAdmin: boolean) => [
   { id: "perfil", text: "Perfil", icon: UserCircle, path: "/perfil" },
-  { id: "configuracoes", text: "Configurações", icon: Settings, path: "/admin/configuracoes" },
+  { 
+    id: "configuracoes", 
+    text: "Configurações", 
+    icon: Settings, 
+    path: isSuperAdmin ? "/admin/configuracoes" : "/configuracoes" 
+  },
   { id: "sair", text: "Sair", icon: LogOut, path: "/logout" }
 ]
 
@@ -191,7 +197,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-border p-2">
         <SidebarMenu>
-          {footerItems.map((item) => (
+          {getFooterItems(isSuperAdmin).map((item) => (
             <SidebarMenuItem key={item.id}>
               <SidebarMenuButton asChild>
                 <NavLink 

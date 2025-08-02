@@ -24,8 +24,10 @@ import NotFound from "./pages/NotFound";
 import Administradores from "./pages/admin/Administradores";
 import Leads from "./pages/admin/Leads";
 import AdminClientes from "./pages/admin/AdminClientes";
-import Faturas from "./pages/admin/Faturas";
-import Configuracoes from "./pages/admin/Configuracoes";
+import AdminFaturas from "./pages/admin/Faturas";
+import AdminConfiguracoes from "./pages/admin/Configuracoes";
+import Faturas from "./pages/Faturas";
+import Configuracoes from "./pages/Configuracoes";
 
 const queryClient = new QueryClient();
 
@@ -133,6 +135,20 @@ function App() {
                     </DashboardLayout>
                   </ProtectedRoute>
                 } />
+                <Route path="/faturas" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Faturas />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/configuracoes" element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <Configuracoes />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                } />
                 
                 {/* Rotas do Super Administrador */}
                 <Route path="/admin/administradores" element={
@@ -159,14 +175,14 @@ function App() {
                 <Route path="/admin/faturas" element={
                   <ProtectedRoute>
                     <DashboardLayout>
-                      <Faturas />
+                      <AdminFaturas />
                     </DashboardLayout>
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/configuracoes" element={
                   <ProtectedRoute>
                     <DashboardLayout>
-                      <Configuracoes />
+                      <AdminConfiguracoes />
                     </DashboardLayout>
                   </ProtectedRoute>
                 } />
