@@ -244,23 +244,13 @@ export default function Index() {
                       </ul>
                     </div>
                     
-                    <div className="space-y-3">
-                      <Button 
-                        className={`w-full ${plan.popular ? 'bg-orange-600 hover:bg-orange-700' : ''}`}
-                        variant={plan.popular ? 'default' : 'outline'}
-                        onClick={() => handlePlanSelection(plan.id)}
-                      >
-                        Escolher Plano - Pagar Agora
-                      </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={handleTrialSignup}
-                      >
-                        Teste Grátis por 7 dias
-                      </Button>
-                    </div>
+                    <Button 
+                      className={`w-full ${plan.popular ? 'bg-orange-600 hover:bg-orange-700' : ''}`}
+                      variant={plan.popular ? 'default' : 'outline'}
+                      onClick={() => handlePlanSelection(plan.id)}
+                    >
+                      Escolher Plano - Pagar Agora
+                    </Button>
                   </CardContent>
                 </Card>
               );

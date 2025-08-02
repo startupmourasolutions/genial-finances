@@ -28,6 +28,7 @@ import AdminFaturas from "./pages/admin/Faturas";
 import AdminConfiguracoes from "./pages/admin/Configuracoes";
 import Faturas from "./pages/Faturas";
 import Configuracoes from "./pages/Configuracoes";
+import Payment from "./pages/Payment";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ function App() {
               <SidebarProvider>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/payment" element={<Payment />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
