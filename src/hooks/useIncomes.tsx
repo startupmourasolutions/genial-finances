@@ -129,6 +129,20 @@ export function useIncomes() {
 
       if (error) throw error
 
+      // Automaticamente criar transação correspondente
+      await supabase
+        .from('transactions')
+        .insert([{
+          title: incomeData.title,
+          amount: incomeData.amount,
+          type: 'income',
+          description: incomeData.description,
+          date: incomeData.date,
+          category_id: incomeData.category_id,
+          user_id: user.id,
+          client_id: clientData.id
+        }])
+
       toast.success('Receita criada com sucesso!')
       await fetchIncomes()
       return { data: data[0], error: null }

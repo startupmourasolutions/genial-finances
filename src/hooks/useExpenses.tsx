@@ -128,6 +128,20 @@ export function useExpenses() {
 
       if (error) throw error
 
+      // Automaticamente criar transação correspondente
+      await supabase
+        .from('transactions')
+        .insert([{
+          title: expenseData.title,
+          amount: expenseData.amount,
+          type: 'expense',
+          description: expenseData.description,
+          date: expenseData.date,
+          category_id: expenseData.category_id,
+          user_id: user.id,
+          client_id: clientData.id
+        }])
+
       toast.success('Despesa criada com sucesso!')
       await fetchExpenses()
       return { data: data[0], error: null }
