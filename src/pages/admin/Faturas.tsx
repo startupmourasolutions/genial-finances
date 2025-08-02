@@ -197,6 +197,7 @@ export default function Faturas() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedClientForView, setSelectedClientForView] = useState<Client | null>(null);
+  const [selectedInvoiceInDetail, setSelectedInvoiceInDetail] = useState<Invoice | null>(null);
   const [newPaymentMethod, setNewPaymentMethod] = useState("");
   const [newBillingEmail, setNewBillingEmail] = useState("");
   const [newDueDay, setNewDueDay] = useState<number>(1);
@@ -238,6 +239,10 @@ export default function Faturas() {
 
   const handleViewClientDetails = (client: Client) => {
     setSelectedClientForView(client);
+    // Sempre abrir com a fatura mais atual (mais recente)
+    const clientInvoices = getClientInvoices(client.id);
+    const latestInvoice = clientInvoices.sort((a, b) => new Date(b.issue_date).getTime() - new Date(a.issue_date).getTime())[0];
+    setSelectedInvoiceInDetail(latestInvoice || null);
   };
 
   const processPayment = () => {
@@ -373,14 +378,17 @@ export default function Faturas() {
                               <CreditCard className="w-4 h-4" />
                             </Button>
                           )}
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => client && handleManageClient(client)}
-                            title="Gerenciar cliente"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
+                           <Button 
+                             variant="outline" 
+                             size="sm"
+                             onClick={() => {
+                               const client = getClient(invoice.client_id);
+                               if (client) handleViewClientDetails(client);
+                             }}
+                             title="Ver detalhes do cliente"
+                           >
+                             <Eye className="w-4 h-4" />
+                           </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -597,9 +605,60 @@ export default function Faturas() {
               </Card>
             </div>
 
+            {/* Fatura em Destaque */}
+            {selectedInvoiceInDetail && (
+              <Card className="border-2 border-primary bg-primary/5">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Receipt className="w-5 h-5" />
+                    Fatura Selecionada
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-primary">
+                        {new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL'
+                        }).format(selectedInvoiceInDetail.amount)}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Valor</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-medium">
+                        <Badge className={getStatusBadgeColor(selectedInvoiceInDetail.status)}>
+                          {getStatusLabel(selectedInvoiceInDetail.status)}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground">Status</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-medium">
+                        {selectedInvoiceInDetail.status === 'vencida' ? 'Venceu em' : 
+                         selectedInvoiceInDetail.status === 'paga' ? 'Pago em' : 'Vence em'}: 
+                        <br />{format(new Date(selectedInvoiceInDetail.due_date), "dd/MM/yyyy")}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {selectedInvoiceInDetail.status === 'vencida' ? 'Vencimento' : 
+                         selectedInvoiceInDetail.status === 'paga' ? 'Pagamento' : 'Vencimento'}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-medium">
+                        Próxima: {selectedClientForView?.due_day}/
+                        {format(new Date(), "MM/yyyy")}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Próximo Fechamento</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Últimas Faturas</CardTitle>
+                <CardTitle className="text-lg">Histórico de Faturas</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -614,7 +673,13 @@ export default function Faturas() {
                   </TableHeader>
                   <TableBody>
                     {selectedClientForView && getClientInvoices(selectedClientForView.id).map((invoice) => (
-                      <TableRow key={invoice.id}>
+                      <TableRow 
+                        key={invoice.id}
+                        className={`cursor-pointer hover:bg-muted/50 ${
+                          selectedInvoiceInDetail?.id === invoice.id ? 'bg-primary/10 border-l-4 border-l-primary' : ''
+                        }`}
+                        onClick={() => setSelectedInvoiceInDetail(invoice)}
+                      >
                         <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
                         <TableCell>
                           {new Intl.NumberFormat('pt-BR', {
