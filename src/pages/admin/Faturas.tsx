@@ -194,7 +194,9 @@ export default function Faturas() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
+  const [isInvoiceDetailOpen, setIsInvoiceDetailOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [selectedInvoiceForDetail, setSelectedInvoiceForDetail] = useState<Invoice | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedClientForView, setSelectedClientForView] = useState<Client | null>(null);
   const [selectedInvoiceInDetail, setSelectedInvoiceInDetail] = useState<Invoice | null>(null);
@@ -237,6 +239,11 @@ export default function Faturas() {
     setIsClientDialogOpen(true);
   };
 
+  const handleViewInvoiceDetails = (invoice: Invoice) => {
+    setSelectedInvoiceForDetail(invoice);
+    setIsInvoiceDetailOpen(true);
+  };
+
   const handleViewClientDetails = (client: Client) => {
     setSelectedClientForView(client);
     // Sempre abrir com a fatura mais atual (mais recente)
@@ -247,7 +254,7 @@ export default function Faturas() {
 
   const processPayment = () => {
     toast({
-      title: "Pagamento Processado",
+      title: "Pagamento Processado", 
       description: `Fatura ${selectedInvoice?.invoice_number} paga com sucesso pelo administrador`
     });
     setIsPaymentDialogOpen(false);
@@ -381,11 +388,8 @@ export default function Faturas() {
                            <Button 
                              variant="outline" 
                              size="sm"
-                             onClick={() => {
-                               const client = getClient(invoice.client_id);
-                               if (client) handleViewClientDetails(client);
-                             }}
-                             title="Ver detalhes do cliente"
+                             onClick={() => handleViewInvoiceDetails(invoice)}
+                             title="Ver detalhes da fatura"
                            >
                              <Eye className="w-4 h-4" />
                            </Button>
@@ -701,6 +705,81 @@ export default function Faturas() {
               </CardContent>
             </Card>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog para detalhes da fatura */}
+      <Dialog open={isInvoiceDetailOpen} onOpenChange={setIsInvoiceDetailOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Detalhes da Fatura</DialogTitle>
+          </DialogHeader>
+          {selectedInvoiceForDetail && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Informações da Fatura</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div><span className="font-medium">Número:</span> {selectedInvoiceForDetail.invoice_number}</div>
+                    <div><span className="font-medium">Valor:</span> {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(selectedInvoiceForDetail.amount)}</div>
+                    <div><span className="font-medium">Emissão:</span> {format(new Date(selectedInvoiceForDetail.issue_date), "dd/MM/yyyy")}</div>
+                    <div><span className="font-medium">Vencimento:</span> {format(new Date(selectedInvoiceForDetail.due_date), "dd/MM/yyyy")}</div>
+                    <div><span className="font-medium">Status:</span> 
+                      <Badge className={`ml-2 ${getStatusBadgeColor(selectedInvoiceForDetail.status)}`}>
+                        {getStatusLabel(selectedInvoiceForDetail.status)}
+                      </Badge>
+                    </div>
+                    {selectedInvoiceForDetail.payment_date && (
+                      <div><span className="font-medium">Data Pagamento:</span> {format(new Date(selectedInvoiceForDetail.payment_date), "dd/MM/yyyy")}</div>
+                    )}
+                    <div><span className="font-medium">Forma de Pagamento:</span> {selectedInvoiceForDetail.payment_method}</div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Cliente</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {(() => {
+                      const client = getClient(selectedInvoiceForDetail.client_id);
+                      return (
+                        <>
+                          <div><span className="font-medium">Empresa:</span> {client?.company_name}</div>
+                          <div><span className="font-medium">Responsável:</span> {client?.full_name}</div>
+                          <div><span className="font-medium">Email:</span> {client?.email}</div>
+                          <div><span className="font-medium">Telefone:</span> {client?.phone}</div>
+                          <div><span className="font-medium">Plano:</span> {client?.subscription_plan}</div>
+                        </>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {selectedInvoiceForDetail.description && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Descrição</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm">{selectedInvoiceForDetail.description}</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={() => setIsInvoiceDetailOpen(false)}>
+                  Fechar
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
