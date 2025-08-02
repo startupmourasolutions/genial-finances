@@ -1,72 +1,93 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Star, Zap, Shield, BarChart3, Users, PiggyBank, TrendingUp, ArrowRight, LogIn } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Check, Star, Zap, Shield, BarChart3, Users, PiggyBank, TrendingUp, ArrowRight, LogIn, MessageSquare, Clock, Banknote, Smartphone } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 export default function Index() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+
+  const handlePlanSelection = (planId: string) => {
+    // Redireciona para tela de pagamento quando vem da escolha de plano
+    navigate(`/payment?plan=${planId}&cycle=${billingCycle}`);
+  };
+
+  const handleTrialSignup = () => {
+    // Redireciona para cadastro normal com 7 dias grátis
+    navigate('/auth?trial=true');
+  };
 
   const features = [
     {
-      icon: <PiggyBank className="h-6 w-6" />,
-      title: "Controle Financeiro Completo",
-      description: "Gerencie receitas, despesas e investimentos em um só lugar"
+      icon: <Smartphone className="h-6 w-6" />,
+      title: "Controle via WhatsApp",
+      description: "Gerencie suas finanças por texto, áudio e imagem no WhatsApp"
     },
     {
       icon: <BarChart3 className="h-6 w-6" />,
-      title: "Relatórios Inteligentes",
-      description: "Análises avançadas com insights baseados em IA"
+      title: "Gráficos Interativos",
+      description: "Sistema web com relatórios visuais e análises detalhadas"
     },
     {
-      icon: <TrendingUp className="h-6 w-6" />,
-      title: "Previsões Precisas",
-      description: "Projete seu futuro financeiro com algoritmos avançados"
-    },
-    {
-      icon: <Shield className="h-6 w-6" />,
-      title: "Segurança Máxima",
-      description: "Seus dados protegidos com criptografia de nível bancário"
+      icon: <Clock className="h-6 w-6" />,
+      title: "Lembretes Automáticos",
+      description: "Alertas de contas a pagar/receber direto no seu WhatsApp"
     },
     {
       icon: <Users className="h-6 w-6" />,
-      title: "Gestão Empresarial",
-      description: "Ferramentas específicas para empresas e freelancers"
+      title: "Gestão Compartilhada",
+      description: "Perfeito para casais, famílias e equipes"
     },
     {
-      icon: <Zap className="h-6 w-6" />,
-      title: "Automação Inteligente",
-      description: "Categorização automática e lembretes personalizados"
+      icon: <Banknote className="h-6 w-6" />,
+      title: "Contas Ilimitadas",
+      description: "Conecte múltiplas contas bancárias e cartões"
+    },
+    {
+      icon: <Shield className="h-6 w-6" />,
+      title: "Suporte Humanizado",
+      description: "Atendimento VIP por WhatsApp e ligação"
     }
   ];
 
   const plans = [
     {
-      name: "Pessoal",
-      price: "R$ 29",
-      period: "/mês",
-      description: "Perfeito para pessoas físicas",
+      id: "basico",
+      name: "Básico",
+      monthlyPrice: 19.99,
+      yearlyPrice: 179.90,
+      description: "Perfeito para gestão financeira pessoal",
       features: [
-        "Controle de receitas e despesas",
-        "Relatórios básicos",
-        "Metas financeiras",
-        "Suporte por email"
+        "Sistema web com gráficos interativos e gestão financeira",
+        "Controle de gastos via WhatsApp (texto, áudio e imagem)",
+        "Transações ilimitadas via WhatsApp",
+        "Categorias personalizáveis para organização",
+        "Até 3 contas bancárias vinculadas",
+        "Lembretes automáticos de contas a pagar/receber (WhatsApp)",
+        "Gestão individual ou compartilhada (ex: casais)",
+        "Exportação de dados (Excel, PDF)",
+        "Suporte prioritário por WhatsApp e ligação"
       ],
       popular: false
     },
     {
-      name: "Empresarial",
-      price: "R$ 99",
-      period: "/mês",
-      description: "Ideal para empresas e freelancers",
+      id: "genio",
+      name: "Gênio",
+      monthlyPrice: 45.99,
+      yearlyPrice: 413.90,
+      description: "Ideal para famílias e equipes",
       features: [
-        "Tudo do plano Pessoal",
-        "Gestão de múltiplas contas",
-        "Relatórios avançados com IA",
-        "Controle de veículos",
-        "Análise de mercado",
-        "Suporte prioritário"
+        "Tudo do Plano Básico",
+        "Contas bancárias ilimitadas",
+        "Gestão compartilhada avançada (ideal para famílias ou times)",
+        "+1 usuário grátis (adicione membros sem custo extra)",
+        "Alertas personalizados por membro (cada um recebe no seu WhatsApp)",
+        "Dashboard centralizado e atualizado em tempo real para todos",
+        "Suporte humanizado VIP (WhatsApp e ligação)"
       ],
       popular: true
     }
@@ -150,51 +171,100 @@ export default function Index() {
         <div className="w-full max-w-none px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Escolha o plano ideal para você
+              Planos do Sistema de Gestão Financeira
             </h2>
-            <p className="text-xl text-muted-foreground">
-              Comece com 7 dias grátis, sem compromisso
+            <p className="text-xl text-muted-foreground mb-8">
+              Escolha entre mensal ou anual (25% de desconto)
             </p>
+            
+            {/* Billing Cycle Toggle */}
+            <div className="flex items-center justify-center space-x-4 mb-12">
+              <span className={`text-lg ${billingCycle === 'monthly' ? 'font-semibold text-orange-600' : 'text-muted-foreground'}`}>
+                Mensal
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
+                className="relative w-16 h-8 p-1"
+              >
+                <div className={`absolute w-6 h-6 bg-orange-600 rounded-full transition-transform ${billingCycle === 'yearly' ? 'translate-x-7' : 'translate-x-0'}`} />
+              </Button>
+              <span className={`text-lg ${billingCycle === 'yearly' ? 'font-semibold text-orange-600' : 'text-muted-foreground'}`}>
+                Anual
+                <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">-25%</Badge>
+              </span>
+            </div>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {plans.map((plan, index) => (
-              <Card key={index} className={`relative ${plan.popular ? 'border-orange-500 shadow-xl' : ''}`}>
-                {plan.popular && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-orange-600">
-                    <Star className="w-3 h-3 mr-1" />
-                    Mais Popular
-                  </Badge>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    <span className="text-muted-foreground">{plan.period}</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center">
-                        <Check className="h-4 w-4 text-orange-600 mr-3" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button 
-                    className={`w-full mt-6 ${plan.popular ? 'bg-orange-600 hover:bg-orange-700' : ''}`}
-                    variant={plan.popular ? 'default' : 'outline'}
-                    asChild
-                  >
-                    <Link to="/auth">
-                      Começar Teste Grátis
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {plans.map((plan, index) => {
+              const currentPrice = billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice;
+              const equivalentMonthlyPrice = billingCycle === 'yearly' ? plan.yearlyPrice / 12 : null;
+              
+              return (
+                <Card key={index} className={`relative ${plan.popular ? 'border-orange-500 shadow-xl scale-105' : ''}`}>
+                  {plan.popular && (
+                    <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-orange-600">
+                      <Star className="w-3 h-3 mr-1" />
+                      Mais Popular
+                    </Badge>
+                  )}
+                  <CardHeader>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      📌 Plano {plan.name}
+                    </CardTitle>
+                    <CardDescription className="text-base">{plan.description}</CardDescription>
+                    <div className="space-y-2">
+                      <div className="flex items-baseline space-x-2">
+                        <span className="text-4xl font-bold">
+                          R$ {currentPrice.toFixed(2).replace('.', ',')}
+                        </span>
+                        <span className="text-muted-foreground">
+                          /{billingCycle === 'monthly' ? 'mês' : 'ano'}
+                        </span>
+                      </div>
+                      {billingCycle === 'yearly' && equivalentMonthlyPrice && (
+                        <p className="text-sm text-green-600 font-medium">
+                          Equivale a R$ {equivalentMonthlyPrice.toFixed(2).replace('.', ',')}/mês
+                        </p>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div>
+                      <h4 className="font-semibold mb-3 text-green-600">✅ Inclui:</h4>
+                      <ul className="space-y-2">
+                        {plan.features.map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-start">
+                            <span className="text-green-600 mr-2 text-sm">✔</span>
+                            <span className="text-sm leading-relaxed">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Button 
+                        className={`w-full ${plan.popular ? 'bg-orange-600 hover:bg-orange-700' : ''}`}
+                        variant={plan.popular ? 'default' : 'outline'}
+                        onClick={() => handlePlanSelection(plan.id)}
+                      >
+                        Escolher Plano - Pagar Agora
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={handleTrialSignup}
+                      >
+                        Teste Grátis por 7 dias
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
