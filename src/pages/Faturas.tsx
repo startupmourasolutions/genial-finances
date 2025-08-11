@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
@@ -31,6 +31,7 @@ interface Invoice {
 export default function Faturas() {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const { toast } = useToast();
   const { user, profile } = useAuth();
   const { subscriberData, invoices, loading, error } = useSubscriberData();
@@ -75,6 +76,11 @@ export default function Faturas() {
   const handlePayInvoice = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
     setIsPaymentDialogOpen(true);
+  };
+
+  const handleViewInvoice = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setIsDetailDialogOpen(true);
   };
 
   const processPayment = () => {
@@ -164,7 +170,6 @@ export default function Faturas() {
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">Valor</Label>
                 <div className="flex items-center text-3xl font-bold text-primary">
-                  <DollarSign className="w-6 h-6 mr-1" />
                   {new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL'
@@ -339,13 +344,10 @@ export default function Faturas() {
                   <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
                   <TableCell>{invoice.description}</TableCell>
                   <TableCell>
-                    <div className="flex items-center">
-                      <DollarSign className="w-4 h-4 mr-1" />
-                      {new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      }).format(invoice.amount)}
-                    </div>
+                    {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(invoice.amount)}
                   </TableCell>
                   <TableCell>
                     {format(new Date(invoice.due_date), "dd/MM/yyyy")}
@@ -371,6 +373,7 @@ export default function Faturas() {
                       <Button 
                         variant="outline" 
                         size="sm"
+                        onClick={() => handleViewInvoice(invoice)}
                         title="Ver detalhes"
                       >
                         <Eye className="w-4 h-4" />
@@ -383,6 +386,73 @@ export default function Faturas() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Dialog de Detalhes da Fatura */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Detalhes da Fatura</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedInvoice && (
+              <>
+                <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Número</Label>
+                    <p className="font-medium">{selectedInvoice.invoice_number}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Status</Label>
+                    <Badge className={getStatusBadgeColor(selectedInvoice.status)}>
+                      {getStatusLabel(selectedInvoice.status)}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Valor</Label>
+                    <p className="text-lg font-bold">
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(selectedInvoice.amount)}
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Moeda</Label>
+                    <p>{selectedInvoice.currency}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Data de Emissão</Label>
+                    <p>{format(new Date(selectedInvoice.issue_date), "dd/MM/yyyy", { locale: ptBR })}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">Data de Vencimento</Label>
+                    <p>{format(new Date(selectedInvoice.due_date), "dd/MM/yyyy", { locale: ptBR })}</p>
+                  </div>
+                  {selectedInvoice.payment_date && (
+                    <>
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">Data de Pagamento</Label>
+                        <p>{format(new Date(selectedInvoice.payment_date), "dd/MM/yyyy", { locale: ptBR })}</p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-muted-foreground">Método de Pagamento</Label>
+                        <p>{selectedInvoice.payment_method || 'Não informado'}</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+                
+                {selectedInvoice.description && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Descrição</Label>
+                    <p className="p-3 bg-muted rounded-md">{selectedInvoice.description}</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog de Pagamento */}
       <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
