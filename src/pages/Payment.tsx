@@ -142,8 +142,8 @@ export default function Payment() {
       }
       
       if (data?.url) {
-        // Open Stripe checkout in new tab
-        window.open(data.url, '_blank');
+        // Redirect to Stripe checkout in the same tab
+        window.location.href = data.url;
       } else {
         toast.error("URL de pagamento não encontrada");
       }
