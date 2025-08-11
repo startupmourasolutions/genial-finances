@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -107,23 +108,39 @@ export default function Payment() {
     setIsProcessing(true);
     
     try {
-      // Simular processamento do pagamento
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      // Check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Você precisa estar logado para continuar");
+        navigate('/auth');
+        return;
+      }
+
       toast.success("Redirecionando para o pagamento...");
       
-      // Aqui seria a integração real com o gateway de pagamento
-      console.log("Processando pagamento:", {
-        plan: planId,
-        cycle,
-        amount: currentPrice,
-        paymentMethod: selectedPaymentMethod
+      // Call Stripe checkout
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          planType: planId,
+          cycle: cycle
+        }
       });
       
-      // Redirecionar para página de sucesso ou gateway de pagamento
-      navigate('/auth?payment=pending');
+      if (error) {
+        console.error('Stripe error:', error);
+        toast.error("Erro ao processar pagamento. Tente novamente.");
+        return;
+      }
+      
+      if (data?.url) {
+        // Open Stripe checkout in new tab
+        window.open(data.url, '_blank');
+      } else {
+        toast.error("URL de pagamento não encontrada");
+      }
       
     } catch (error) {
+      console.error('Payment error:', error);
       toast.error("Erro ao processar pagamento. Tente novamente.");
     } finally {
       setIsProcessing(false);
