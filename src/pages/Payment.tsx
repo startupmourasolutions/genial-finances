@@ -142,11 +142,18 @@ export default function Payment() {
       }
       
       if (data?.url) {
-        // Force redirect at top level to avoid iframe issues
-        if (window.top) {
-          window.top.location.href = data.url;
-        } else {
-          window.location.href = data.url;
+        // Try different approaches to escape iframe restrictions
+        try {
+          // Method 1: Open in parent window
+          window.open(data.url, '_parent');
+        } catch (error) {
+          try {
+            // Method 2: Open in top window
+            window.open(data.url, '_top');
+          } catch (error2) {
+            // Method 3: Regular new window as fallback
+            window.open(data.url, '_blank', 'noopener,noreferrer');
+          }
         }
       } else {
         toast.error("URL de pagamento não encontrada");
