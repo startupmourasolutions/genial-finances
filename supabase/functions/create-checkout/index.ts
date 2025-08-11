@@ -31,20 +31,17 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
-    logStep("Authorization header found");
-
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
-
-    // Parse request body
+    // Parse request body first
     const body = await req.json();
-    const { planType, cycle } = body;
-    logStep("Request body parsed", { planType, cycle });
+    const { planType, cycle, email } = body;
+    logStep("Request body parsed", { planType, cycle, email });
+
+    // Validate email is provided
+    if (!email) {
+      throw new Error("Email is required");
+    }
+    
+    logStep("Using email from request", { email });
 
     // Plan pricing
     const plans = {
@@ -71,7 +68,7 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
     // Check if customer exists
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customers = await stripe.customers.list({ email: email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
@@ -85,7 +82,7 @@ serve(async (req) => {
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
+      customer_email: customerId ? undefined : email,
       line_items: [
         {
           price_data: {
@@ -106,7 +103,7 @@ serve(async (req) => {
       metadata: {
         plan_type: planType,
         cycle: cycle,
-        user_id: user.id
+        email: email // Usar email em vez de user_id já que não temos usuário autenticado ainda
       }
     });
 
