@@ -10,6 +10,7 @@ import { TransactionFormModal } from "@/components/TransactionFormModal"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale" 
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 const Transacoes = () => {
   const { transactions, categories, loading, createTransaction, updateTransaction, deleteTransaction } = useTransactions()
@@ -23,6 +24,7 @@ const Transacoes = () => {
   const [endDate, setEndDate] = useState<string>('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedType, setSelectedType] = useState<string>('all')
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
   const handleEdit = (transaction: any) => {
     setEditingTransaction(transaction)
@@ -78,7 +80,7 @@ const Transacoes = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Transações</h1>
           <p className="text-sm md:text-base text-muted-foreground">Visualize e gerencie suas receitas e despesas</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <Button size="sm" onClick={() => handleCreate('income')} className="h-8 px-2 md:h-10 md:px-4 whitespace-nowrap bg-success hover:bg-success/90">
             <Plus className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Nova Receita</span>
@@ -98,54 +100,110 @@ const Transacoes = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-3 pb-3 md:px-6 md:pb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4">
-            <Input 
-              type="date" 
-              placeholder="Data inicial" 
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="h-8 text-xs"
-            />
-            <Input 
-              type="date" 
-              placeholder="Data final" 
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="h-8 text-xs"
-            />
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="h-8 md:h-10 text-xs md:text-sm">
-                <SelectValue placeholder="Categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as Categorias</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="h-8 md:h-10 text-xs md:text-sm">
-                <SelectValue placeholder="Tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os Tipos</SelectItem>
-                <SelectItem value="income">Receitas</SelectItem>
-                <SelectItem value="expense">Despesas</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Mobile: filtros colapsáveis */}
+          <div className="md:hidden">
+            <Collapsible open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+              <div className="flex items-center justify-between">
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8">
+                    <Filter className="w-4 h-4 mr-2" />
+                    {mobileFiltersOpen ? 'Ocultar filtros' : 'Mostrar filtros'}
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
+              <CollapsibleContent className="mt-2">
+                <div className="grid grid-cols-1 gap-2">
+                  <Input 
+                    type="date" 
+                    placeholder="Data inicial" 
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                  <Input 
+                    type="date" 
+                    placeholder="Data final" 
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder="Categoria" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50">
+                      <SelectItem value="all">Todas as Categorias</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedType} onValueChange={setSelectedType}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder="Tipo" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50">
+                      <SelectItem value="all">Todos os Tipos</SelectItem>
+                      <SelectItem value="income">Receitas</SelectItem>
+                      <SelectItem value="expense">Despesas</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+
+          {/* Desktop: filtros sempre visíveis */}
+          <div className="hidden md:block">
+            <div className="grid grid-cols-4 gap-4">
+              <Input 
+                type="date" 
+                placeholder="Data inicial" 
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <Input 
+                type="date" 
+                placeholder="Data final" 
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as Categorias</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os Tipos</SelectItem>
+                  <SelectItem value="income">Receitas</SelectItem>
+                  <SelectItem value="expense">Despesas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <Card className="shadow-card">
-        <CardHeader className="py-2 px-3 md:py-4 md:px-6">
+        <CardHeader className="hidden md:flex py-2 px-6">
           <CardTitle className="text-sm md:text-lg">Lista de Transações</CardTitle>
         </CardHeader>
         <CardContent className="px-3 pb-3 md:px-6 md:pb-6">
-          <div className="space-y-2 md:space-y-3">
+          <div className="space-y-1 md:space-y-3">
             {filteredTransactions.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 {transactions.length === 0 
@@ -174,7 +232,7 @@ const Transacoes = () => {
                         {format(new Date(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}
                       </p>
                       {transaction.description && (
-                        <p className="text-[10px] md:text-xs text-muted-foreground truncate max-w-48">
+                        <p className="hidden md:block text-xs text-muted-foreground truncate max-w-48">
                           {transaction.description}
                         </p>
                       )}
@@ -187,7 +245,7 @@ const Transacoes = () => {
                       }`}>
                         {transaction.type === 'income' ? '+' : '-'}R$ {Number(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
-                      <Badge variant="outline" className="text-[10px] md:text-xs px-2 py-0.5">
+                      <Badge variant="outline" className="hidden sm:inline-flex text-[10px] md:text-xs px-2 py-0.5">
                         {transaction.type === 'income' ? 'Receita' : 'Despesa'}
                       </Badge>
                     </div>
