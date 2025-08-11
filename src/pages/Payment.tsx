@@ -169,8 +169,24 @@ export default function Payment() {
             try {
               if (paymentWindow.closed) {
                 clearInterval(checkClosed);
-                // Quando a janela fechar, criar conta e fazer login
-                createAccountAndLogin();
+                // Aguardar um pouco antes de processar para garantir que o pagamento foi processado
+                setTimeout(() => {
+                  createAccountAndLogin();
+                }, 2000);
+              } else {
+                // Verificar se voltou para nossa página de sucesso
+                try {
+                  const currentUrl = paymentWindow.location.href;
+                  if (currentUrl.includes('/auth?payment=success') || 
+                      currentUrl.includes('localhost:3000') ||
+                      currentUrl.includes('lovableproject.com')) {
+                    paymentWindow.close();
+                    clearInterval(checkClosed);
+                    createAccountAndLogin();
+                  }
+                } catch (e) {
+                  // Erro de CORS é normal quando está no Stripe
+                }
               }
             } catch (error) {
               // Continuar monitorando
