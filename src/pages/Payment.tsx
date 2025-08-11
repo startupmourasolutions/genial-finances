@@ -219,7 +219,7 @@ export default function Payment() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className={`${currentStep === 1 ? 'max-w-2xl' : 'max-w-6xl'} mx-auto px-6 py-8`}>
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Button 
