@@ -72,49 +72,49 @@ const Transacoes = () => {
   }
 
   return (
-    <div className="p-4 md:p-8 space-y-4 md:space-y-6">
+    <div className="p-3 md:p-8 space-y-3 md:space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Transações</h1>
           <p className="text-sm md:text-base text-muted-foreground">Visualize e gerencie suas receitas e despesas</p>
         </div>
         <div className="flex gap-3">
-          <Button size="sm" onClick={() => handleCreate('income')} className="bg-success hover:bg-success/90">
+          <Button size="sm" onClick={() => handleCreate('income')} className="h-8 px-2 md:h-10 md:px-4 whitespace-nowrap bg-success hover:bg-success/90">
             <Plus className="w-4 h-4 mr-2" />
-            Nova Receita
+            <span className="hidden sm:inline">Nova Receita</span>
           </Button>
-          <Button size="sm" onClick={() => handleCreate('expense')} className="bg-destructive hover:bg-destructive/90">
+          <Button size="sm" onClick={() => handleCreate('expense')} className="h-8 px-2 md:h-10 md:px-4 whitespace-nowrap bg-destructive hover:bg-destructive/90">
             <Plus className="w-4 h-4 mr-2" />
-            Nova Despesa
+            <span className="hidden sm:inline">Nova Despesa</span>
           </Button>
         </div>
       </div>
 
       <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+        <CardHeader className="py-2 px-3 md:py-4 md:px-6">
+          <CardTitle className="flex items-center gap-2 text-sm md:text-lg">
             <Filter className="w-5 h-5" />
             Filtros
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
+        <CardContent className="px-3 pb-3 md:px-6 md:pb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4">
             <Input 
               type="date" 
               placeholder="Data inicial" 
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="text-sm"
+              className="h-8 text-xs"
             />
             <Input 
               type="date" 
               placeholder="Data final" 
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="text-sm"
+              className="h-8 text-xs"
             />
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="h-9 md:h-10 text-sm">
+              <SelectTrigger className="h-8 md:h-10 text-xs md:text-sm">
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
@@ -127,7 +127,7 @@ const Transacoes = () => {
               </SelectContent>
             </Select>
             <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="h-9 md:h-10 text-sm">
+              <SelectTrigger className="h-8 md:h-10 text-xs md:text-sm">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -141,11 +141,11 @@ const Transacoes = () => {
       </Card>
 
       <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="text-base md:text-lg">Lista de Transações</CardTitle>
+        <CardHeader className="py-2 px-3 md:py-4 md:px-6">
+          <CardTitle className="text-sm md:text-lg">Lista de Transações</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
+        <CardContent className="px-3 pb-3 md:px-6 md:pb-6">
+          <div className="space-y-2 md:space-y-3">
             {filteredTransactions.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 {transactions.length === 0 
@@ -155,9 +155,9 @@ const Transacoes = () => {
               </div>
             ) : (
               filteredTransactions.map((transaction) => (
-                <div key={transaction.id} className="group flex items-center justify-between p-2 md:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                <div key={transaction.id} className="group flex items-center justify-between p-1.5 md:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${
+                    <div className={`p-1.5 md:p-2 rounded-full ${
                       transaction.type === 'income' 
                         ? 'bg-success/20 text-success' 
                         : 'bg-destructive/20 text-destructive'
@@ -169,12 +169,12 @@ const Transacoes = () => {
                       )}
                     </div>
                     <div>
-                      <p className="font-medium text-foreground text-sm md:text-base">{transaction.title}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="font-medium text-foreground text-xs md:text-base">{transaction.title}</p>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">
                         {format(new Date(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}
                       </p>
                       {transaction.description && (
-                        <p className="text-xs text-muted-foreground truncate max-w-48">
+                        <p className="text-[10px] md:text-xs text-muted-foreground truncate max-w-48">
                           {transaction.description}
                         </p>
                       )}
@@ -187,7 +187,7 @@ const Transacoes = () => {
                       }`}>
                         {transaction.type === 'income' ? '+' : '-'}R$ {Number(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-[10px] md:text-xs px-2 py-0.5">
                         {transaction.type === 'income' ? 'Receita' : 'Despesa'}
                       </Badge>
                     </div>
@@ -195,7 +195,7 @@ const Transacoes = () => {
                       <Button 
                         size="icon" 
                         variant="outline"
-                        className="h-8 w-8 md:h-9 md:w-9"
+                        className="h-7 w-7 md:h-9 md:w-9"
                         onClick={() => handleEdit(transaction)}
                       >
                         <Edit className="w-4 h-4" />
@@ -203,7 +203,7 @@ const Transacoes = () => {
                       <Button 
                         size="icon" 
                         variant="destructive" 
-                        className="h-8 w-8 md:h-9 md:w-9"
+                        className="h-7 w-7 md:h-9 md:w-9"
                         onClick={() => setDeleteId(transaction.id)}
                       >
                         <Trash2 className="w-4 h-4" />
