@@ -7,28 +7,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   CreditCard, 
   QrCode, 
   Receipt, 
   ArrowLeft, 
   Check, 
-  Smartphone,
-  Clock,
-  Users,
-  Banknote,
-  Shield
+  Shield,
+  User
 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Payment() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [phone, setPhone] = useState("");
   const [document, setDocument] = useState("");
+  
+  // Auth form states
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const [authLoading, setAuthLoading] = useState(false);
 
   // Detecta se é CPF (11 dígitos) ou CNPJ (14 dígitos)
   const getDocumentMask = (value: string) => {
@@ -108,6 +112,63 @@ export default function Payment() {
     }
   }, [planId, cycle, selectedPlan, navigate]);
 
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    
+    try {
+      if (isLogin) {
+        // Login
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
+        
+        toast.success("Login realizado com sucesso!");
+      } else {
+        // Signup
+        if (password !== confirmPassword) {
+          toast.error("As senhas não conferem");
+          return;
+        }
+        
+        if (password.length < 6) {
+          toast.error("A senha deve ter pelo menos 6 caracteres");
+          return;
+        }
+        
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`
+          }
+        });
+        
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
+        
+        toast.success("Conta criada com sucesso!");
+      }
+      
+      // Avançar para próxima etapa
+      setCurrentStep(2);
+      
+    } catch (error) {
+      console.error('Auth error:', error);
+      toast.error("Erro na autenticação. Tente novamente.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   const handlePayment = async () => {
     if (!selectedPaymentMethod) {
       toast.error("Selecione uma forma de pagamento");
@@ -120,8 +181,8 @@ export default function Payment() {
       // Check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast.error("Você precisa estar logado para continuar");
-        navigate('/auth');
+        toast.error("Erro de autenticação. Tente fazer login novamente.");
+        setCurrentStep(1);
         return;
       }
 
@@ -216,7 +277,22 @@ export default function Payment() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold">Finalizar Assinatura</h1>
-            <p className="text-muted-foreground">Escolha sua forma de pagamento</p>
+            <p className="text-muted-foreground">
+              {currentStep === 1 ? 'Entre com sua conta ou crie uma nova' : 'Escolha sua forma de pagamento'}
+            </p>
+          </div>
+        </div>
+
+        {/* Steps indicator */}
+        <div className="flex items-center justify-center mb-8">
+          <div className="flex items-center space-x-4">
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+              <User className="w-4 h-4" />
+            </div>
+            <div className={`h-px w-16 ${currentStep >= 2 ? 'bg-orange-600' : 'bg-gray-200'}`}></div>
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+              <CreditCard className="w-4 h-4" />
+            </div>
           </div>
         </div>
 
@@ -304,157 +380,226 @@ export default function Payment() {
             </Card>
           </div>
 
-          {/* Formas de Pagamento */}
+          {/* Conteúdo dos Steps */}
           <div className="space-y-6">
-            {/* Aviso importante sobre autenticação */}
-            <Card className="border-blue-500 bg-blue-50/50 dark:bg-blue-950/20">
-              <CardContent className="pt-6">
-                <h4 className="font-semibold mb-3 text-blue-600 flex items-center gap-2">
-                  ℹ️ Importante: Autenticação Necessária
-                </h4>
-                <p className="text-sm mb-3">
-                  Para realizar o pagamento, você precisa estar logado com sua conta. Se ainda não tem uma conta, <strong>crie agora mesmo</strong> clicando no botão abaixo.
-                </p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate('/auth')}
-                  className="w-full border-blue-500 text-blue-600 hover:bg-blue-50"
-                >
-                  🔐 Fazer Login ou Criar Conta
-                </Button>
-                <p className="text-xs text-muted-foreground mt-3">
-                  💡 Sua senha será a mesma que você criar no cadastro - não esqueça de anotá-la!
-                </p>
-              </CardContent>
-            </Card>
+            {currentStep === 1 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    {isLogin ? 'Fazer Login' : 'Criar Conta'}
+                  </CardTitle>
+                  <CardDescription>
+                    {isLogin ? 'Entre com sua conta existente' : 'Crie sua conta para continuar'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleAuth} className="space-y-4">
+                    <div>
+                      <Label htmlFor="auth-email">E-mail</Label>
+                      <Input
+                        id="auth-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="seu@email.com"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="auth-password">Senha</Label>
+                      <Input
+                        id="auth-password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Sua senha"
+                        required
+                      />
+                    </div>
+                    
+                    {!isLogin && (
+                      <div>
+                        <Label htmlFor="confirm-password">Confirmar Senha</Label>
+                        <Input
+                          id="confirm-password"
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Confirme sua senha"
+                          required
+                        />
+                      </div>
+                    )}
+                    
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-orange-600 hover:bg-orange-700"
+                      disabled={authLoading}
+                    >
+                      {authLoading ? "Processando..." : (isLogin ? "Entrar" : "Criar Conta")}
+                    </Button>
+                    
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => setIsLogin(!isLogin)}
+                        className="text-orange-600 hover:underline text-sm"
+                      >
+                        {isLogin ? "Não tem conta? Criar uma nova" : "Já tem conta? Fazer login"}
+                      </button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Forma de Pagamento</CardTitle>
-                <CardDescription>
-                  Escolha como deseja pagar sua assinatura
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {paymentMethods.map((method) => (
-                  <Card 
-                    key={method.id}
-                    className={`cursor-pointer transition-all hover:shadow-md ${
-                      selectedPaymentMethod === method.id 
-                        ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-950/20' 
-                        : ''
-                    }`}
-                    onClick={() => setSelectedPaymentMethod(method.id)}
-                  >
-                    <CardContent className="flex items-center gap-4 p-4">
-                      <div className="text-orange-600">
-                        {method.icon}
+            {currentStep === 2 && (
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Forma de Pagamento</CardTitle>
+                    <CardDescription>
+                      Escolha como deseja pagar sua assinatura
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {paymentMethods.map((method) => (
+                      <Card 
+                        key={method.id}
+                        className={`cursor-pointer transition-all hover:shadow-md ${
+                          selectedPaymentMethod === method.id 
+                            ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-950/20' 
+                            : ''
+                        }`}
+                        onClick={() => setSelectedPaymentMethod(method.id)}
+                      >
+                        <CardContent className="flex items-center gap-4 p-4">
+                          <div className="text-orange-600">
+                            {method.icon}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium">{method.name}</h4>
+                            <p className="text-sm text-muted-foreground">{method.description}</p>
+                            <p className="text-xs text-green-600 mt-1">
+                              Processamento: {method.processingTime}
+                            </p>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            selectedPaymentMethod === method.id
+                              ? 'border-orange-600 bg-orange-600'
+                              : 'border-gray-300'
+                          }`}>
+                            {selectedPaymentMethod === method.id && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Dados de Cobrança</CardTitle>
+                    <CardDescription>
+                      Informações para emissão da nota fiscal
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="firstName">Nome</Label>
+                        <Input id="firstName" placeholder="Seu nome" />
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium">{method.name}</h4>
-                        <p className="text-sm text-muted-foreground">{method.description}</p>
-                        <p className="text-xs text-green-600 mt-1">
-                          Processamento: {method.processingTime}
-                        </p>
+                      <div>
+                        <Label htmlFor="lastName">Sobrenome</Label>
+                        <Input id="lastName" placeholder="Seu sobrenome" />
                       </div>
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        selectedPaymentMethod === method.id
-                          ? 'border-orange-600 bg-orange-600'
-                          : 'border-gray-300'
-                      }`}>
-                        {selectedPaymentMethod === method.id && (
-                          <Check className="w-3 h-3 text-white" />
+                    </div>
+                    <div>
+                      <Label htmlFor="billing-email">E-mail</Label>
+                      <Input 
+                        id="billing-email" 
+                        type="email" 
+                        placeholder="seu@email.com"
+                        value={email}
+                        readOnly
+                        className="bg-gray-50"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Telefone/WhatsApp</Label>
+                      <InputMask
+                        mask="(99) 99999-9999"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      >
+                        {(inputProps: any) => (
+                          <Input
+                            {...inputProps}
+                            id="phone"
+                            placeholder="(11) 99999-9999"
+                            className="w-full"
+                          />
                         )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </CardContent>
-            </Card>
+                      </InputMask>
+                    </div>
+                    <div>
+                      <Label htmlFor="document">CPF/CNPJ</Label>
+                      <InputMask
+                        mask={getDocumentMask(document)}
+                        value={document}
+                        onChange={(e) => setDocument(e.target.value)}
+                      >
+                        {(inputProps: any) => (
+                          <Input
+                            {...inputProps}
+                            id="document"
+                            placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                            className="w-full"
+                          />
+                        )}
+                      </InputMask>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Dados Pessoais */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Dados de Cobrança</CardTitle>
-                <CardDescription>
-                  Informações para emissão da nota fiscal
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">Nome</Label>
-                    <Input id="firstName" placeholder="Seu nome" />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Sobrenome</Label>
-                    <Input id="lastName" placeholder="Seu sobrenome" />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="email">E-mail</Label>
-                  <Input id="email" type="email" placeholder="seu@email.com" />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Telefone/WhatsApp</Label>
-                  <InputMask
-                    mask="(99) 99999-9999"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline"
+                    onClick={() => setCurrentStep(1)}
+                    className="flex-1"
                   >
-                    {(inputProps: any) => (
-                      <Input
-                        {...inputProps}
-                        id="phone"
-                        placeholder="(11) 99999-9999"
-                        className="w-full"
-                      />
-                    )}
-                  </InputMask>
-                </div>
-                <div>
-                  <Label htmlFor="document">CPF/CNPJ</Label>
-                  <InputMask
-                    mask={getDocumentMask(document)}
-                    value={document}
-                    onChange={(e) => setDocument(e.target.value)}
+                    Voltar
+                  </Button>
+                  <Button 
+                    className="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-6 text-lg"
+                    onClick={handlePayment}
+                    disabled={!selectedPaymentMethod || isProcessing}
                   >
-                    {(inputProps: any) => (
-                      <Input
-                        {...inputProps}
-                        id="document"
-                        placeholder="000.000.000-00 ou 00.000.000/0000-00"
-                        className="w-full"
-                      />
+                    {isProcessing ? (
+                      "Processando..."
+                    ) : (
+                      `Pagar R$ ${currentPrice.toFixed(2).replace('.', ',')}`
                     )}
-                  </InputMask>
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Botão de Pagamento */}
-            <Button 
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white py-6 text-lg"
-              onClick={handlePayment}
-              disabled={!selectedPaymentMethod || isProcessing}
-            >
-              {isProcessing ? (
-                "Processando..."
-              ) : (
-                `Pagar R$ ${currentPrice.toFixed(2).replace('.', ',')}`
-              )}
-            </Button>
-
-            <p className="text-xs text-center text-muted-foreground">
-              Ao finalizar o pagamento, você concorda com nossos{' '}
-              <span className="text-orange-600 cursor-pointer hover:underline">
-                Termos de Uso
-              </span>{' '}
-              e{' '}
-              <span className="text-orange-600 cursor-pointer hover:underline">
-                Política de Privacidade
-              </span>
-            </p>
+                <p className="text-xs text-center text-muted-foreground">
+                  Ao finalizar o pagamento, você concorda com nossos{' '}
+                  <span className="text-orange-600 cursor-pointer hover:underline">
+                    Termos de Uso
+                  </span>{' '}
+                  e{' '}
+                  <span className="text-orange-600 cursor-pointer hover:underline">
+                    Política de Privacidade
+                  </span>
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
