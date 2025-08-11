@@ -152,14 +152,29 @@ export default function Payment() {
         if (paymentWindow) {
           // Monitorar a janela para detectar quando o pagamento foi concluído
           const checkClosed = setInterval(() => {
-            if (paymentWindow.closed) {
-              clearInterval(checkClosed);
-              // Verificar se o pagamento foi concluído
-              setTimeout(() => {
-                toast.success("Pagamento processado! Verificando status...");
-                // Redirecionar para a área logada após o pagamento
-                navigate('/dashboard');
-              }, 1000);
+            try {
+              // Verificar se a janela ainda existe e se mudou de URL
+              if (paymentWindow.closed) {
+                clearInterval(checkClosed);
+                setTimeout(() => {
+                  toast.success("Pagamento processado! Redirecionando...");
+                  navigate('/dashboard');
+                }, 1000);
+              } else {
+                // Verificar se voltou para nossa página de sucesso
+                try {
+                  if (paymentWindow.location.href.includes('/auth?payment=success')) {
+                    paymentWindow.close();
+                    clearInterval(checkClosed);
+                    toast.success("Pagamento confirmado! Bem-vindo!");
+                    navigate('/dashboard');
+                  }
+                } catch (e) {
+                  // Erro de CORS é normal quando está no Stripe
+                }
+              }
+            } catch (error) {
+              // Continuar monitorando
             }
           }, 1000);
           
@@ -291,6 +306,28 @@ export default function Payment() {
 
           {/* Formas de Pagamento */}
           <div className="space-y-6">
+            {/* Aviso importante sobre autenticação */}
+            <Card className="border-blue-500 bg-blue-50/50 dark:bg-blue-950/20">
+              <CardContent className="pt-6">
+                <h4 className="font-semibold mb-3 text-blue-600 flex items-center gap-2">
+                  ℹ️ Importante: Autenticação Necessária
+                </h4>
+                <p className="text-sm mb-3">
+                  Para realizar o pagamento, você precisa estar logado com sua conta. Se ainda não tem uma conta, <strong>crie agora mesmo</strong> clicando no botão abaixo.
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/auth')}
+                  className="w-full border-blue-500 text-blue-600 hover:bg-blue-50"
+                >
+                  🔐 Fazer Login ou Criar Conta
+                </Button>
+                <p className="text-xs text-muted-foreground mt-3">
+                  💡 Sua senha será a mesma que você criar no cadastro - não esqueça de anotá-la!
+                </p>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle>Forma de Pagamento</CardTitle>
