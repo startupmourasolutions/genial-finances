@@ -29,6 +29,7 @@ export default function Payment() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [phone, setPhone] = useState("");
   const [document, setDocument] = useState("");
+  const [paymentUrl, setPaymentUrl] = useState<string>("");
 
   // Detecta se é CPF (11 dígitos) ou CNPJ (14 dígitos)
   const getDocumentMask = (value: string) => {
@@ -142,19 +143,9 @@ export default function Payment() {
       }
       
       if (data?.url) {
-        // Try different approaches to escape iframe restrictions
-        try {
-          // Method 1: Open in parent window
-          window.open(data.url, '_parent');
-        } catch (error) {
-          try {
-            // Method 2: Open in top window
-            window.open(data.url, '_top');
-          } catch (error2) {
-            // Method 3: Regular new window as fallback
-            window.open(data.url, '_blank', 'noopener,noreferrer');
-          }
-        }
+        // Due to iframe restrictions in Lovable, show the link for manual opening
+        setPaymentUrl(data.url);
+        toast.success("Link de pagamento gerado! Clique no botão abaixo para abrir.");
       } else {
         toast.error("URL de pagamento não encontrada");
       }
@@ -393,6 +384,46 @@ export default function Payment() {
                 `Pagar R$ ${currentPrice.toFixed(2).replace('.', ',')}`
               )}
             </Button>
+
+            {/* Link de Pagamento Gerado */}
+            {paymentUrl && (
+              <Card className="border-green-500 bg-green-50/50 dark:bg-green-950/20">
+                <CardContent className="pt-6">
+                  <h4 className="font-semibold mb-3 text-green-600 flex items-center gap-2">
+                    ✅ Link de Pagamento Gerado
+                  </h4>
+                  <p className="text-sm mb-4">
+                    Copie o link abaixo e cole em uma nova aba do seu navegador para finalizar o pagamento:
+                  </p>
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded border mb-4">
+                    <code className="text-xs break-all text-blue-600">{paymentUrl}</code>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(paymentUrl);
+                        toast.success("Link copiado!");
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                    >
+                      📋 Copiar Link
+                    </Button>
+                    <Button 
+                      onClick={() => window.open(paymentUrl, '_blank')}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      size="sm"
+                    >
+                      🌐 Abrir Link
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    💡 Após o pagamento, você será redirecionado de volta para a aplicação.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
 
             <p className="text-xs text-center text-muted-foreground">
               Ao finalizar o pagamento, você concorda com nossos{' '}
