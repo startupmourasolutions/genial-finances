@@ -142,20 +142,32 @@ export default function Payment() {
       }
       
       if (data?.url) {
-        // Force open payment window with aggressive settings
+        // Abrir janela do Stripe
         const paymentWindow = window.open(
           data.url, 
           'stripe_payment',
           'width=800,height=600,scrollbars=yes,resizable=yes,toolbar=no,location=yes'
         );
         
-        if (!paymentWindow) {
-          // Fallback if popup blocked - try window.location
-          try {
-            window.location.href = data.url;
-          } catch (e) {
-            toast.error("Não foi possível abrir o pagamento. Tente permitir popups.");
-          }
+        if (paymentWindow) {
+          // Monitorar a janela para detectar quando o pagamento foi concluído
+          const checkClosed = setInterval(() => {
+            if (paymentWindow.closed) {
+              clearInterval(checkClosed);
+              // Verificar se o pagamento foi concluído
+              setTimeout(() => {
+                toast.success("Pagamento processado! Verificando status...");
+                // Redirecionar para a área logada após o pagamento
+                navigate('/dashboard');
+              }, 1000);
+            }
+          }, 1000);
+          
+          toast.success("Redirecionando para o pagamento...");
+        } else {
+          // Fallback se popup foi bloqueado
+          toast.error("Popup bloqueado. Abrindo na mesma janela...");
+          window.location.href = data.url;
         }
       } else {
         toast.error("URL de pagamento não encontrada");
