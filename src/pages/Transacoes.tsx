@@ -8,6 +8,8 @@ import { Plus, Filter, Edit, Trash2, TrendingUp, TrendingDown, ArrowUpCircle, Ar
 import { useTransactions } from "@/hooks/useTransactions"
 import { TransactionFormModal } from "@/components/TransactionFormModal"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale" 
 
 const Transacoes = () => {
   const { transactions, categories, loading, createTransaction, updateTransaction, deleteTransaction } = useTransactions()
@@ -151,62 +153,58 @@ const Transacoes = () => {
               </div>
             ) : (
               filteredTransactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
+                <div key={transaction.id} className="group flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-full ${
+                      transaction.type === 'income' 
+                        ? 'bg-success/20 text-success' 
+                        : 'bg-destructive/20 text-destructive'
+                    }`}>
                       {transaction.type === 'income' ? (
-                        <ArrowUpCircle className="w-6 h-6 text-success" />
+                        <ArrowUpCircle className="h-4 w-4" />
                       ) : (
-                        <ArrowDownCircle className="w-6 h-6 text-destructive" />
+                        <ArrowDownCircle className="h-4 w-4" />
                       )}
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-medium text-foreground">{transaction.title}</h4>
-                          <Badge variant={transaction.type === 'income' ? 'default' : 'destructive'} className="text-xs">
-                            {transaction.type === 'income' ? (
-                              <><TrendingUp className="w-3 h-3 mr-1" />ENTRADA</>
-                            ) : (
-                              <><TrendingDown className="w-3 h-3 mr-1" />SAÍDA</>
-                            )}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {transaction.categories?.name || 'Sem categoria'}
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">{transaction.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}
+                      </p>
+                      {transaction.description && (
+                        <p className="text-xs text-muted-foreground truncate max-w-48">
+                          {transaction.description}
                         </p>
-                        {transaction.description && (
-                          <p className="text-xs text-muted-foreground mt-1">{transaction.description}</p>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(transaction.date).toLocaleDateString('pt-BR')}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className={`text-xl font-bold ${
-                      transaction.type === 'income' ? 'text-success' : 'text-destructive'
-                    }`}>
-                      {transaction.type === 'income' ? '+' : '-'}
-                      R$ {transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  <div className="flex gap-2 ml-4">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => handleEdit(transaction)}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="destructive" 
-                      onClick={() => setDeleteId(transaction.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className={`font-semibold ${
+                        transaction.type === 'income' ? 'text-success' : 'text-destructive'
+                      }`}>
+                        {transaction.type === 'income' ? '+' : '-'}R$ {Number(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </p>
+                      <Badge variant="outline" className="text-xs">
+                        {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleEdit(transaction)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        onClick={() => setDeleteId(transaction.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))
