@@ -14,7 +14,9 @@ import {
   ArrowLeft, 
   Check, 
   Shield,
-  User
+  User,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -32,6 +34,8 @@ export default function Payment() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Detecta se é CPF (11 dígitos) ou CNPJ (14 dígitos)
   const getDocumentMask = (value: string) => {
@@ -134,21 +138,14 @@ export default function Payment() {
     setIsProcessing(true);
     
     try {
-      // Check if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Erro de autenticação. Tente fazer login novamente.");
-        setCurrentStep(1);
-        return;
-      }
-
       toast.success("Redirecionando para o pagamento...");
       
-      // Call Stripe checkout
+      // Call Stripe checkout SEM autenticação prévia
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           planType: planId,
-          cycle: cycle
+          cycle: cycle,
+          email: email // Passar o email do step 1
         }
       });
       
@@ -170,32 +167,16 @@ export default function Payment() {
           // Monitorar a janela para detectar quando o pagamento foi concluído
           const checkClosed = setInterval(() => {
             try {
-              // Verificar se a janela ainda existe e se mudou de URL
               if (paymentWindow.closed) {
                 clearInterval(checkClosed);
-                setTimeout(() => {
-                  toast.success("Pagamento processado! Redirecionando...");
-                  navigate('/dashboard');
-                }, 1000);
-              } else {
-                // Verificar se voltou para nossa página de sucesso
-                try {
-                  if (paymentWindow.location.href.includes('/auth?payment=success')) {
-                    paymentWindow.close();
-                    clearInterval(checkClosed);
-                    toast.success("Pagamento confirmado! Bem-vindo!");
-                    navigate('/dashboard');
-                  }
-                } catch (e) {
-                  // Erro de CORS é normal quando está no Stripe
-                }
+                // Quando a janela fechar, criar conta e fazer login
+                createAccountAndLogin();
               }
             } catch (error) {
               // Continuar monitorando
             }
           }, 1000);
           
-          toast.success("Redirecionando para o pagamento...");
         } else {
           // Fallback se popup foi bloqueado
           toast.error("Popup bloqueado. Abrindo na mesma janela...");
@@ -210,6 +191,44 @@ export default function Payment() {
       toast.error("Erro ao processar pagamento. Tente novamente.");
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const createAccountAndLogin = async () => {
+    try {
+      toast.success("Pagamento confirmado! Criando sua conta...");
+      
+      // Criar conta com email e senha do step 1
+      const { error: signupError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+      
+      if (signupError) {
+        console.error('Signup error:', signupError);
+        // Se der erro de "já existe", tenta fazer login
+        const { error: loginError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (loginError) {
+          toast.error("Erro ao criar conta. Tente novamente.");
+          return;
+        }
+      }
+      
+      toast.success("Conta criada com sucesso! Redirecionando...");
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Account creation error:', error);
+      toast.error("Erro ao criar conta. Entre em contato com o suporte.");
     }
   };
 
@@ -252,9 +271,82 @@ export default function Payment() {
           </div>
         </div>
 
-        <div className={`${currentStep === 1 ? '' : 'grid lg:grid-cols-2 gap-8'}`}>
-          {/* Resumo do Plano - só aparece no step 2 */}
-          {currentStep === 2 && (
+        {currentStep === 1 ? (
+          <div className="flex justify-center">
+            <div className="w-full max-w-md space-y-6">
+              <div>
+                <Label htmlFor="auth-email" className="text-lg">E-mail</Label>
+                <Input
+                  id="auth-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="auth-password" className="text-lg">Senha</Label>
+                <div className="relative">
+                  <Input
+                    id="auth-password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Sua senha"
+                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600 pr-10"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="auth-confirm-password" className="text-lg">Confirmar Senha</Label>
+                <div className="relative">
+                  <Input
+                    id="auth-confirm-password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirme sua senha"
+                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600 pr-10"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+              
+              {email && password && confirmPassword && (
+                <div className="flex justify-end mt-8">
+                  <button
+                    onClick={handleAuth}
+                    className="text-orange-600 hover:text-orange-700 font-medium"
+                    disabled={authLoading}
+                  >
+                    {authLoading ? "Processando..." : "Próximo →"}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Resumo do Plano */}
             <div className="space-y-6">
               <Card>
                 <CardHeader>
@@ -336,200 +428,141 @@ export default function Payment() {
                 </CardContent>
               </Card>
             </div>
-          )}
 
-          {/* Conteúdo dos Steps */}
-          <div className="space-y-6">
-            {currentStep === 1 && (
-              <div className="space-y-6">
-                <div>
-                  <Label htmlFor="auth-email" className="text-lg">E-mail</Label>
-                  <Input
-                    id="auth-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="seu@email.com"
-                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="auth-password" className="text-lg">Senha</Label>
-                  <Input
-                    id="auth-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Sua senha"
-                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="auth-confirm-password" className="text-lg">Confirmar Senha</Label>
-                  <Input
-                    id="auth-confirm-password"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirme sua senha"
-                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
-                    required
-                  />
-                </div>
-                
-                {email && password && confirmPassword && (
-                  <div className="flex justify-end mt-8">
-                    <button
-                      onClick={handleAuth}
-                      className="text-orange-600 hover:text-orange-700 font-medium"
-                      disabled={authLoading}
+            {/* Checkout */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Forma de Pagamento</CardTitle>
+                  <CardDescription>
+                    Escolha como deseja pagar sua assinatura
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {paymentMethods.map((method) => (
+                    <Card 
+                      key={method.id}
+                      className={`cursor-pointer transition-all hover:shadow-md ${
+                        selectedPaymentMethod === method.id 
+                          ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-950/20' 
+                          : ''
+                      }`}
+                      onClick={() => setSelectedPaymentMethod(method.id)}
                     >
-                      {authLoading ? "Processando..." : "Próximo →"}
-                    </button>
+                      <CardContent className="flex items-center gap-4 p-4">
+                        <div className="text-orange-600">
+                          {method.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium">{method.name}</h4>
+                          <p className="text-sm text-muted-foreground">{method.description}</p>
+                          <p className="text-xs text-green-600 mt-1">
+                            Processamento: {method.processingTime}
+                          </p>
+                        </div>
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          selectedPaymentMethod === method.id
+                            ? 'border-orange-600 bg-orange-600'
+                            : 'border-gray-300'
+                        }`}>
+                          {selectedPaymentMethod === method.id && (
+                            <Check className="w-3 h-3 text-white" />
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Dados de Cobrança</CardTitle>
+                  <CardDescription>
+                    Informações para emissão da nota fiscal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="firstName">Nome</Label>
+                      <Input id="firstName" placeholder="Seu nome" />
+                    </div>
+                    <div>
+                      <Label htmlFor="lastName">Sobrenome</Label>
+                      <Input id="lastName" placeholder="Seu sobrenome" />
+                    </div>
                   </div>
-                )}
+                  <div>
+                    <Label htmlFor="phone">Telefone/WhatsApp</Label>
+                    <InputMask
+                      mask="(99) 99999-9999"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    >
+                      {(inputProps: any) => (
+                        <Input
+                          {...inputProps}
+                          id="phone"
+                          placeholder="(11) 99999-9999"
+                          className="w-full"
+                        />
+                      )}
+                    </InputMask>
+                  </div>
+                  <div>
+                    <Label htmlFor="document">CPF/CNPJ</Label>
+                    <InputMask
+                      mask={getDocumentMask(document)}
+                      value={document}
+                      onChange={(e) => setDocument(e.target.value)}
+                    >
+                      {(inputProps: any) => (
+                        <Input
+                          {...inputProps}
+                          id="document"
+                          placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                          className="w-full"
+                        />
+                      )}
+                    </InputMask>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex items-center justify-between mt-8">
+                <button
+                  onClick={() => setCurrentStep(1)}
+                  className="text-gray-600 hover:text-gray-800 font-medium"
+                >
+                  ← Voltar
+                </button>
+                <Button 
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3"
+                  onClick={handlePayment}
+                  disabled={!selectedPaymentMethod || isProcessing}
+                >
+                  {isProcessing ? (
+                    "Processando..."
+                  ) : (
+                    `Pagar R$ ${currentPrice.toFixed(2).replace('.', ',')}`
+                  )}
+                </Button>
               </div>
-            )}
 
-            {currentStep === 2 && (
-              <>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Forma de Pagamento</CardTitle>
-                    <CardDescription>
-                      Escolha como deseja pagar sua assinatura
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {paymentMethods.map((method) => (
-                      <Card 
-                        key={method.id}
-                        className={`cursor-pointer transition-all hover:shadow-md ${
-                          selectedPaymentMethod === method.id 
-                            ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-950/20' 
-                            : ''
-                        }`}
-                        onClick={() => setSelectedPaymentMethod(method.id)}
-                      >
-                        <CardContent className="flex items-center gap-4 p-4">
-                          <div className="text-orange-600">
-                            {method.icon}
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-medium">{method.name}</h4>
-                            <p className="text-sm text-muted-foreground">{method.description}</p>
-                            <p className="text-xs text-green-600 mt-1">
-                              Processamento: {method.processingTime}
-                            </p>
-                          </div>
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                            selectedPaymentMethod === method.id
-                              ? 'border-orange-600 bg-orange-600'
-                              : 'border-gray-300'
-                          }`}>
-                            {selectedPaymentMethod === method.id && (
-                              <Check className="w-3 h-3 text-white" />
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Dados de Cobrança</CardTitle>
-                    <CardDescription>
-                      Informações para emissão da nota fiscal
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="firstName">Nome</Label>
-                        <Input id="firstName" placeholder="Seu nome" />
-                      </div>
-                      <div>
-                        <Label htmlFor="lastName">Sobrenome</Label>
-                        <Input id="lastName" placeholder="Seu sobrenome" />
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Telefone/WhatsApp</Label>
-                      <InputMask
-                        mask="(99) 99999-9999"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                      >
-                        {(inputProps: any) => (
-                          <Input
-                            {...inputProps}
-                            id="phone"
-                            placeholder="(11) 99999-9999"
-                            className="w-full"
-                          />
-                        )}
-                      </InputMask>
-                    </div>
-                    <div>
-                      <Label htmlFor="document">CPF/CNPJ</Label>
-                      <InputMask
-                        mask={getDocumentMask(document)}
-                        value={document}
-                        onChange={(e) => setDocument(e.target.value)}
-                      >
-                        {(inputProps: any) => (
-                          <Input
-                            {...inputProps}
-                            id="document"
-                            placeholder="000.000.000-00 ou 00.000.000/0000-00"
-                            className="w-full"
-                          />
-                        )}
-                      </InputMask>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <div className="flex items-center justify-between mt-8">
-                  <button
-                    onClick={() => setCurrentStep(1)}
-                    className="text-gray-600 hover:text-gray-800 font-medium"
-                  >
-                    ← Voltar
-                  </button>
-                  <Button 
-                    className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3"
-                    onClick={handlePayment}
-                    disabled={!selectedPaymentMethod || isProcessing}
-                  >
-                    {isProcessing ? (
-                      "Processando..."
-                    ) : (
-                      `Pagar R$ ${currentPrice.toFixed(2).replace('.', ',')}`
-                    )}
-                  </Button>
-                </div>
-
-                <p className="text-xs text-center text-muted-foreground">
-                  Ao finalizar o pagamento, você concorda com nossos{' '}
-                  <span className="text-orange-600 cursor-pointer hover:underline">
-                    Termos de Uso
-                  </span>{' '}
-                  e{' '}
-                  <span className="text-orange-600 cursor-pointer hover:underline">
-                    Política de Privacidade
-                  </span>
-                </p>
-              </>
-            )}
+              <p className="text-xs text-center text-muted-foreground">
+                Ao finalizar o pagamento, você concorda com nossos{' '}
+                <span className="text-orange-600 cursor-pointer hover:underline">
+                  Termos de Uso
+                </span>{' '}
+                e{' '}
+                <span className="text-orange-600 cursor-pointer hover:underline">
+                  Política de Privacidade
+                </span>
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
