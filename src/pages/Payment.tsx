@@ -252,7 +252,7 @@ export default function Payment() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className={`${currentStep === 1 ? 'max-w-md mx-auto' : 'grid lg:grid-cols-2 gap-8'}`}>
           {/* Resumo do Plano - só aparece no step 2 */}
           {currentStep === 2 && (
             <div className="space-y-6">
@@ -339,9 +339,9 @@ export default function Payment() {
           )}
 
           {/* Conteúdo dos Steps */}
-          <div className={`space-y-6 ${currentStep === 1 ? 'lg:col-span-2' : ''}`}>
+          <div className="space-y-6">
             {currentStep === 1 && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
                   <Label htmlFor="auth-email" className="text-lg">E-mail</Label>
                   <Input
@@ -382,13 +382,15 @@ export default function Payment() {
                 </div>
                 
                 {email && password && confirmPassword && (
-                  <Button 
-                    onClick={handleAuth}
-                    className="w-full bg-orange-600 hover:bg-orange-700 mt-6 py-3 text-lg"
-                    disabled={authLoading}
-                  >
-                    {authLoading ? "Processando..." : "Próximo"}
-                  </Button>
+                  <div className="flex justify-end mt-8">
+                    <button
+                      onClick={handleAuth}
+                      className="text-orange-600 hover:text-orange-700 font-medium"
+                      disabled={authLoading}
+                    >
+                      {authLoading ? "Processando..." : "Próximo →"}
+                    </button>
+                  </div>
                 )}
               </div>
             )}
@@ -505,16 +507,15 @@ export default function Payment() {
                   </CardContent>
                 </Card>
 
-                <div className="flex gap-3">
-                  <Button 
-                    variant="outline"
+                <div className="flex items-center justify-between mt-8">
+                  <button
                     onClick={() => setCurrentStep(1)}
-                    className="flex-1"
+                    className="text-gray-600 hover:text-gray-800 font-medium"
                   >
-                    Voltar
-                  </Button>
+                    ← Voltar
+                  </button>
                   <Button 
-                    className="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-6 text-lg"
+                    className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3"
                     onClick={handlePayment}
                     disabled={!selectedPaymentMethod || isProcessing}
                   >
