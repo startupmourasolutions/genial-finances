@@ -341,48 +341,48 @@ export default function Payment() {
           {/* Conteúdo dos Steps */}
           <div className="space-y-6">
             {currentStep === 1 && (
-              <div className="space-y-6">
+              <div className="space-y-6 text-center">
                 <div>
-                  <Label htmlFor="auth-email" className="text-lg">E-mail</Label>
+                  <Label htmlFor="auth-email" className="text-lg block mb-2">E-mail</Label>
                   <Input
                     id="auth-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="seu@email.com"
-                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
+                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600 text-center"
                     required
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="auth-password" className="text-lg">Senha</Label>
+                  <Label htmlFor="auth-password" className="text-lg block mb-2">Senha</Label>
                   <Input
                     id="auth-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Sua senha"
-                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
+                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600 text-center"
                     required
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="auth-confirm-password" className="text-lg">Confirmar Senha</Label>
+                  <Label htmlFor="auth-confirm-password" className="text-lg block mb-2">Confirmar Senha</Label>
                   <Input
                     id="auth-confirm-password"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirme sua senha"
-                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
+                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600 text-center"
                     required
                   />
                 </div>
                 
                 {email && password && confirmPassword && (
-                  <div className="flex justify-end mt-8">
+                  <div className="flex justify-center mt-8">
                     <button
                       onClick={handleAuth}
                       className="text-orange-600 hover:text-orange-700 font-medium"
