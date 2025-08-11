@@ -111,8 +111,12 @@ export function AppSidebar() {
     <Sidebar className={`border-r border-border ${collapsed ? "w-16" : "w-64"}`}>
       <SidebarHeader className="border-b border-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-brand-orange rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">G</span>
+          <div className="w-10 h-10 flex items-center justify-center">
+            <img 
+              src="/lovable-uploads/e5cda14e-171c-4121-9cee-20d3c20bc6c3.png" 
+              alt="Gênio Financeiro" 
+              className="w-10 h-10 object-contain"
+            />
           </div>
           {!collapsed && (
             <div>

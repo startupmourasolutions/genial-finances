@@ -71,13 +71,22 @@ export default function Auth() {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-background via-background/95 to-primary/5 flex items-center justify-center p-4 lg:p-8">
       <div className="w-full max-w-md lg:max-w-lg space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-            Gênio Financeiro
-          </h1>
-          <p className="text-muted-foreground">
-            Sua gestão financeira inteligente
-          </p>
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <img 
+              src="/lovable-uploads/e5cda14e-171c-4121-9cee-20d3c20bc6c3.png" 
+              alt="Gênio Financeiro" 
+              className="w-20 h-20 object-contain"
+            />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+              Gênio Financeiro
+            </h1>
+            <p className="text-muted-foreground">
+              Sua gestão financeira inteligente
+            </p>
+          </div>
         </div>
 
         <Card className="w-full shadow-lg border-0 bg-background/80 backdrop-blur-sm">
