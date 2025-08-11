@@ -31,7 +31,6 @@ export default function Payment() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLogin, setIsLogin] = useState(true);
   const [authLoading, setAuthLoading] = useState(false);
 
   // Detecta se é CPF (11 dígitos) ou CNPJ (14 dígitos)
@@ -112,45 +111,18 @@ export default function Payment() {
     }
   }, [planId, cycle, selectedPlan, navigate]);
 
-  const handleAuth = async () => {
-    setAuthLoading(true);
-    
-    try {
-      // Primeiro tenta fazer login
-      const { error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (loginError) {
-        // Se der erro de login, tenta criar conta
-        const { error: signupError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`
-          }
-        });
-        
-        if (signupError) {
-          toast.error(signupError.message);
-          return;
-        }
-        
-        toast.success("Conta criada com sucesso!");
-      } else {
-        toast.success("Login realizado com sucesso!");
-      }
-      
-      // Avançar para próxima etapa
-      setCurrentStep(2);
-      
-    } catch (error) {
-      console.error('Auth error:', error);
-      toast.error("Erro na autenticação. Tente novamente.");
-    } finally {
-      setAuthLoading(false);
+  const handleAuth = () => {
+    if (password !== confirmPassword) {
+      toast.error("As senhas não coincidem");
+      return;
     }
+    
+    if (password.length < 6) {
+      toast.error("A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+    
+    setCurrentStep(2);
   };
 
   const handlePayment = async () => {
@@ -262,7 +234,7 @@ export default function Payment() {
           <div>
             <h1 className="text-2xl font-bold">Finalizar Assinatura</h1>
             <p className="text-muted-foreground">
-              {currentStep === 1 ? 'Entre com sua conta ou crie uma nova' : 'Escolha sua forma de pagamento'}
+              {currentStep === 1 ? 'Preencha seus dados de acesso' : 'Escolha sua forma de pagamento'}
             </p>
           </div>
         </div>
@@ -281,91 +253,93 @@ export default function Payment() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Resumo do Plano */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  📌 Plano {selectedPlan.name}
-                  {planId === 'genio' && (
-                    <Badge className="bg-orange-600">Mais Popular</Badge>
-                  )}
-                </CardTitle>
-                <CardDescription>
-                  Cobrança {cycle === 'monthly' ? 'mensal' : 'anual'}
-                  {cycle === 'yearly' && (
-                    <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">
-                      -25% desconto
-                    </Badge>
-                  )}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-2xl font-bold">
-                    R$ {currentPrice.toFixed(2).replace('.', ',')}
-                  </span>
-                  <span className="text-muted-foreground">
-                    /{cycle === 'monthly' ? 'mês' : 'ano'}
-                  </span>
-                </div>
-                
-                {equivalentMonthlyPrice && (
-                  <p className="text-sm text-green-600 font-medium">
-                    Equivale a R$ {equivalentMonthlyPrice.toFixed(2).replace('.', ',')}/mês
-                  </p>
-                )}
-
-                <div className="pt-4 border-t">
-                  <h4 className="font-semibold mb-3 text-green-600">✅ Recursos inclusos:</h4>
-                  <ul className="space-y-2">
-                    {selectedPlan.features.slice(0, 5).map((feature, index) => (
-                      <li key={index} className="flex items-start">
-                        <Check className="w-4 h-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                    {selectedPlan.features.length > 5 && (
-                      <li className="text-sm text-muted-foreground">
-                        E mais {selectedPlan.features.length - 5} recursos...
-                      </li>
+          {/* Resumo do Plano - só aparece no step 2 */}
+          {currentStep === 2 && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    📌 Plano {selectedPlan.name}
+                    {planId === 'genio' && (
+                      <Badge className="bg-orange-600">Mais Popular</Badge>
                     )}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardTitle>
+                  <CardDescription>
+                    Cobrança {cycle === 'monthly' ? 'mensal' : 'anual'}
+                    {cycle === 'yearly' && (
+                      <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">
+                        -25% desconto
+                      </Badge>
+                    )}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-2xl font-bold">
+                      R$ {currentPrice.toFixed(2).replace('.', ',')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      /{cycle === 'monthly' ? 'mês' : 'ano'}
+                    </span>
+                  </div>
+                  
+                  {equivalentMonthlyPrice && (
+                    <p className="text-sm text-green-600 font-medium">
+                      Equivale a R$ {equivalentMonthlyPrice.toFixed(2).replace('.', ',')}/mês
+                    </p>
+                  )}
 
-            {/* Garantias */}
-            <Card>
-              <CardContent className="pt-6">
-                <h4 className="font-semibold mb-4 flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-green-600" />
-                  Garantias
-                </h4>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    7 dias de garantia incondicional
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    Cancele quando quiser
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    Dados seguros e criptografados
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    Suporte especializado
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
+                  <div className="pt-4 border-t">
+                    <h4 className="font-semibold mb-3 text-green-600">✅ Recursos inclusos:</h4>
+                    <ul className="space-y-2">
+                      {selectedPlan.features.slice(0, 5).map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                          <Check className="w-4 h-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                      {selectedPlan.features.length > 5 && (
+                        <li className="text-sm text-muted-foreground">
+                          E mais {selectedPlan.features.length - 5} recursos...
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Garantias */}
+              <Card>
+                <CardContent className="pt-6">
+                  <h4 className="font-semibold mb-4 flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-green-600" />
+                    Garantias
+                  </h4>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      7 dias de garantia incondicional
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      Cancele quando quiser
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      Dados seguros e criptografados
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      Suporte especializado
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Conteúdo dos Steps */}
-          <div className="space-y-6">
+          <div className={`space-y-6 ${currentStep === 1 ? 'lg:col-span-2' : ''}`}>
             {currentStep === 1 && (
               <div className="space-y-4">
                 <div>
@@ -394,7 +368,20 @@ export default function Payment() {
                   />
                 </div>
                 
-                {email && password && (
+                <div>
+                  <Label htmlFor="auth-confirm-password" className="text-lg">Confirmar Senha</Label>
+                  <Input
+                    id="auth-confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirme sua senha"
+                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
+                    required
+                  />
+                </div>
+                
+                {email && password && confirmPassword && (
                   <Button 
                     onClick={handleAuth}
                     className="w-full bg-orange-600 hover:bg-orange-700 mt-6 py-3 text-lg"
