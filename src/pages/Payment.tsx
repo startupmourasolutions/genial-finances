@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import InputMask from "react-input-mask";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,14 @@ export default function Payment() {
   const navigate = useNavigate();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [document, setDocument] = useState("");
+
+  // Detecta se é CPF (11 dígitos) ou CNPJ (14 dígitos)
+  const getDocumentMask = (value: string) => {
+    const cleanValue = value.replace(/\D/g, '');
+    return cleanValue.length <= 11 ? '999.999.999-99' : '99.999.999/9999-99';
+  };
 
   const planId = searchParams.get('plan');
   const cycle = searchParams.get('cycle');
@@ -326,11 +335,37 @@ export default function Payment() {
                 </div>
                 <div>
                   <Label htmlFor="phone">Telefone/WhatsApp</Label>
-                  <Input id="phone" placeholder="(11) 99999-9999" />
+                  <InputMask
+                    mask="(99) 99999-9999"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  >
+                    {(inputProps: any) => (
+                      <Input
+                        {...inputProps}
+                        id="phone"
+                        placeholder="(11) 99999-9999"
+                        className="w-full"
+                      />
+                    )}
+                  </InputMask>
                 </div>
                 <div>
                   <Label htmlFor="document">CPF/CNPJ</Label>
-                  <Input id="document" placeholder="000.000.000-00" />
+                  <InputMask
+                    mask={getDocumentMask(document)}
+                    value={document}
+                    onChange={(e) => setDocument(e.target.value)}
+                  >
+                    {(inputProps: any) => (
+                      <Input
+                        {...inputProps}
+                        id="document"
+                        placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                        className="w-full"
+                      />
+                    )}
+                  </InputMask>
                 </div>
               </CardContent>
             </Card>
