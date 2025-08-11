@@ -60,81 +60,81 @@ export default function DashboardPessoal() {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+      <div className="flex flex-col gap-2 mb-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard Pessoal</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Visão geral das suas finanças pessoais</p>
+          <h1 className="text-lg sm:text-2xl font-bold text-foreground">Dashboard Pessoal</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Visão geral das suas finanças pessoais</p>
         </div>
-        <Badge variant="outline" className="text-xs">
+        <Badge variant="outline" className="text-xs self-start">
           Perfil Individual
         </Badge>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         <Card className="shadow-card hover:shadow-lg transition-smooth">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
               Saldo Atual
             </CardTitle>
-            <TrendingUp className={`h-3 w-3 sm:h-4 sm:w-4 ${currentMonthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'}`} />
+            <TrendingUp className={`h-3 w-3 ${currentMonthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'}`} />
           </CardHeader>
-          <CardContent className="pb-3">
-            <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${currentMonthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'}`}>
+          <CardContent className="pb-2">
+            <div className={`text-sm sm:text-base font-bold ${currentMonthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'}`}>
               R$ {currentMonthStats.currentBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-[10px] text-muted-foreground mt-0.5">
               Este mês
             </p>
           </CardContent>
         </Card>
 
         <Card className="shadow-card hover:shadow-lg transition-smooth">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
               Receitas
             </CardTitle>
-            <ArrowUpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-success" />
+            <ArrowUpCircle className="h-3 w-3 text-success" />
           </CardHeader>
-          <CardContent className="pb-3">
-            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-success">
+          <CardContent className="pb-2">
+            <div className="text-sm sm:text-base font-bold text-success">
               R$ {currentMonthStats.totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-[10px] text-muted-foreground mt-0.5">
               {currentMonthStats.incomeCount} receitas este mês
             </p>
           </CardContent>
         </Card>
 
         <Card className="shadow-card hover:shadow-lg transition-smooth">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
               Despesas
             </CardTitle>
-            <ArrowDownCircle className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
+            <ArrowDownCircle className="h-3 w-3 text-destructive" />
           </CardHeader>
-          <CardContent className="pb-3">
-            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-destructive">
+          <CardContent className="pb-2">
+            <div className="text-sm sm:text-base font-bold text-destructive">
               R$ {currentMonthStats.totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-[10px] text-muted-foreground mt-0.5">
               {currentMonthStats.expenseCount} despesas este mês
             </p>
           </CardContent>
         </Card>
 
         <Card className="shadow-card hover:shadow-lg transition-smooth">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
               Progresso Metas
             </CardTitle>
-            <Target className="h-3 w-3 sm:h-4 sm:w-4 text-brand-orange" />
+            <Target className="h-3 w-3 text-brand-orange" />
           </CardHeader>
-          <CardContent className="pb-3">
-            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-brand-orange">
+          <CardContent className="pb-2">
+            <div className="text-sm sm:text-base font-bold text-brand-orange">
               {currentMonthStats.goalProgress.toFixed(1)}%
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-[10px] text-muted-foreground mt-0.5">
               Média das metas ativas
             </p>
           </CardContent>
