@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { DollarSign, Calendar, CreditCard, Mail, QrCode, FileText, Download, Eye } from "lucide-react";
+import { DollarSign, Calendar, CreditCard, Mail, QrCode, FileText, Download, Eye, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSubscriberData } from "@/hooks/useSubscriberData";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Invoice {
   id: string;
@@ -25,170 +27,50 @@ interface Invoice {
   next_close_date?: string;
 }
 
-// Dados mockados das faturas do cliente
-const mockClientInvoices: Invoice[] = [
-  {
-    id: "inv1",
-    invoice_number: "FAT-202401-0001",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2024-04-10",
-    issue_date: "2024-03-10",
-    status: "pendente",
-    payment_method: "PIX",
-    description: "Mensalidade Premium - Março/2024",
-    next_close_date: "2024-04-10"
-  },
-  {
-    id: "inv2", 
-    invoice_number: "FAT-202401-0002",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2024-03-10",
-    issue_date: "2024-02-10",
-    status: "paga",
-    payment_method: "PIX",
-    payment_date: "2024-03-08",
-    description: "Mensalidade Premium - Fevereiro/2024"
-  },
-  {
-    id: "inv3",
-    invoice_number: "FAT-202401-0003", 
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2024-02-10",
-    issue_date: "2024-01-10",
-    status: "paga",
-    payment_method: "PIX",
-    payment_date: "2024-02-09",
-    description: "Mensalidade Premium - Janeiro/2024"
-  },
-  {
-    id: "inv4",
-    invoice_number: "FAT-202401-0004",
-    amount: 59.90,
-    currency: "BRL", 
-    due_date: "2024-01-10",
-    issue_date: "2023-12-10",
-    status: "paga",
-    payment_method: "PIX",
-    payment_date: "2024-01-08",
-    description: "Mensalidade Premium - Dezembro/2023"
-  },
-  {
-    id: "inv5",
-    invoice_number: "FAT-202401-0005",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2023-12-10",
-    issue_date: "2023-11-10", 
-    status: "paga",
-    payment_method: "PIX",
-    payment_date: "2023-12-08",
-    description: "Mensalidade Premium - Novembro/2023"
-  },
-  {
-    id: "inv6",
-    invoice_number: "FAT-202401-0006",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2023-11-10",
-    issue_date: "2023-10-10",
-    status: "paga",
-    payment_method: "PIX", 
-    description: "Mensalidade Premium - Outubro/2023"
-  },
-  {
-    id: "inv7",
-    invoice_number: "FAT-202401-0007",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2023-10-10",
-    issue_date: "2023-09-10",
-    status: "paga",
-    payment_method: "PIX", 
-    description: "Mensalidade Premium - Setembro/2023"
-  },
-  {
-    id: "inv8",
-    invoice_number: "FAT-202401-0008",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2023-09-10",
-    issue_date: "2023-08-10",
-    status: "paga",
-    payment_method: "PIX", 
-    description: "Mensalidade Premium - Agosto/2023"
-  },
-  {
-    id: "inv9",
-    invoice_number: "FAT-202401-0009",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2023-08-10",
-    issue_date: "2023-07-10",
-    status: "paga",
-    payment_method: "PIX", 
-    description: "Mensalidade Premium - Julho/2023"
-  },
-  {
-    id: "inv10",
-    invoice_number: "FAT-202401-0010",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2023-07-10",
-    issue_date: "2023-06-10",
-    status: "paga",
-    payment_method: "PIX", 
-    description: "Mensalidade Premium - Junho/2023"
-  },
-  {
-    id: "inv11",
-    invoice_number: "FAT-202401-0011",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2023-06-10",
-    issue_date: "2023-05-10",
-    status: "paga",
-    payment_method: "PIX", 
-    description: "Mensalidade Premium - Maio/2023"
-  },
-  {
-    id: "inv12",
-    invoice_number: "FAT-202401-0012",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2023-05-10",
-    issue_date: "2023-04-10",
-    status: "paga",
-    payment_method: "PIX", 
-    description: "Mensalidade Premium - Abril/2023"
-  }
-];
-
-const clientData = {
-  name: "João Silva Santos",
-  company: "Empresa ABC Ltda",
-  email: "joao.silva@empresa1.com.br",
-  billing_email: "financeiro@empresa1.com.br",
-  payment_method: "PIX",
-  plan: "Premium"
-};
 
 export default function Faturas() {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState(clientData.payment_method);
-  const [billingEmail, setBillingEmail] = useState(clientData.billing_email);
   const { toast } = useToast();
+  const { user, profile } = useAuth();
+  const { subscriberData, invoices, loading, error } = useSubscriberData();
+
+  // Definir método de pagamento com base na assinatura
+  const [paymentMethod, setPaymentMethod] = useState("Cartão de Crédito");
+  const [billingEmail, setBillingEmail] = useState("");
+
+  useEffect(() => {
+    if (profile?.email) {
+      setBillingEmail(profile.email);
+    }
+  }, [profile]);
 
   // Fatura atual (mais recente com status pendente ou a primeira da lista)
-  const currentInvoice = mockClientInvoices.find(inv => inv.status === 'pendente') || mockClientInvoices[0];
+  const currentInvoice = invoices.find(inv => inv.status === 'pendente') || invoices[0];
 
   // Últimas 12 faturas ordenadas por data de emissão (mais recente primeiro)
-  const last12Invoices = mockClientInvoices
+  const last12Invoices = invoices
     .sort((a, b) => new Date(b.issue_date).getTime() - new Date(a.issue_date).getTime())
     .slice(0, 12);
+
+  if (loading) {
+    return (
+      <div className="w-full flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Carregando dados da assinatura...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full p-6">
+        <div className="text-center text-red-600">
+          <p>Erro ao carregar dados: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   const handlePayInvoice = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
@@ -316,19 +198,19 @@ export default function Faturas() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">Próximo Fechamento</Label>
-                <div className="flex items-center text-lg">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  {currentInvoice.next_close_date 
-                    ? format(new Date(currentInvoice.next_close_date), "dd/MM/yyyy", { locale: ptBR })
-                    : "10/04/2024"
-                  }
+              {subscriberData?.subscription_end && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground">Próximo Fechamento</Label>
+                  <div className="flex items-center text-lg">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    {format(new Date(subscriberData.subscription_end), "dd/MM/yyyy", { locale: ptBR })}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            {currentInvoice.status === 'pendente' && (
+            {/* Só mostra botão de pagar se não for cartão de crédito ou se não tiver assinatura ativa */}
+            {currentInvoice.status === 'pendente' && (!subscriberData?.subscribed || paymentMethod !== 'Cartão de Crédito') && (
               <div className="mt-6">
                 <Button 
                   size="lg" 
@@ -344,43 +226,95 @@ export default function Faturas() {
         </Card>
       )}
 
-      {/* Configurações de Pagamento */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Configurações de Pagamento</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="payment-method">Método de Pagamento</Label>
-              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PIX">PIX</SelectItem>
-                  <SelectItem value="Boleto">Boleto Bancário</SelectItem>
-                  <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-                </SelectContent>
-              </Select>
+      {/* Configurações de Pagamento - Só mostra se não for cartão de crédito */}
+      {subscriberData && !subscriberData.subscribed && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Configurações de Pagamento</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="payment-method">Método de Pagamento</Label>
+                <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PIX">PIX</SelectItem>
+                    <SelectItem value="Boleto">Boleto Bancário</SelectItem>
+                    <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {paymentMethod === 'Boleto' && (
+                <div className="space-y-2">
+                  <Label htmlFor="billing-email">Email para Cobrança</Label>
+                  <div className="flex items-center">
+                    <Mail className="w-4 h-4 mr-2 text-muted-foreground" />
+                    <span className="text-sm">{billingEmail}</span>
+                  </div>
+                </div>
+              )}
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="billing-email">Email para Cobrança</Label>
-              <div className="flex items-center">
-                <Mail className="w-4 h-4 mr-2 text-muted-foreground" />
-                <span className="text-sm">{billingEmail}</span>
-              </div>
+            <div className="mt-4">
+              <Button onClick={updatePaymentSettings} variant="outline">
+                Atualizar Configurações
+              </Button>
             </div>
-          </div>
-          
-          <div className="mt-4">
-            <Button onClick={updatePaymentSettings} variant="outline">
-              Atualizar Configurações
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Status da Assinatura para usuários com cartão de crédito */}
+      {subscriberData && subscriberData.subscribed && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Status da Assinatura</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">Plano Ativo</Label>
+                <div className="text-lg font-semibold text-green-600">
+                  {subscriberData.subscription_tier || 'Premium'}
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">Método de Pagamento</Label>
+                <div className="flex items-center text-lg">
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Cartão de Crédito
+                </div>
+              </div>
+              
+              {subscriberData.subscription_end && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground">Próxima Cobrança</Label>
+                  <div className="flex items-center text-lg">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    {format(new Date(subscriberData.subscription_end), "dd/MM/yyyy", { locale: ptBR })}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="mt-4">
+              <Button variant="outline" onClick={() => {
+                toast({
+                  title: "Portal do Cliente",
+                  description: "Redirecionando para o portal de gerenciamento..."
+                });
+              }}>
+                Gerenciar Assinatura
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Histórico de Faturas */}
       <Card>
@@ -423,7 +357,8 @@ export default function Faturas() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      {invoice.status === 'pendente' && (
+                      {/* Só mostra botão de pagar se não for cartão de crédito ou se não tiver assinatura ativa */}
+                      {invoice.status === 'pendente' && (!subscriberData?.subscribed || paymentMethod !== 'Cartão de Crédito') && (
                         <Button 
                           variant="outline" 
                           size="sm"
