@@ -24,14 +24,14 @@ export function ProfileSelector({
     onProfileChange?.(newProfile);
   };
   return <div className="flex items-center justify-between w-full text-sm font-bold">
-      <div className="flex items-center gap-1 sm:gap-3">
-        <h1 className="text-base sm:text-xl font-semibold text-foreground">
+      <div className="flex items-center gap-4">
+        <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
           Dashboard {selectedProfile}
         </h1>
         <TrialBadge />
       </div>
       
-      <div className="flex items-center gap-1 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-4">
         <ProfileToggle profiles={profiles} onProfileChange={handleProfileChange} />
         
         <ThemeToggle />

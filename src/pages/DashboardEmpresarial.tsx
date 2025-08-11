@@ -75,48 +75,48 @@ export default function DashboardEmpresarial() {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex flex-col gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
         <div>
-          <h1 className="text-lg sm:text-2xl font-bold text-foreground">Dashboard Empresarial</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">Visão estratégica do seu negócio</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard Empresarial</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Visão estratégica do seu negócio</p>
         </div>
-        <Badge variant="outline" className="text-xs bg-brand-orange/10 text-brand-orange border-brand-orange self-start">
+        <Badge variant="outline" className="text-xs bg-brand-orange/10 text-brand-orange border-brand-orange">
           <Building2 className="w-3 h-3 mr-1" />
           Perfil Empresarial
         </Badge>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="shadow-card hover:shadow-lg transition-smooth">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-xs font-medium text-muted-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               Receita Mensal
             </CardTitle>
-            <DollarSign className="h-3 w-3 text-success" />
+            <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-success" />
           </CardHeader>
-          <CardContent className="pb-2">
-            <div className="text-sm sm:text-base font-bold text-success">
+          <CardContent className="pb-3">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-success">
               R$ {businessStats.monthlyRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
+            <p className="text-xs text-muted-foreground mt-1">
               Faturamento do mês
             </p>
           </CardContent>
         </Card>
 
         <Card className="shadow-card hover:shadow-lg transition-smooth">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-xs font-medium text-muted-foreground">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               Lucro Líquido
             </CardTitle>
-            <TrendingUp className={`h-3 w-3 ${businessStats.monthlyProfit >= 0 ? 'text-success' : 'text-destructive'}`} />
+            <TrendingUp className={`h-3 w-3 sm:h-4 sm:w-4 ${businessStats.monthlyProfit >= 0 ? 'text-success' : 'text-destructive'}`} />
           </CardHeader>
-          <CardContent className="pb-2">
-            <div className={`text-sm sm:text-base font-bold ${businessStats.monthlyProfit >= 0 ? 'text-success' : 'text-destructive'}`}>
+          <CardContent className="pb-3">
+            <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${businessStats.monthlyProfit >= 0 ? 'text-success' : 'text-destructive'}`}>
               R$ {businessStats.monthlyProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
+            <p className="text-xs text-muted-foreground mt-1">
               Margem: {businessStats.profitMargin.toFixed(1)}%
             </p>
           </CardContent>
