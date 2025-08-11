@@ -102,7 +102,7 @@ export function AppSidebar() {
     const isActiveItem = isActive(path)
     return `transition-smooth rounded-lg mx-2 ${
       isActiveItem 
-        ? "bg-brand-orange text-white shadow-lg font-medium" 
+        ? "bg-brand-blue text-white shadow-lg font-medium" 
         : "text-muted-foreground hover:bg-muted hover:text-foreground"
     }`
   }

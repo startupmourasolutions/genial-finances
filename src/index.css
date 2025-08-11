@@ -8,43 +8,45 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Gênio Financeiro Brand Colors */
-    --brand-orange: 20 95% 52%;
-    --brand-orange-light: 34 100% 95%;
-    --brand-orange-glow: 20 95% 65%;
+    /* Gênio Financeiro Brand Colors - Nova Paleta */
+    --brand-blue: 215 78% 55%;
+    --brand-blue-light: 215 78% 85%;
+    --brand-blue-glow: 215 78% 65%;
+    --brand-green: 147 100% 50%;
+    --brand-dark: 210 9% 17%;
     
-    /* Core colors based on specification */
-    --background: 210 20% 98%;
-    --foreground: 215 25% 27%;
+    /* Core colors based on new specification */
+    --background: 0 0% 100%;
+    --foreground: 210 9% 17%;
     --surface: 0 0% 100%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    --card-foreground: 210 9% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover-foreground: 210 9% 17%;
 
-    --primary: 20 95% 52%;
+    --primary: 215 78% 55%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 17% 93%;
-    --secondary-foreground: 215 25% 27%;
+    --secondary-foreground: 210 9% 17%;
 
     --muted: 210 17% 93%;
-    --muted-foreground: 215 14% 34%;
+    --muted-foreground: 210 14% 34%;
 
-    --accent: 34 100% 95%;
-    --accent-foreground: 215 25% 27%;
+    --accent: 147 100% 50%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
+    --success: 147 100% 50%;
     --success-foreground: 0 0% 100%;
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 20 95% 52%;
+    --ring: 215 78% 55%;
 
     --radius: 0.5rem;
 
@@ -66,34 +68,34 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --surface: 222.2 84% 4.9%;
+    --background: 210 9% 17%;
+    --foreground: 0 0% 100%;
+    --surface: 210 9% 17%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 210 9% 17%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 210 9% 17%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 20 95% 52%;
+    --primary: 215 78% 55%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 217.2 32.6% 25%;
     --muted-foreground: 210 40% 95%;
 
-    --accent: 217.2 32.6% 25%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 147 100% 50%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
     --border: 217.2 32.6% 25%;
     --input: 217.2 32.6% 25%;
-    --ring: 20 95% 52%;
+    --ring: 215 78% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -126,7 +128,7 @@ All colors MUST be HSL.
   }
   
   .gradient-brand {
-    background: linear-gradient(135deg, hsl(var(--brand-orange)), hsl(var(--brand-orange-glow)));
+    background: linear-gradient(135deg, hsl(var(--brand-blue)), hsl(var(--brand-blue-glow)));
   }
   
   .transition-smooth {
