@@ -112,37 +112,19 @@ export default function Payment() {
     }
   }, [planId, cycle, selectedPlan, navigate]);
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAuth = async () => {
     setAuthLoading(true);
     
     try {
-      if (isLogin) {
-        // Login
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
-        
-        toast.success("Login realizado com sucesso!");
-      } else {
-        // Signup
-        if (password !== confirmPassword) {
-          toast.error("As senhas não conferem");
-          return;
-        }
-        
-        if (password.length < 6) {
-          toast.error("A senha deve ter pelo menos 6 caracteres");
-          return;
-        }
-        
-        const { error } = await supabase.auth.signUp({
+      // Primeiro tenta fazer login
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (loginError) {
+        // Se der erro de login, tenta criar conta
+        const { error: signupError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -150,12 +132,14 @@ export default function Payment() {
           }
         });
         
-        if (error) {
-          toast.error(error.message);
+        if (signupError) {
+          toast.error(signupError.message);
           return;
         }
         
         toast.success("Conta criada com sucesso!");
+      } else {
+        toast.success("Login realizado com sucesso!");
       }
       
       // Avançar para próxima etapa
@@ -383,76 +367,43 @@ export default function Payment() {
           {/* Conteúdo dos Steps */}
           <div className="space-y-6">
             {currentStep === 1 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5" />
-                    {isLogin ? 'Fazer Login' : 'Criar Conta'}
-                  </CardTitle>
-                  <CardDescription>
-                    {isLogin ? 'Entre com sua conta existente' : 'Crie sua conta para continuar'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleAuth} className="space-y-4">
-                    <div>
-                      <Label htmlFor="auth-email">E-mail</Label>
-                      <Input
-                        id="auth-email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="seu@email.com"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="auth-password">Senha</Label>
-                      <Input
-                        id="auth-password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Sua senha"
-                        required
-                      />
-                    </div>
-                    
-                    {!isLogin && (
-                      <div>
-                        <Label htmlFor="confirm-password">Confirmar Senha</Label>
-                        <Input
-                          id="confirm-password"
-                          type="password"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="Confirme sua senha"
-                          required
-                        />
-                      </div>
-                    )}
-                    
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-orange-600 hover:bg-orange-700"
-                      disabled={authLoading}
-                    >
-                      {authLoading ? "Processando..." : (isLogin ? "Entrar" : "Criar Conta")}
-                    </Button>
-                    
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => setIsLogin(!isLogin)}
-                        className="text-orange-600 hover:underline text-sm"
-                      >
-                        {isLogin ? "Não tem conta? Criar uma nova" : "Já tem conta? Fazer login"}
-                      </button>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="auth-email" className="text-lg">E-mail</Label>
+                  <Input
+                    id="auth-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="seu@email.com"
+                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="auth-password" className="text-lg">Senha</Label>
+                  <Input
+                    id="auth-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Sua senha"
+                    className="border-0 border-b-2 border-gray-200 rounded-none bg-transparent text-lg py-3 focus:border-orange-600"
+                    required
+                  />
+                </div>
+                
+                {email && password && (
+                  <Button 
+                    onClick={handleAuth}
+                    className="w-full bg-orange-600 hover:bg-orange-700 mt-6 py-3 text-lg"
+                    disabled={authLoading}
+                  >
+                    {authLoading ? "Processando..." : "Próximo"}
+                  </Button>
+                )}
+              </div>
             )}
 
             {currentStep === 2 && (
