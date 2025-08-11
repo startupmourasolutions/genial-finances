@@ -240,7 +240,7 @@ export default function Payment() {
         </div>
 
         {/* Steps indicator */}
-        <div className="flex items-center justify-center mb-8">
+        <div className="w-full flex justify-center mb-8">
           <div className="flex items-center space-x-4">
             <div className={`flex items-center justify-center w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
               <User className="w-4 h-4" />
@@ -252,7 +252,8 @@ export default function Payment() {
           </div>
         </div>
 
-        <div className={`${currentStep === 1 ? 'max-w-md mx-auto' : 'grid lg:grid-cols-2 gap-8'}`}>
+        <div className={`w-full ${currentStep === 1 ? 'flex justify-center' : ''}`}>
+          <div className={`${currentStep === 1 ? 'max-w-md w-full' : 'grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto'}`}>
           {/* Resumo do Plano - só aparece no step 2 */}
           {currentStep === 2 && (
             <div className="space-y-6">
@@ -541,6 +542,7 @@ export default function Payment() {
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
