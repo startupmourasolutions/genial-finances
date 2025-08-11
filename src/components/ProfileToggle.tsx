@@ -50,10 +50,5 @@ export function ProfileToggle({
         </div>
       </button>
       
-      {isLocked && <div className="absolute -bottom-6 left-0 right-0 text-center">
-          <span className="text-xs text-muted-foreground bg-background rounded border mx-px py-[3px] px-0 my-0">
-            Requer plano empresarial
-          </span>
-        </div>}
     </div>;
 }

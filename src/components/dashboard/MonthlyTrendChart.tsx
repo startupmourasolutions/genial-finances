@@ -52,31 +52,52 @@ export function MonthlyTrendChart() {
       </CardHeader>
       <CardContent>
         {chartData.length > 0 ? (
-          <div className="h-64 md:h-80">
+          <div className="h-48 sm:h-64 md:h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+              <LineChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis 
+                  dataKey="month" 
+                  tick={{ fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <YAxis 
-                  tickFormatter={(value) => 
-                    `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`
-                  }
+                  tick={{ fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(value) => {
+                    if (value >= 1000000) return `R$ ${(value / 1000000).toFixed(0)}M`
+                    if (value >= 1000) return `R$ ${(value / 1000).toFixed(0)}K`
+                    return `R$ ${value.toFixed(0)}`
+                  }}
                 />
                 <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px',
+                    fontSize: '12px'
+                  }}
                   formatter={(value: number, name: string) => [
                     `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
                     name === 'receitas' ? 'Receitas' : 
                     name === 'despesas' ? 'Despesas' : 'Saldo'
                   ]}
-                  labelFormatter={(label) => `Mês: ${label}`}
+                  labelFormatter={(label) => `${label}`}
                 />
-                <Legend />
+                <Legend 
+                  wrapperStyle={{ fontSize: '11px' }}
+                  iconType="line"
+                />
                 <Line 
                   type="monotone" 
                   dataKey="receitas" 
                   stroke="hsl(var(--success))" 
                   strokeWidth={2}
                   name="Receitas"
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 4 }}
                 />
                 <Line 
                   type="monotone" 
@@ -84,13 +105,17 @@ export function MonthlyTrendChart() {
                   stroke="hsl(var(--destructive))" 
                   strokeWidth={2}
                   name="Despesas"
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 4 }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="saldo" 
                   stroke="hsl(var(--primary))" 
-                  strokeWidth={3}
+                  strokeWidth={2}
                   name="Saldo"
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 4 }}
                 />
               </LineChart>
             </ResponsiveContainer>

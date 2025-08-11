@@ -49,16 +49,16 @@ export function ExpensesByCategoryChart() {
       </CardHeader>
       <CardContent>
         {chartData.length > 0 ? (
-          <div className="h-64 md:h-80">
+          <div className="h-48 sm:h-64 md:h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={chartData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={120}
-                  paddingAngle={5}
+                  innerRadius={40}
+                  outerRadius={80}
+                  paddingAngle={2}
                   dataKey="value"
                 >
                   {chartData.map((entry, index) => (
@@ -69,16 +69,28 @@ export function ExpensesByCategoryChart() {
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value: number) => [
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px',
+                    fontSize: '12px'
+                  }}
+                  formatter={(value: number, name: string) => [
                     `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-                    'Valor'
+                    name
                   ]}
                 />
-                <Legend />
+                <Legend 
+                  wrapperStyle={{ fontSize: '10px' }}
+                  iconType="circle"
+                  layout="horizontal"
+                  align="center"
+                  verticalAlign="bottom"
+                />
               </PieChart>
             </ResponsiveContainer>
-            <div className="text-center mt-4">
-              <p className="text-sm text-muted-foreground">
+            <div className="text-center mt-2">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Total: R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             </div>
