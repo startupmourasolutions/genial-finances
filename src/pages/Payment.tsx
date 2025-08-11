@@ -154,6 +154,9 @@ export default function Payment() {
       if (error) {
         console.error('Stripe error:', error);
         toast.error("Erro ao processar pagamento. Tente novamente.");
+        // Re-enable button only on error
+        setIsProcessing(false);
+        setPaymentInProgress(false);
         return;
       }
       
@@ -172,8 +175,17 @@ export default function Payment() {
               if (paymentWindow.closed) {
                 clearInterval(checkClosed);
                 // Aguardar um pouco antes de processar para garantir que o pagamento foi processado
-                setTimeout(() => {
-                  createAccountAndLogin();
+                setTimeout(async () => {
+                  try {
+                    await createAccountAndLogin();
+                    // Don't re-enable button on success - user will be redirected
+                  } catch (error) {
+                    console.error('Account creation error:', error);
+                    toast.error("Erro ao criar conta após pagamento. Entre em contato com o suporte.");
+                    // Re-enable button only on error
+                    setIsProcessing(false);
+                    setPaymentInProgress(false);
+                  }
                 }, 2000);
               } else {
                 // Verificar se voltou para nossa página de sucesso
@@ -202,12 +214,15 @@ export default function Payment() {
         }
       } else {
         toast.error("URL de pagamento não encontrada");
+        // Re-enable button on error
+        setIsProcessing(false);
+        setPaymentInProgress(false);
       }
       
     } catch (error) {
       console.error('Payment error:', error);
       toast.error("Erro ao processar pagamento. Tente novamente.");
-    } finally {
+      // Re-enable button only on error
       setIsProcessing(false);
       setPaymentInProgress(false);
     }
