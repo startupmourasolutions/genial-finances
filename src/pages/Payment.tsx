@@ -26,6 +26,7 @@ export default function Payment() {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentInProgress, setPaymentInProgress] = useState(false);
   const [phone, setPhone] = useState("");
   const [document, setDocument] = useState("");
   
@@ -136,6 +137,7 @@ export default function Payment() {
     }
 
     setIsProcessing(true);
+    setPaymentInProgress(true);
     
     try {
       toast.success("Redirecionando para o pagamento...");
@@ -207,6 +209,7 @@ export default function Payment() {
       toast.error("Erro ao processar pagamento. Tente novamente.");
     } finally {
       setIsProcessing(false);
+      setPaymentInProgress(false);
     }
   };
 
@@ -301,7 +304,7 @@ export default function Payment() {
           due_date: today,
           issue_date: today,
           payment_date: today,
-          status: 'pago',
+          status: 'paga',
           payment_method: selectedPaymentMethod,
           description: `Assinatura ${selectedPlan.name} - ${cycle === 'monthly' ? 'Mensal' : 'Anual'}`,
           invoice_number: `INV-${Date.now()}`,
@@ -629,10 +632,10 @@ export default function Payment() {
                 <Button 
                   className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3"
                   onClick={handlePayment}
-                  disabled={!selectedPaymentMethod || isProcessing}
+                  disabled={!selectedPaymentMethod || isProcessing || paymentInProgress}
                 >
-                  {isProcessing ? (
-                    "Processando..."
+                  {isProcessing || paymentInProgress ? (
+                    paymentInProgress ? "Processando pagamento..." : "Processando..."
                   ) : (
                     `Pagar R$ ${currentPrice.toFixed(2).replace('.', ',')}`
                   )}
