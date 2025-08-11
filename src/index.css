@@ -12,7 +12,7 @@ All colors MUST be HSL.
     --brand-blue: 215 78% 55%;
     --brand-blue-light: 215 78% 85%;
     --brand-blue-glow: 215 78% 65%;
-    --brand-green: 147 100% 50%;
+    --brand-green: 147 76% 36%;
     --brand-dark: 210 9% 17%;
     
     /* Core colors based on new specification */
@@ -35,13 +35,13 @@ All colors MUST be HSL.
     --muted: 210 17% 93%;
     --muted-foreground: 210 14% 34%;
 
-    --accent: 147 100% 50%;
+    --accent: 147 76% 36%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 147 100% 50%;
+    --success: 147 76% 36%;
     --success-foreground: 0 0% 100%;
 
     --border: 220 13% 91%;
@@ -87,7 +87,7 @@ All colors MUST be HSL.
     --muted: 217.2 32.6% 25%;
     --muted-foreground: 210 40% 95%;
 
-    --accent: 147 100% 50%;
+    --accent: 147 76% 36%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
