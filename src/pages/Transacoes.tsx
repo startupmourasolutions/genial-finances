@@ -74,13 +74,13 @@ const Transacoes = () => {
   }
 
   return (
-    <div className="p-3 md:p-8 space-y-3 md:space-y-6">
+    <div className="p-3 md:p-8 space-y-3 md:space-y-6 overflow-x-hidden max-w-full">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Transações</h1>
           <p className="text-sm md:text-base text-muted-foreground">Visualize e gerencie suas receitas e despesas</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1 flex-shrink-0">
           <Button size="sm" onClick={() => handleCreate('income')} className="h-8 px-2 md:h-10 md:px-4 whitespace-nowrap bg-success hover:bg-success/90">
             <Plus className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Nova Receita</span>
@@ -99,7 +99,7 @@ const Transacoes = () => {
             Filtros
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3 md:px-6 md:pb-6">
+        <CardContent className="px-3 pb-3 md:px-6 md:pb-6 overflow-x-hidden">
           {/* Mobile: filtros colapsáveis */}
           <div className="md:hidden">
             <Collapsible open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
@@ -202,7 +202,7 @@ const Transacoes = () => {
         <CardHeader className="hidden md:flex py-2 px-6">
           <CardTitle className="text-sm md:text-lg">Lista de Transações</CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3 md:px-6 md:pb-6">
+        <CardContent className="px-3 pb-3 md:px-6 md:pb-6 overflow-x-hidden">
           <div className="space-y-1 md:space-y-3">
             {filteredTransactions.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
@@ -213,8 +213,8 @@ const Transacoes = () => {
               </div>
             ) : (
               filteredTransactions.map((transaction) => (
-                <div key={transaction.id} className="group flex items-center justify-between p-1.5 md:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
+                <div key={transaction.id} className="group flex items-center justify-between gap-2 p-1.5 md:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
                     <div className={`p-1.5 md:p-2 rounded-full ${
                       transaction.type === 'income' 
                         ? 'bg-success/20 text-success' 
@@ -226,8 +226,8 @@ const Transacoes = () => {
                         <ArrowDownCircle className="h-3 w-3 md:h-4 md:w-4" />
                       )}
                     </div>
-                    <div>
-                      <p className="font-medium text-foreground text-xs md:text-base">{transaction.title}</p>
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground text-xs md:text-base truncate">{transaction.title}</p>
                       <p className="text-[10px] md:text-xs text-muted-foreground">
                         {format(new Date(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}
                       </p>
@@ -238,9 +238,9 @@ const Transacoes = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                     <div className="text-right">
-                      <p className={`text-sm md:text-base font-semibold ${
+                      <p className={`text-xs md:text-base font-semibold ${
                         transaction.type === 'income' ? 'text-success' : 'text-destructive'
                       }`}>
                         {transaction.type === 'income' ? '+' : '-'}R$ {Number(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -249,11 +249,11 @@ const Transacoes = () => {
                         {transaction.type === 'income' ? 'Receita' : 'Despesa'}
                       </Badge>
                     </div>
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                    <div className="flex gap-1 md:gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity shrink-0">
                       <Button 
                         size="icon" 
                         variant="outline"
-                        className="h-7 w-7 md:h-9 md:w-9"
+                        className="h-6 w-6 md:h-9 md:w-9"
                         onClick={() => handleEdit(transaction)}
                       >
                         <Edit className="w-4 h-4" />
@@ -261,7 +261,7 @@ const Transacoes = () => {
                       <Button 
                         size="icon" 
                         variant="destructive" 
-                        className="h-7 w-7 md:h-9 md:w-9"
+                        className="h-6 w-6 md:h-9 md:w-9"
                         onClick={() => setDeleteId(transaction.id)}
                       >
                         <Trash2 className="w-4 h-4" />
