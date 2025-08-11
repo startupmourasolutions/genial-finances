@@ -56,6 +56,25 @@ export default function Dashboard() {
         <Card className="shadow-card transition-smooth hover:shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
+              Saldo Atual
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${
+              currentMonthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'
+            }`}>
+              R$ {currentMonthStats.currentBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {currentMonthStats.currentBalance >= 0 ? 'Saldo positivo' : 'Saldo negativo'}
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-card transition-smooth hover:shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Receitas do Mês
             </CardTitle>
             <ArrowUpCircle className="h-4 w-4 text-muted-foreground" />
@@ -83,25 +102,6 @@ export default function Dashboard() {
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               {currentMonthStats.monthlyExpenses > 0 ? "Mês atual" : "Nenhuma despesa cadastrada"}
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="shadow-card transition-smooth hover:shadow-lg">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Saldo do Mês
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${
-              currentMonthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'
-            }`}>
-              R$ {currentMonthStats.currentBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {currentMonthStats.currentBalance >= 0 ? 'Saldo positivo' : 'Saldo negativo'}
             </p>
           </CardContent>
         </Card>
