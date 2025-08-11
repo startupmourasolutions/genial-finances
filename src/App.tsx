@@ -55,7 +55,7 @@ function App() {
           <RadixToaster />
           <BrowserRouter>
             <AuthProvider>
-              <SidebarProvider>
+              
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/payment" element={<Payment />} />
@@ -191,7 +191,7 @@ function App() {
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </SidebarProvider>
+            
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
