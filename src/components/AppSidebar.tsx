@@ -79,7 +79,7 @@ const getFooterItems = (isSuperAdmin: boolean) => [
 ]
 
 export function AppSidebar() {
-  const { state } = useSidebar()
+  const { state, setOpen } = useSidebar()
   const { profile } = useAuth()
   const location = useLocation()
   const currentPath = location.pathname
@@ -92,6 +92,11 @@ export function AppSidebar() {
   const navItems = isSuperAdmin ? superAdminNavItems : clientNavItems
 
   const isActive = (path: string) => currentPath === path
+
+  const handleNavClick = () => {
+    // Fecha o sidebar automaticamente ao clicar em um item de navegação
+    setOpen(false)
+  }
 
   const getNavClasses = (path: string) => {
     const isActiveItem = isActive(path)
@@ -134,6 +139,7 @@ export function AppSidebar() {
                         <NavLink 
                           to={item.path} 
                           className={getNavClasses(item.path)}
+                          onClick={handleNavClick}
                         >
                           <item.icon className="w-5 h-5" />
                           {!collapsed && <span className="ml-3">{item.text}</span>}
@@ -158,6 +164,7 @@ export function AppSidebar() {
                         <NavLink 
                           to={item.path} 
                           className={getNavClasses(item.path)}
+                          onClick={handleNavClick}
                         >
                           <item.icon className="w-5 h-5" />
                           {!collapsed && <span className="ml-3">{item.text}</span>}
@@ -182,6 +189,7 @@ export function AppSidebar() {
                       <NavLink 
                         to={item.path} 
                         className={getNavClasses(item.path)}
+                        onClick={handleNavClick}
                       >
                         <item.icon className="w-5 h-5" />
                         {!collapsed && <span className="ml-3">{item.text}</span>}
@@ -203,6 +211,7 @@ export function AppSidebar() {
                 <NavLink 
                   to={item.path} 
                   className={getNavClasses(item.path)}
+                  onClick={handleNavClick}
                 >
                   <item.icon className="w-4 h-4" />
                   {!collapsed && <span>{item.text}</span>}
