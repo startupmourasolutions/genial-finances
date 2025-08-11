@@ -252,8 +252,8 @@ export default function Payment() {
           </div>
         </div>
 
-        <div className={`w-full ${currentStep === 1 ? 'flex justify-center' : ''}`}>
-          <div className={`${currentStep === 1 ? 'max-w-md w-full' : 'grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto'}`}>
+        <div className="w-full flex justify-center">
+          <div className={`${currentStep === 1 ? 'max-w-md w-full' : 'grid lg:grid-cols-2 gap-8 max-w-6xl w-full'}`}>
           {/* Resumo do Plano - só aparece no step 2 */}
           {currentStep === 2 && (
             <div className="space-y-6">
@@ -459,17 +459,6 @@ export default function Payment() {
                         <Label htmlFor="lastName">Sobrenome</Label>
                         <Input id="lastName" placeholder="Seu sobrenome" />
                       </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="billing-email">E-mail</Label>
-                      <Input 
-                        id="billing-email" 
-                        type="email" 
-                        placeholder="seu@email.com"
-                        value={email}
-                        readOnly
-                        className="bg-gray-50"
-                      />
                     </div>
                     <div>
                       <Label htmlFor="phone">Telefone/WhatsApp</Label>
