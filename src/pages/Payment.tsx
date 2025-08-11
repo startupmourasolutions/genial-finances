@@ -199,7 +199,7 @@ export default function Payment() {
       toast.success("Pagamento confirmado! Criando sua conta...");
       
       // Criar conta com email e senha do step 1
-      const { error: signupError } = await supabase.auth.signUp({
+      const { data: authData, error: signupError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -210,7 +210,7 @@ export default function Payment() {
       if (signupError) {
         console.error('Signup error:', signupError);
         // Se der erro de "já existe", tenta fazer login
-        const { error: loginError } = await supabase.auth.signInWithPassword({
+        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
           email,
           password
         });
@@ -219,9 +219,17 @@ export default function Payment() {
           toast.error("Erro ao criar conta. Tente novamente.");
           return;
         }
+        
+        // Se fez login com sucesso, usar os dados do login
+        if (loginData.user) {
+          await createClientAndInvoice(loginData.user.id);
+        }
+      } else if (authData.user) {
+        // Se criou conta com sucesso, usar os dados da criação
+        await createClientAndInvoice(authData.user.id);
       }
       
-      toast.success("Conta criada com sucesso! Redirecionando...");
+      toast.success("Conta criada e fatura gerada com sucesso! Redirecionando...");
       setTimeout(() => {
         navigate('/dashboard');
       }, 1500);
@@ -229,6 +237,71 @@ export default function Payment() {
     } catch (error) {
       console.error('Account creation error:', error);
       toast.error("Erro ao criar conta. Entre em contato com o suporte.");
+    }
+  };
+
+  const createClientAndInvoice = async (userId: string) => {
+    try {
+      // Buscar o perfil do usuário (criado automaticamente pelo trigger)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+
+      if (!profile) {
+        throw new Error('Perfil não encontrado');
+      }
+
+      // Criar registro de cliente
+      const { data: client, error: clientError } = await supabase
+        .from('clients')
+        .insert({
+          profile_id: profile.id,
+          client_type: 'personal',
+          subscription_active: true,
+          subscription_plan: planId,
+          subscription_status: 'active',
+          subscription_start_date: new Date().toISOString(),
+          subscription_end_date: cycle === 'yearly' 
+            ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+            : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          monthly_fee: cycle === 'monthly' ? currentPrice : currentPrice / 12
+        })
+        .select()
+        .single();
+
+      if (clientError) {
+        throw new Error(`Erro ao criar cliente: ${clientError.message}`);
+      }
+
+      // Criar fatura como paga
+      const today = new Date().toISOString().split('T')[0];
+      const { error: invoiceError } = await supabase
+        .from('invoices')
+        .insert({
+          client_id: client.id,
+          amount: currentPrice,
+          due_date: today,
+          issue_date: today,
+          payment_date: today,
+          status: 'pago',
+          payment_method: selectedPaymentMethod,
+          description: `Assinatura ${selectedPlan.name} - ${cycle === 'monthly' ? 'Mensal' : 'Anual'}`,
+          invoice_number: `INV-${Date.now()}`,
+          currency: 'BRL',
+          created_by: userId
+        });
+
+      if (invoiceError) {
+        throw new Error(`Erro ao criar fatura: ${invoiceError.message}`);
+      }
+
+      console.log('Cliente e fatura criados com sucesso');
+      
+    } catch (error) {
+      console.error('Erro ao criar cliente e fatura:', error);
+      throw error;
     }
   };
 
