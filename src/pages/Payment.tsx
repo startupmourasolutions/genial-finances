@@ -29,6 +29,8 @@ export default function Payment() {
   const [paymentInProgress, setPaymentInProgress] = useState(false);
   const [phone, setPhone] = useState("");
   const [document, setDocument] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   
   // Auth form states
   const [email, setEmail] = useState("");
@@ -128,6 +130,15 @@ export default function Payment() {
     }
     
     setCurrentStep(2);
+  };
+
+  // Validação de campos obrigatórios
+  const isFormValid = () => {
+    return selectedPaymentMethod && 
+           firstName.trim() && 
+           lastName.trim() && 
+           phone.replace(/\D/g, '').length >= 10 && 
+           document.replace(/\D/g, '').length >= 11;
   };
 
   const handlePayment = async () => {
@@ -593,11 +604,21 @@ export default function Payment() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">Nome</Label>
-                      <Input id="firstName" placeholder="Seu nome" />
+                      <Input 
+                        id="firstName" 
+                        placeholder="Seu nome" 
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                      />
                     </div>
                     <div>
                       <Label htmlFor="lastName">Sobrenome</Label>
-                      <Input id="lastName" placeholder="Seu sobrenome" />
+                      <Input 
+                        id="lastName" 
+                        placeholder="Seu sobrenome" 
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                      />
                     </div>
                   </div>
                   <div>
@@ -647,7 +668,7 @@ export default function Payment() {
                 <Button 
                   className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3"
                   onClick={handlePayment}
-                  disabled={!selectedPaymentMethod || isProcessing || paymentInProgress}
+                  disabled={!isFormValid() || isProcessing || paymentInProgress}
                 >
                   {isProcessing || paymentInProgress ? (
                     paymentInProgress ? "Processando pagamento..." : "Processando..."
