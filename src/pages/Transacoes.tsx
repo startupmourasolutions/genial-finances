@@ -72,18 +72,18 @@ const Transacoes = () => {
   }
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-4 md:space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Transações</h1>
-          <p className="text-muted-foreground">Visualize e gerencie suas receitas e despesas</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Transações</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Visualize e gerencie suas receitas e despesas</p>
         </div>
         <div className="flex gap-3">
-          <Button onClick={() => handleCreate('income')} className="bg-success hover:bg-success/90">
+          <Button size="sm" onClick={() => handleCreate('income')} className="bg-success hover:bg-success/90">
             <Plus className="w-4 h-4 mr-2" />
             Nova Receita
           </Button>
-          <Button onClick={() => handleCreate('expense')} className="bg-destructive hover:bg-destructive/90">
+          <Button size="sm" onClick={() => handleCreate('expense')} className="bg-destructive hover:bg-destructive/90">
             <Plus className="w-4 h-4 mr-2" />
             Nova Despesa
           </Button>
@@ -92,27 +92,29 @@ const Transacoes = () => {
 
       <Card className="shadow-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
             <Filter className="w-5 h-5" />
             Filtros
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
             <Input 
               type="date" 
               placeholder="Data inicial" 
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              className="text-sm"
             />
             <Input 
               type="date" 
               placeholder="Data final" 
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
+              className="text-sm"
             />
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger>
+              <SelectTrigger className="h-9 md:h-10 text-sm">
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
@@ -125,7 +127,7 @@ const Transacoes = () => {
               </SelectContent>
             </Select>
             <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger>
+              <SelectTrigger className="h-9 md:h-10 text-sm">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -140,7 +142,7 @@ const Transacoes = () => {
 
       <Card className="shadow-card">
         <CardHeader>
-          <CardTitle>Lista de Transações</CardTitle>
+          <CardTitle className="text-base md:text-lg">Lista de Transações</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -153,7 +155,7 @@ const Transacoes = () => {
               </div>
             ) : (
               filteredTransactions.map((transaction) => (
-                <div key={transaction.id} className="group flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                <div key={transaction.id} className="group flex items-center justify-between p-2 md:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-full ${
                       transaction.type === 'income' 
@@ -161,13 +163,13 @@ const Transacoes = () => {
                         : 'bg-destructive/20 text-destructive'
                     }`}>
                       {transaction.type === 'income' ? (
-                        <ArrowUpCircle className="h-4 w-4" />
+                        <ArrowUpCircle className="h-3 w-3 md:h-4 md:w-4" />
                       ) : (
-                        <ArrowDownCircle className="h-4 w-4" />
+                        <ArrowDownCircle className="h-3 w-3 md:h-4 md:w-4" />
                       )}
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">{transaction.title}</p>
+                      <p className="font-medium text-foreground text-sm md:text-base">{transaction.title}</p>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}
                       </p>
@@ -180,7 +182,7 @@ const Transacoes = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className={`font-semibold ${
+                      <p className={`text-sm md:text-base font-semibold ${
                         transaction.type === 'income' ? 'text-success' : 'text-destructive'
                       }`}>
                         {transaction.type === 'income' ? '+' : '-'}R$ {Number(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -191,15 +193,17 @@ const Transacoes = () => {
                     </div>
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                       <Button 
-                        size="sm" 
-                        variant="outline" 
+                        size="icon" 
+                        variant="outline"
+                        className="h-8 w-8 md:h-9 md:w-9"
                         onClick={() => handleEdit(transaction)}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button 
-                        size="sm" 
+                        size="icon" 
                         variant="destructive" 
+                        className="h-8 w-8 md:h-9 md:w-9"
                         onClick={() => setDeleteId(transaction.id)}
                       >
                         <Trash2 className="w-4 h-4" />
