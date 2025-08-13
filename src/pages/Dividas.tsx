@@ -5,47 +5,133 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Plus, Filter, BarChart3, Table as TableIcon, AlertTriangle, Calendar, DollarSign, Edit, Trash2 } from "lucide-react"
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
+import { DebtFormModal } from "@/components/DebtFormModal"
+import { useDebts } from "@/hooks/useDebts"
+import { Plus, Filter, BarChart3, Table as TableIcon, AlertTriangle, Calendar, DollarSign, Edit, Trash2, CreditCard } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+import { toast } from "sonner"
 
 const Dividas = () => {
   const [viewMode, setViewMode] = useState<"table" | "chart">("table")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingDebt, setEditingDebt] = useState<any>(null)
+  const [deleteDebtId, setDeleteDebtId] = useState<string | null>(null)
+  const [searchFilter, setSearchFilter] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
+  
+  const { debts, loading, createDebt, updateDebt, deleteDebt, makePayment } = useDebts()
 
-  const dividas = [
-    { id: 1, creditor: "Banco Central", description: "Financiamento Casa", amount: 85000.00, dueDate: "2024-02-15", status: "Em dia", priority: "alta", category: "Financiamento" },
-    { id: 2, creditor: "Cartão Visa", description: "Fatura Janeiro", amount: 2450.00, dueDate: "2024-01-25", status: "Vencida", priority: "alta", category: "Cartão" },
-    { id: 3, creditor: "Financeira ABC", description: "Empréstimo Pessoal", amount: 12000.00, dueDate: "2024-02-10", status: "Em dia", priority: "média", category: "Empréstimo" },
-    { id: 4, creditor: "Loja XYZ", description: "Parcelamento Móveis", amount: 3200.00, dueDate: "2024-01-30", status: "Em dia", priority: "baixa", category: "Parcelamento" }
-  ]
+  // Filter debts
+  const filteredDebts = debts.filter(debt => {
+    const matchesSearch = !searchFilter || 
+      debt.creditor_name?.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      debt.title.toLowerCase().includes(searchFilter.toLowerCase())
+    
+    const matchesCategory = categoryFilter === "all" || debt.debt_type === categoryFilter
+    const matchesStatus = statusFilter === "all" || debt.status === statusFilter
+    
+    return matchesSearch && matchesCategory && matchesStatus
+  })
 
-  const chartData = dividas.map(divida => ({
-    name: divida.creditor,
-    valor: divida.amount,
-    status: divida.status
+  const chartData = filteredDebts.map(debt => ({
+    name: debt.creditor_name || debt.title,
+    valor: Number(debt.remaining_amount),
+    status: debt.status
   }))
 
-  const pieData = [
-    { name: "Financiamento", value: 85000, fill: "hsl(var(--brand-orange))" },
-    { name: "Cartão", value: 2450, fill: "hsl(var(--destructive))" },
-    { name: "Empréstimo", value: 12000, fill: "hsl(var(--warning))" },
-    { name: "Parcelamento", value: 3200, fill: "hsl(var(--success))" }
-  ]
+  // Group debts by type for pie chart
+  const debtsByType = filteredDebts.reduce((acc, debt) => {
+    const type = debt.debt_type || 'outros'
+    acc[type] = (acc[type] || 0) + Number(debt.remaining_amount)
+    return acc
+  }, {} as Record<string, number>)
 
-  const totalDividas = dividas.reduce((sum, divida) => sum + divida.amount, 0)
-  const dividasVencidas = dividas.filter(d => d.status === "Vencida").length
-  const proximosVencimentos = dividas.filter(d => new Date(d.dueDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)).length
+  const pieData = Object.entries(debtsByType).map(([type, value], index) => ({
+    name: type,
+    value,
+    fill: [
+      "hsl(var(--brand-orange))",
+      "hsl(var(--destructive))", 
+      "hsl(var(--warning))",
+      "hsl(var(--success))",
+      "hsl(var(--primary))"
+    ][index % 5]
+  }))
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "alta": return "bg-destructive"
-      case "média": return "bg-warning"
-      case "baixa": return "bg-success"
-      default: return "bg-muted"
+  const totalDividas = filteredDebts.reduce((sum, debt) => sum + Number(debt.remaining_amount), 0)
+  const dividasVencidas = filteredDebts.filter(d => d.due_date && new Date(d.due_date) < new Date()).length
+  const proximosVencimentos = filteredDebts.filter(d => {
+    if (!d.due_date) return false
+    const dueDate = new Date(d.due_date)
+    const oneWeekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    return dueDate <= oneWeekFromNow && dueDate >= new Date()
+  }).length
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'paid': return "bg-success text-success-foreground"
+      case 'active': return "bg-warning text-warning-foreground" 
+      case 'overdue': return "bg-destructive text-destructive-foreground"
+      default: return "bg-muted text-muted-foreground"
     }
   }
 
-  const getStatusColor = (status: string) => {
-    return status === "Vencida" ? "bg-destructive text-destructive-foreground" : "bg-success text-success-foreground"
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'paid': return 'Paga'
+      case 'active': return 'Ativa'
+      case 'overdue': return 'Vencida'
+      default: return status
+    }
+  }
+
+  const handleSubmit = async (formData: any) => {
+    try {
+      let result
+      if (editingDebt) {
+        result = await updateDebt(editingDebt.id, formData)
+      } else {
+        result = await createDebt(formData)
+      }
+      
+      if (!result.error) {
+        setIsModalOpen(false)
+        setEditingDebt(null)
+      }
+      
+      return { error: result.error }
+    } catch (error) {
+      console.error('Error saving debt:', error)
+      return { error: error }
+    }
+  }
+
+  const handleEdit = (debt: any) => {
+    setEditingDebt(debt)
+    setIsModalOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (deleteDebtId) {
+      await deleteDebt(deleteDebtId)
+      setDeleteDebtId(null)
+    }
+  }
+
+  const handlePayment = async (debtId: string, amount: number) => {
+    try {
+      await makePayment(debtId, amount)
+      toast.success('Pagamento registrado com sucesso!')
+    } catch (error) {
+      console.error('Error making payment:', error)
+    }
+  }
+
+  const isOverdue = (dueDate: string | null) => {
+    if (!dueDate) return false
+    return new Date(dueDate) < new Date()
   }
 
   return (
@@ -56,7 +142,10 @@ const Dividas = () => {
           <p className="text-muted-foreground">Gerencie e acompanhe suas obrigações financeiras</p>
         </div>
         <div className="flex gap-3">
-          <Button className="bg-brand-orange hover:bg-brand-orange/90">
+          <Button 
+            className="bg-brand-orange hover:bg-brand-orange/90"
+            onClick={() => setIsModalOpen(true)}
+          >
             <Plus className="w-4 h-4 mr-2" />
             Nova Dívida
           </Button>
@@ -117,7 +206,7 @@ const Dividas = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total de Dívidas</p>
-                <p className="text-2xl font-bold text-brand-orange">{dividas.length}</p>
+                <p className="text-2xl font-bold text-brand-orange">{filteredDebts.length}</p>
               </div>
             </div>
           </CardContent>
@@ -134,27 +223,33 @@ const Dividas = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <Input placeholder="Buscar credor..." />
-            <Select>
+            <Input 
+              placeholder="Buscar dívida..." 
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+            />
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="financiamento">Financiamento</SelectItem>
-                <SelectItem value="cartao">Cartão</SelectItem>
-                <SelectItem value="emprestimo">Empréstimo</SelectItem>
-                <SelectItem value="parcelamento">Parcelamento</SelectItem>
+                <SelectItem value="loan">Empréstimo</SelectItem>
+                <SelectItem value="credit_card">Cartão</SelectItem>
+                <SelectItem value="financing">Financiamento</SelectItem>
+                <SelectItem value="installment">Parcelamento</SelectItem>
+                <SelectItem value="other">Outros</SelectItem>
               </SelectContent>
             </Select>
-            <Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="em-dia">Em dia</SelectItem>
-                <SelectItem value="vencida">Vencida</SelectItem>
+                <SelectItem value="active">Ativa</SelectItem>
+                <SelectItem value="paid">Paga</SelectItem>
+                <SelectItem value="overdue">Vencida</SelectItem>
               </SelectContent>
             </Select>
             <Select>
@@ -204,42 +299,81 @@ const Dividas = () => {
             <CardContent>
               {viewMode === "table" ? (
                 <div className="space-y-3">
-                  {dividas.map((divida) => (
-                    <div key={divida.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-3 h-3 rounded-full ${getPriorityColor(divida.priority)}`} />
-                          <div>
-                            <h4 className="font-medium text-foreground">{divida.creditor}</h4>
-                            <p className="text-sm text-muted-foreground">{divida.description}</p>
+                  {loading ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">Carregando dívidas...</p>
+                    </div>
+                  ) : filteredDebts.length === 0 ? (
+                    <div className="text-center py-8">
+                      <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">Nenhuma dívida encontrada</p>
+                    </div>
+                  ) : (
+                    filteredDebts.map((debt) => (
+                      <div key={debt.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-3 h-3 rounded-full ${isOverdue(debt.due_date) ? 'bg-destructive' : debt.status === 'paid' ? 'bg-success' : 'bg-warning'}`} />
+                            <div>
+                              <h4 className="font-medium text-foreground">{debt.title}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {debt.creditor_name || debt.description}
+                              </p>
+                            </div>
                           </div>
                         </div>
+                        <div className="text-center">
+                          <Badge variant="outline" className={getStatusColor(isOverdue(debt.due_date) ? 'overdue' : debt.status)}>
+                            {isOverdue(debt.due_date) ? 'Vencida' : getStatusLabel(debt.status)}
+                          </Badge>
+                          {debt.due_date && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {new Date(debt.due_date).toLocaleDateString('pt-BR')}
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <span className="text-lg font-semibold text-destructive">
+                            R$ {Number(debt.remaining_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                          {debt.total_amount !== debt.remaining_amount && (
+                            <p className="text-sm text-muted-foreground">
+                              de R$ {Number(debt.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2 ml-4">
+                          {debt.status === 'active' && (
+                            <Button 
+                              size="sm" 
+                              variant="default" 
+                              className="hover-scale"
+                              onClick={() => handlePayment(debt.id, Number(debt.remaining_amount))}
+                            >
+                              Pagar
+                            </Button>
+                          )}
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="hover-scale"
+                            onClick={() => handleEdit(debt)}
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            Editar
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive" 
+                            className="hover-scale"
+                            onClick={() => setDeleteDebtId(debt.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <Badge variant="outline" className={getStatusColor(divida.status)}>
-                          {divida.status}
-                        </Badge>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {new Date(divida.dueDate).toLocaleDateString('pt-BR')}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-lg font-semibold text-destructive">
-                          R$ {divida.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </span>
-                      </div>
-                      <div className="flex gap-2 ml-4">
-                        <Button size="sm" variant="default" className="hover-scale">Pagar</Button>
-                        <Button size="sm" variant="outline" className="hover-scale">
-                          <Edit className="w-3 h-3 mr-1" />
-                          Editar
-                        </Button>
-                        <Button size="sm" variant="destructive" className="hover-scale">
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               ) : (
                 <div className="h-80">
@@ -326,6 +460,22 @@ const Dividas = () => {
           </Card>
         </div>
       </div>
+
+      <DebtFormModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        onSubmit={handleSubmit}
+        initialData={editingDebt}
+        mode={editingDebt ? 'edit' : 'create'}
+      />
+
+      <DeleteConfirmationDialog
+        isOpen={!!deleteDebtId}
+        onClose={() => setDeleteDebtId(null)}
+        onConfirm={handleDelete}
+        title="Excluir Dívida"
+        description="Tem certeza que deseja excluir esta dívida? Esta ação não pode ser desfeita."
+      />
     </div>
   )
 }
