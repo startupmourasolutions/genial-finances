@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
 import { Eye, EyeOff, LogIn, UserPlus, Mail, ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import InputMask from 'react-input-mask'
 
 export default function Auth() {
   const { signIn, signUp, resetPassword, loading } = useAuth()
@@ -24,6 +25,7 @@ export default function Auth() {
   const [signupPassword, setSignupPassword] = useState('')
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
   const [userType, setUserType] = useState<'client' | 'super_administrator'>('client')
   const [clientType, setClientType] = useState<'personal' | 'business'>('personal')
   const [companyName, setCompanyName] = useState('')
@@ -196,6 +198,25 @@ export default function Auth() {
                       onChange={(e) => setSignupEmail(e.target.value)}
                       required
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Celular</Label>
+                    <InputMask
+                      mask="(99) 99999-9999"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                    >
+                      {(inputProps: any) => (
+                        <Input
+                          {...inputProps}
+                          id="phone"
+                          type="tel"
+                          placeholder="(11) 99999-9999"
+                        />
+                      )}
+                    </InputMask>
                   </div>
 
                   <div className="space-y-2">
