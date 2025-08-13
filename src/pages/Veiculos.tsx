@@ -146,7 +146,7 @@ const Veiculos = () => {
             <Plus className="w-4 h-4 mr-2" />
             Nova Manutenção
           </Button>
-          <Button onClick={handleCreateVehicle} className="bg-brand-orange hover:bg-brand-orange/90">
+          <Button onClick={handleCreateVehicle} className="bg-primary text-primary-foreground hover:bg-primary/90">
             <Plus className="w-4 h-4 mr-2" />
             Novo Veículo
           </Button>
@@ -211,7 +211,7 @@ const Veiculos = () => {
             <div className="text-center py-8">
               <Car className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground mb-4">Nenhum veículo cadastrado</p>
-              <Button onClick={handleCreateVehicle} className="bg-brand-orange hover:bg-brand-orange/90">
+              <Button onClick={handleCreateVehicle} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Primeiro Veículo
               </Button>
@@ -408,7 +408,7 @@ const Veiculos = () => {
               <Button variant="outline" onClick={() => setKmUpdateModalOpen(false)}>
                 Cancelar
               </Button>
-              <Button onClick={handleKmSubmit} className="bg-brand-orange hover:bg-brand-orange/90">
+              <Button onClick={handleKmSubmit} className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Atualizar
               </Button>
             </div>

@@ -212,7 +212,7 @@ export function VehicleFormModal({ open, onOpenChange, onSubmit, initialData, mo
             </Button>
             <Button
               type="submit"
-              className="bg-brand-orange hover:bg-brand-orange/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
               {loading ? 'Salvando...' : mode === 'create' ? 'Adicionar' : 'Salvar'}
