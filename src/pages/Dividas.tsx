@@ -143,7 +143,7 @@ const Dividas = () => {
         </div>
         <div className="flex gap-3">
           <Button 
-            className="bg-brand-orange hover:bg-brand-orange/90"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() => setIsModalOpen(true)}
           >
             <Plus className="w-4 h-4 mr-2" />

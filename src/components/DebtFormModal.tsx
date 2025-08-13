@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import CurrencyInput from 'react-currency-input-field'
 import { toast } from "sonner"
 
 interface DebtFormModalProps {
@@ -166,26 +167,34 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, initialData, mode 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="total_amount">Valor Total *</Label>
-                <Input
+                <CurrencyInput
                   id="total_amount"
-                  type="number"
-                  step="0.01"
+                  placeholder="R$ 0,00"
                   value={formData.total_amount}
-                  onChange={(e) => setFormData(prev => ({ ...prev, total_amount: parseFloat(e.target.value) || 0 }))}
-                  min="0"
-                  required
+                  decimalsLimit={2}
+                  decimalSeparator=","
+                  groupSeparator="."
+                  prefix="R$ "
+                  allowDecimals={true}
+                  allowNegativeValue={false}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, total_amount: parseFloat(value || '0') }))}
+                  className="w-full px-3 py-2 border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
                 />
               </div>
               <div>
                 <Label htmlFor="remaining_amount">Valor Restante</Label>
-                <Input
+                <CurrencyInput
                   id="remaining_amount"
-                  type="number"
-                  step="0.01"
+                  placeholder="R$ 0,00 (Se vazio, usa o valor total)"
                   value={formData.remaining_amount}
-                  onChange={(e) => setFormData(prev => ({ ...prev, remaining_amount: parseFloat(e.target.value) || 0 }))}
-                  min="0"
-                  placeholder="Se vazio, usa o valor total"
+                  decimalsLimit={2}
+                  decimalSeparator=","
+                  groupSeparator="."
+                  prefix="R$ "
+                  allowDecimals={true}
+                  allowNegativeValue={false}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, remaining_amount: parseFloat(value || '0') }))}
+                  className="w-full px-3 py-2 border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
                 />
               </div>
             </div>
@@ -193,13 +202,18 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, initialData, mode 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="monthly_payment">Pagamento Mensal</Label>
-                <Input
+                <CurrencyInput
                   id="monthly_payment"
-                  type="number"
-                  step="0.01"
+                  placeholder="R$ 0,00"
                   value={formData.monthly_payment}
-                  onChange={(e) => setFormData(prev => ({ ...prev, monthly_payment: parseFloat(e.target.value) || 0 }))}
-                  min="0"
+                  decimalsLimit={2}
+                  decimalSeparator=","
+                  groupSeparator="."
+                  prefix="R$ "
+                  allowDecimals={true}
+                  allowNegativeValue={false}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, monthly_payment: parseFloat(value || '0') }))}
+                  className="w-full px-3 py-2 border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md"
                 />
               </div>
               <div>
@@ -255,7 +269,7 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, initialData, mode 
             </Button>
             <Button
               type="submit"
-              className="bg-brand-orange hover:bg-brand-orange/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
               {loading ? 'Salvando...' : mode === 'create' ? 'Adicionar' : 'Salvar'}
