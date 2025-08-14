@@ -95,6 +95,9 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path
 
+  // No mobile, sempre mostra texto. No desktop, depende do estado collapsed
+  const shouldShowText = isMobile || !collapsed
+
   const handleNavClick = () => {
     // Fecha o sidebar apenas no mobile
     if (isMobile) {
@@ -122,7 +125,7 @@ export function AppSidebar() {
               className="w-10 h-10 object-contain"
             />
           </div>
-          {!collapsed && (
+          {shouldShowText && (
             <div>
               <h2 className="text-lg font-semibold text-foreground">Gênio</h2>
               <p className="text-xs text-muted-foreground">Financeiro</p>
@@ -150,7 +153,7 @@ export function AppSidebar() {
                           onClick={handleNavClick}
                          >
                            <item.icon className="w-5 h-5 flex-shrink-0" />
-                           {!collapsed && <span className="ml-3">{item.text}</span>}
+                           {shouldShowText && <span className="ml-3">{item.text}</span>}
                          </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -175,7 +178,7 @@ export function AppSidebar() {
                           onClick={handleNavClick}
                          >
                            <item.icon className="w-5 h-5 flex-shrink-0" />
-                           {!collapsed && <span className="ml-3">{item.text}</span>}
+                           {shouldShowText && <span className="ml-3">{item.text}</span>}
                          </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -200,7 +203,7 @@ export function AppSidebar() {
                         onClick={handleNavClick}
                        >
                          <item.icon className="w-5 h-5 flex-shrink-0" />
-                         {!collapsed && <span className="ml-3">{item.text}</span>}
+                         {shouldShowText && <span className="ml-3">{item.text}</span>}
                        </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -222,7 +225,7 @@ export function AppSidebar() {
                   onClick={handleNavClick}
                  >
                    <item.icon className="w-4 h-4 flex-shrink-0" />
-                   {!collapsed && <span>{item.text}</span>}
+                   {shouldShowText && <span>{item.text}</span>}
                  </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
