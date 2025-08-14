@@ -9,6 +9,7 @@ import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-di
 import { DebtFormModal } from "@/components/DebtFormModal"
 import { useDebts } from "@/hooks/useDebts"
 import { Plus, Filter, BarChart3, Table as TableIcon, AlertTriangle, Calendar, DollarSign, Edit, Trash2, CreditCard } from "lucide-react"
+import { FloatingActionButton } from "@/components/FloatingActionButton"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 import { toast } from "sonner"
 
@@ -135,13 +136,13 @@ const Dividas = () => {
   }
 
   return (
-    <div className="p-8 space-y-6 animate-fade-in">
+    <div className="p-2 sm:p-4 lg:p-8 space-y-4 lg:space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Dívidas</h1>
-          <p className="text-muted-foreground">Gerencie e acompanhe suas obrigações financeiras</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Dívidas</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Gerencie e acompanhe suas obrigações financeiras</p>
         </div>
-        <div className="flex gap-3">
+        <div className="hidden sm:flex gap-3">
           <Button 
             className="bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() => setIsModalOpen(true)}
@@ -153,16 +154,16 @@ const Dividas = () => {
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
         <Card className="shadow-card hover-scale">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-destructive/10 rounded-lg">
-                <DollarSign className="w-6 h-6 text-destructive" />
+          <CardContent className="p-3 lg:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <div className="p-2 lg:p-3 bg-destructive/10 rounded-lg">
+                <DollarSign className="w-4 h-4 lg:w-6 lg:h-6 text-destructive" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total em Dívidas</p>
-                <p className="text-2xl font-bold text-foreground">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs lg:text-sm text-muted-foreground">Total em Dívidas</p>
+                <p className="text-lg lg:text-2xl font-bold text-foreground truncate">
                   R$ {totalDividas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
@@ -171,42 +172,42 @@ const Dividas = () => {
         </Card>
 
         <Card className="shadow-card hover-scale">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-destructive/10 rounded-lg">
-                <AlertTriangle className="w-6 h-6 text-destructive" />
+          <CardContent className="p-3 lg:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <div className="p-2 lg:p-3 bg-destructive/10 rounded-lg">
+                <AlertTriangle className="w-4 h-4 lg:w-6 lg:h-6 text-destructive" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Dívidas Vencidas</p>
-                <p className="text-2xl font-bold text-destructive">{dividasVencidas}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-card hover-scale">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-warning/10 rounded-lg">
-                <Calendar className="w-6 h-6 text-warning" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Vencem em 7 dias</p>
-                <p className="text-2xl font-bold text-warning">{proximosVencimentos}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs lg:text-sm text-muted-foreground">Dívidas Vencidas</p>
+                <p className="text-lg lg:text-2xl font-bold text-destructive">{dividasVencidas}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-card hover-scale">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-brand-orange/10 rounded-lg">
-                <BarChart3 className="w-6 h-6 text-brand-orange" />
+          <CardContent className="p-3 lg:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <div className="p-2 lg:p-3 bg-warning/10 rounded-lg">
+                <Calendar className="w-4 h-4 lg:w-6 lg:h-6 text-warning" />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total de Dívidas</p>
-                <p className="text-2xl font-bold text-brand-orange">{filteredDebts.length}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs lg:text-sm text-muted-foreground">Vencem em 7 dias</p>
+                <p className="text-lg lg:text-2xl font-bold text-warning">{proximosVencimentos}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card hover-scale">
+          <CardContent className="p-3 lg:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <div className="p-2 lg:p-3 bg-brand-orange/10 rounded-lg">
+                <BarChart3 className="w-4 h-4 lg:w-6 lg:h-6 text-brand-orange" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs lg:text-sm text-muted-foreground">Total de Dívidas</p>
+                <p className="text-lg lg:text-2xl font-bold text-brand-orange">{filteredDebts.length}</p>
               </div>
             </div>
           </CardContent>
@@ -222,7 +223,7 @@ const Dividas = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-4">
             <Input 
               placeholder="Buscar dívida..." 
               value={searchFilter}
@@ -263,15 +264,15 @@ const Dividas = () => {
                 <SelectItem value="baixa">Baixa</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex gap-2">
+            <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
               <Button
                 variant={viewMode === "table" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setViewMode("table")}
                 className="flex-1"
               >
-                <TableIcon className="w-4 h-4 mr-2" />
-                Tabela
+                <TableIcon className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Tabela</span>
               </Button>
               <Button
                 variant={viewMode === "chart" ? "default" : "outline"}
@@ -279,8 +280,8 @@ const Dividas = () => {
                 onClick={() => setViewMode("chart")}
                 className="flex-1"
               >
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Gráfico
+                <BarChart3 className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Gráfico</span>
               </Button>
             </div>
           </div>
@@ -288,7 +289,7 @@ const Dividas = () => {
       </Card>
 
       {/* Conteúdo Principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         <div className="lg:col-span-2">
           <Card className="shadow-card">
             <CardHeader>
@@ -309,70 +310,78 @@ const Dividas = () => {
                       <p className="text-muted-foreground">Nenhuma dívida encontrada</p>
                     </div>
                   ) : (
-                    filteredDebts.map((debt) => (
-                      <div key={debt.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-3 h-3 rounded-full ${isOverdue(debt.due_date) ? 'bg-destructive' : debt.status === 'paid' ? 'bg-success' : 'bg-warning'}`} />
-                            <div>
-                              <h4 className="font-medium text-foreground">{debt.title}</h4>
-                              <p className="text-sm text-muted-foreground">
-                                {debt.creditor_name || debt.description}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <Badge variant="outline" className={getStatusColor(isOverdue(debt.due_date) ? 'overdue' : debt.status)}>
-                            {isOverdue(debt.due_date) ? 'Vencida' : getStatusLabel(debt.status)}
-                          </Badge>
-                          {debt.due_date && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {new Date(debt.due_date).toLocaleDateString('pt-BR')}
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-right">
-                          <span className="text-lg font-semibold text-destructive">
-                            R$ {Number(debt.remaining_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </span>
-                          {debt.total_amount !== debt.remaining_amount && (
-                            <p className="text-sm text-muted-foreground">
-                              de R$ {Number(debt.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex gap-2 ml-4">
-                          {debt.status === 'active' && (
-                            <Button 
-                              size="sm" 
-                              variant="default" 
-                              className="hover-scale"
-                              onClick={() => handlePayment(debt.id, Number(debt.remaining_amount))}
-                            >
-                              Pagar
-                            </Button>
-                          )}
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="hover-scale"
-                            onClick={() => handleEdit(debt)}
-                          >
-                            <Edit className="w-3 h-3 mr-1" />
-                            Editar
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="destructive" 
-                            className="hover-scale"
-                            onClick={() => setDeleteDebtId(debt.id)}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
+                     filteredDebts.map((debt) => (
+                       <div key={debt.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
+                         <div className="flex-1 min-w-0">
+                           <div className="flex items-center gap-3">
+                             <div className={`w-3 h-3 rounded-full flex-shrink-0 ${isOverdue(debt.due_date) ? 'bg-destructive' : debt.status === 'paid' ? 'bg-success' : 'bg-warning'}`} />
+                             <div className="min-w-0 flex-1">
+                               <h4 className="font-medium text-foreground truncate">{debt.title}</h4>
+                               <p className="text-sm text-muted-foreground truncate">
+                                 {debt.creditor_name || debt.description}
+                               </p>
+                             </div>
+                           </div>
+                         </div>
+                         
+                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                           <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+                             <div className="text-center">
+                               <Badge variant="outline" className={getStatusColor(isOverdue(debt.due_date) ? 'overdue' : debt.status)}>
+                                 {isOverdue(debt.due_date) ? 'Vencida' : getStatusLabel(debt.status)}
+                               </Badge>
+                               {debt.due_date && (
+                                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                                   {new Date(debt.due_date).toLocaleDateString('pt-BR')}
+                                 </p>
+                               )}
+                             </div>
+                             
+                             <div className="text-right">
+                               <span className="text-base sm:text-lg font-semibold text-destructive">
+                                 R$ {Number(debt.remaining_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                               </span>
+                               {debt.total_amount !== debt.remaining_amount && (
+                                 <p className="text-xs sm:text-sm text-muted-foreground">
+                                   de R$ {Number(debt.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                 </p>
+                               )}
+                             </div>
+                           </div>
+                           
+                           <div className="flex gap-2 w-full sm:w-auto">
+                             {debt.status === 'active' && (
+                               <Button 
+                                 size="sm" 
+                                 variant="default" 
+                                 className="hover-scale flex-1 sm:flex-none"
+                                 onClick={() => handlePayment(debt.id, Number(debt.remaining_amount))}
+                               >
+                                 <span className="sm:hidden">Pagar</span>
+                                 <span className="hidden sm:inline">Pagar</span>
+                               </Button>
+                             )}
+                             <Button 
+                               size="sm" 
+                               variant="outline" 
+                               className="hover-scale flex-1 sm:flex-none"
+                               onClick={() => handleEdit(debt)}
+                             >
+                               <Edit className="w-3 h-3 sm:mr-1" />
+                               <span className="hidden sm:inline">Editar</span>
+                             </Button>
+                             <Button 
+                               size="sm" 
+                               variant="destructive" 
+                               className="hover-scale"
+                               onClick={() => setDeleteDebtId(debt.id)}
+                             >
+                               <Trash2 className="w-3 h-3" />
+                             </Button>
+                           </div>
+                         </div>
+                       </div>
+                     ))
                   )}
                 </div>
               ) : (
@@ -460,6 +469,8 @@ const Dividas = () => {
           </Card>
         </div>
       </div>
+
+      <FloatingActionButton onClick={() => setIsModalOpen(true)} />
 
       <DebtFormModal
         open={isModalOpen}

@@ -25,7 +25,7 @@ export function ProfileSelector({
   };
   return <div className="flex items-center justify-between w-full text-sm font-bold">
       <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-        <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
+        <h1 className="hidden sm:block text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
           Dashboard {selectedProfile}
         </h1>
         <div className="hidden sm:block">
