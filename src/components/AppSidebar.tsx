@@ -80,7 +80,7 @@ const getFooterItems = (isSuperAdmin: boolean) => [
 ]
 
 export function AppSidebar() {
-  const { state, setOpen } = useSidebar()
+  const { state, setOpen, setOpenMobile } = useSidebar()
   const { profile } = useAuth()
   const location = useLocation()
   const currentPath = location.pathname
@@ -101,7 +101,7 @@ export function AppSidebar() {
   const handleNavClick = () => {
     // Fecha o sidebar apenas no mobile
     if (isMobile) {
-      setOpen(false)
+      setOpenMobile(false)
     }
   }
 
