@@ -14,50 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      automation_events: {
-        Row: {
-          client_id: string
-          created_at: string
-          event_data: Json | null
-          event_type: string
-          id: string
-          processed: boolean | null
-          processed_at: string | null
-          processing_result: Json | null
-          source_platform: string | null
-        }
-        Insert: {
-          client_id: string
-          created_at?: string
-          event_data?: Json | null
-          event_type: string
-          id?: string
-          processed?: boolean | null
-          processed_at?: string | null
-          processing_result?: Json | null
-          source_platform?: string | null
-        }
-        Update: {
-          client_id?: string
-          created_at?: string
-          event_data?: Json | null
-          event_type?: string
-          id?: string
-          processed?: boolean | null
-          processed_at?: string | null
-          processing_result?: Json | null
-          source_platform?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "automation_events_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       categories: {
         Row: {
           client_id: string | null
@@ -99,33 +55,6 @@ export type Database = {
           },
         ]
       }
-      chats: {
-        Row: {
-          app: string | null
-          conversation_id: string | null
-          created_at: string | null
-          id: number
-          phone: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          app?: string | null
-          conversation_id?: string | null
-          created_at?: string | null
-          id?: number
-          phone?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          app?: string | null
-          conversation_id?: string | null
-          created_at?: string | null
-          id?: number
-          phone?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       clients: {
         Row: {
           can_upgrade: boolean | null
@@ -136,7 +65,6 @@ export type Database = {
           id: string
           monthly_fee: number | null
           profile_id: string
-          ssesionID: string | null
           subscription_active: boolean | null
           subscription_end_date: string | null
           subscription_plan: string | null
@@ -155,7 +83,6 @@ export type Database = {
           id?: string
           monthly_fee?: number | null
           profile_id: string
-          ssesionID?: string | null
           subscription_active?: boolean | null
           subscription_end_date?: string | null
           subscription_plan?: string | null
@@ -174,7 +101,6 @@ export type Database = {
           id?: string
           monthly_fee?: number | null
           profile_id?: string
-          ssesionID?: string | null
           subscription_active?: boolean | null
           subscription_end_date?: string | null
           subscription_plan?: string | null
@@ -658,39 +584,39 @@ export type Database = {
       profiles: {
         Row: {
           account_status: Database["public"]["Enums"]["account_status"]
+          activephone: string | null
           created_at: string
           email: string
           full_name: string
           id: string
           phone: string | null
           profile_image_url: string | null
-          sessionID: string | null
           updated_at: string
           user_id: string
           user_type: Database["public"]["Enums"]["user_type"]
         }
         Insert: {
           account_status?: Database["public"]["Enums"]["account_status"]
+          activephone?: string | null
           created_at?: string
           email: string
           full_name: string
           id?: string
           phone?: string | null
           profile_image_url?: string | null
-          sessionID?: string | null
           updated_at?: string
           user_id: string
           user_type: Database["public"]["Enums"]["user_type"]
         }
         Update: {
           account_status?: Database["public"]["Enums"]["account_status"]
+          activephone?: string | null
           created_at?: string
           email?: string
           full_name?: string
           id?: string
           phone?: string | null
           profile_image_url?: string | null
-          sessionID?: string | null
           updated_at?: string
           user_id?: string
           user_type?: Database["public"]["Enums"]["user_type"]
@@ -1095,50 +1021,6 @@ export type Database = {
           },
         ]
       }
-      whatsapp_integrations: {
-        Row: {
-          api_token: string | null
-          client_id: string
-          configuration: Json | null
-          created_at: string
-          id: string
-          integration_status: string | null
-          updated_at: string
-          webhook_url: string | null
-          whatsapp_number: string
-        }
-        Insert: {
-          api_token?: string | null
-          client_id: string
-          configuration?: Json | null
-          created_at?: string
-          id?: string
-          integration_status?: string | null
-          updated_at?: string
-          webhook_url?: string | null
-          whatsapp_number: string
-        }
-        Update: {
-          api_token?: string | null
-          client_id?: string
-          configuration?: Json | null
-          created_at?: string
-          id?: string
-          integration_status?: string | null
-          updated_at?: string
-          webhook_url?: string | null
-          whatsapp_number?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "whatsapp_integrations_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
@@ -1147,6 +1029,10 @@ export type Database = {
       binary_quantize: {
         Args: { "": string } | { "": unknown }
         Returns: unknown
+      }
+      ensure_user_has_client: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       get_user_client_id: {
         Args: Record<PropertyKey, never>
