@@ -34,9 +34,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <AppSidebar />
           <div className="flex-1 flex flex-col">
             <header className="bg-surface border-b border-border fixed top-0 right-0 left-0 z-40 lg:left-64">
-              <div className="flex items-center h-16 px-3 sm:px-6">
-                <SidebarTrigger className="mr-2 sm:mr-4" />
-                <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between h-16 px-3 sm:px-6 gap-2">
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <SidebarTrigger className="flex-shrink-0" />
+                </div>
+                <div className="flex-1 min-w-0 max-w-xs sm:max-w-none">
                   <ProfileSelector 
                     profiles={["Pessoal", "Empresarial"]} 
                     userInitial="U" 
