@@ -1,7 +1,8 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ProfileSelector } from "@/components/ProfileSelector";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProfileContextType {
   currentProfile: string;
@@ -24,10 +25,11 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [currentProfile, setCurrentProfile] = useState("Pessoal");
+  const isMobile = useIsMobile();
 
   return (
     <ProfileContext.Provider value={{ currentProfile, setCurrentProfile }}>
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={!isMobile}>
         <div className="min-h-screen flex w-full bg-background">
           <AppSidebar />
           <div className="flex-1 flex flex-col">

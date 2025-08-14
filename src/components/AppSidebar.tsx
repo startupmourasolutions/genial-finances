@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 
 import { useAuth } from "@/hooks/useAuth"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 import {
   Sidebar,
@@ -84,6 +85,7 @@ export function AppSidebar() {
   const location = useLocation()
   const currentPath = location.pathname
   const collapsed = state === "collapsed"
+  const isMobile = useIsMobile()
 
   // Verifica se é super administrador
   const isSuperAdmin = profile?.user_type === 'super_administrator'
@@ -94,16 +96,18 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path
 
   const handleNavClick = () => {
-    // Fecha o sidebar automaticamente ao clicar em um item de navegação
-    setOpen(false)
+    // Fecha o sidebar apenas no mobile
+    if (isMobile) {
+      setOpen(false)
+    }
   }
 
   const getNavClasses = (path: string) => {
     const isActiveItem = isActive(path)
-    return `transition-smooth rounded-lg mx-2 ${
+    return `transition-smooth rounded-lg mx-2 flex items-center ${
       isActiveItem 
-        ? "bg-brand-blue text-white shadow-lg font-medium" 
-        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+        ? "bg-primary text-primary-foreground shadow-lg font-medium" 
+        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
     }`
   }
 
@@ -144,10 +148,10 @@ export function AppSidebar() {
                           to={item.path} 
                           className={getNavClasses(item.path)}
                           onClick={handleNavClick}
-                        >
-                          <item.icon className="w-5 h-5" />
-                          {!collapsed && <span className="ml-3">{item.text}</span>}
-                        </NavLink>
+                         >
+                           <item.icon className="w-5 h-5 flex-shrink-0" />
+                           {!collapsed && <span className="ml-3 text-inherit">{item.text}</span>}
+                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
@@ -169,10 +173,10 @@ export function AppSidebar() {
                           to={item.path} 
                           className={getNavClasses(item.path)}
                           onClick={handleNavClick}
-                        >
-                          <item.icon className="w-5 h-5" />
-                          {!collapsed && <span className="ml-3">{item.text}</span>}
-                        </NavLink>
+                         >
+                           <item.icon className="w-5 h-5 flex-shrink-0" />
+                           {!collapsed && <span className="ml-3 text-inherit">{item.text}</span>}
+                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
@@ -194,10 +198,10 @@ export function AppSidebar() {
                         to={item.path} 
                         className={getNavClasses(item.path)}
                         onClick={handleNavClick}
-                      >
-                        <item.icon className="w-5 h-5" />
-                        {!collapsed && <span className="ml-3">{item.text}</span>}
-                      </NavLink>
+                       >
+                         <item.icon className="w-5 h-5 flex-shrink-0" />
+                         {!collapsed && <span className="ml-3 text-inherit">{item.text}</span>}
+                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -216,10 +220,10 @@ export function AppSidebar() {
                   to={item.path} 
                   className={getNavClasses(item.path)}
                   onClick={handleNavClick}
-                >
-                  <item.icon className="w-4 h-4" />
-                  {!collapsed && <span>{item.text}</span>}
-                </NavLink>
+                 >
+                   <item.icon className="w-4 h-4 flex-shrink-0" />
+                   {!collapsed && <span className="text-inherit">{item.text}</span>}
+                 </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
