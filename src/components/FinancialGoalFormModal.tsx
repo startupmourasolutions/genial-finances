@@ -89,11 +89,14 @@ export function FinancialGoalFormModal({ open, onOpenChange, onSubmit, initialDa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto" aria-describedby="goal-form-description">
         <DialogHeader>
           <DialogTitle>
             {mode === 'create' ? 'Adicionar Meta Financeira' : 'Editar Meta Financeira'}
           </DialogTitle>
+          <p id="goal-form-description" className="text-sm text-muted-foreground">
+            {mode === 'create' ? 'Defina uma nova meta financeira para alcançar seus objetivos' : 'Atualize os dados da sua meta financeira'}
+          </p>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">

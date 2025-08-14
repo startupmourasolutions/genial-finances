@@ -44,20 +44,30 @@ export function useFinancialGoals() {
   const { user, profile } = useAuth()
 
   useEffect(() => {
-    if (user && profile) {
-      fetchGoals()
-      fetchCategories()
-    }
-  }, [user, profile])
+    // Aguardar um pouco antes de buscar dados para garantir que profile carregou completamente
+    const timer = setTimeout(() => {
+      if (user && profile && profile.clients && profile.clients.length > 0) {
+        fetchGoals()
+        fetchCategories()
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [user, profile, profile?.clients])
 
   const fetchGoals = async () => {
     if (!user || !profile) return
 
     try {
       setLoading(true)
+      
+      // Aguardar um pouco para garantir que o profile carregou completamente
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
       const clientId = profile?.clients?.[0]?.id
 
       if (!clientId) {
+        console.log('Client ID não encontrado no profile:', profile)
         setGoals([])
         return
       }
@@ -82,9 +92,13 @@ export function useFinancialGoals() {
     if (!user || !profile) return
 
     try {
+      // Aguardar um pouco para garantir que o profile carregou completamente
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
       const clientId = profile?.clients?.[0]?.id
 
       if (!clientId) {
+        console.log('Client ID não encontrado para categorias:', profile)
         setCategories([])
         return
       }
@@ -110,11 +124,16 @@ export function useFinancialGoals() {
     }
 
     try {
+      // Aguardar um pouco para garantir que o profile carregou completamente
+      await new Promise(resolve => setTimeout(resolve, 200))
+      
       const clientId = profile?.clients?.[0]?.id
 
       if (!clientId) {
-        toast.error('Cliente não encontrado')
-        return { error: 'Client not found' }
+        console.error('Profile data:', JSON.stringify(profile, null, 2))
+        console.error('Profile clients:', profile?.clients)
+        toast.error('Perfil de cliente não encontrado. Tente recarregar a página.')
+        return { error: 'Client profile not found' }
       }
 
       const { data, error } = await supabase
