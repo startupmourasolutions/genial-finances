@@ -86,14 +86,14 @@ export default function Configuracoes() {
   };
 
   return (
-    <div className="w-full space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Minhas Configurações</h1>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={handleReset}>
+    <div className="w-full space-y-4 md:space-y-6 p-4 md:p-6">
+      <div className="space-y-4 md:space-y-0 md:flex md:items-center md:justify-between">
+        <h1 className="text-2xl md:text-3xl font-bold">Minhas Configurações</h1>
+        <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+          <Button variant="outline" onClick={handleReset} className="w-full md:w-auto">
             Resetar
           </Button>
-          <Button onClick={handleSave} disabled={isLoading}>
+          <Button onClick={handleSave} disabled={isLoading} className="w-full md:w-auto">
             {isLoading ? "Salvando..." : "Salvar Alterações"}
           </Button>
         </div>
@@ -148,8 +148,8 @@ export default function Configuracoes() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
                 <Label>Notificações por Email</Label>
                 <p className="text-sm text-muted-foreground">
                   Receber notificações importantes por email
@@ -161,8 +161,8 @@ export default function Configuracoes() {
               />
             </div>
             <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
                 <Label>Notificações por SMS</Label>
                 <p className="text-sm text-muted-foreground">
                   Receber notificações por SMS (pode gerar custos)
@@ -174,8 +174,8 @@ export default function Configuracoes() {
               />
             </div>
             <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
                 <Label>Notificações Push</Label>
                 <p className="text-sm text-muted-foreground">
                   Receber notificações no navegador
@@ -187,8 +187,8 @@ export default function Configuracoes() {
               />
             </div>
             <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
                 <Label>Lembrete de Faturas</Label>
                 <p className="text-sm text-muted-foreground">
                   Receber lembretes antes do vencimento das faturas
@@ -328,8 +328,8 @@ export default function Configuracoes() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
                 <Label>Compartilhar Dados Analíticos</Label>
                 <p className="text-sm text-muted-foreground">
                   Permitir que dados anônimos sejam usados para melhorar o serviço
@@ -341,8 +341,8 @@ export default function Configuracoes() {
               />
             </div>
             <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
                 <Label>Emails de Marketing</Label>
                 <p className="text-sm text-muted-foreground">
                   Receber ofertas especiais e novidades por email
