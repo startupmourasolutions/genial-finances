@@ -24,6 +24,8 @@ import { MaintenanceModal } from "@/components/MaintenanceModal"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { VehicleFloatingButtons } from "@/components/VehicleFloatingButtons"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 const Veiculos = () => {
   const { 
@@ -38,6 +40,8 @@ const Veiculos = () => {
     deleteVehicle,
     refetchData
   } = useVehicles()
+  
+  const isMobile = useIsMobile()
 
   const [viewMode, setViewMode] = useState<"table" | "chart">("table")
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false)
@@ -131,30 +135,32 @@ const Veiculos = () => {
   }
 
   if (loading) {
-    return <div className="p-8">Carregando veículos...</div>
+    return <div className={`${isMobile ? 'p-4' : 'p-8'}`}>Carregando veículos...</div>
   }
 
   return (
-    <div className="p-8 space-y-6 animate-fade-in">
-      <div className="flex justify-between items-center">
+    <div className={`${isMobile ? 'p-4' : 'p-8'} space-y-6 animate-fade-in`}>
+      <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Controle de Veículos</h1>
-          <p className="text-muted-foreground">Gerencie seus veículos, manutenções e quilometragem</p>
+          <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-foreground`}>Controle de Veículos</h1>
+          <p className="text-muted-foreground text-sm md:text-base">Gerencie seus veículos, manutenções e quilometragem</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => handleCreateMaintenance()}>
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Manutenção
-          </Button>
-          <Button onClick={handleCreateVehicle} className="bg-primary text-primary-foreground hover:bg-primary/90">
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Veículo
-          </Button>
-        </div>
+        {!isMobile && (
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => handleCreateMaintenance()}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Manutenção
+            </Button>
+            <Button onClick={handleCreateVehicle} className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Veículo
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Cards de Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className={`grid grid-cols-2 md:grid-cols-4 ${isMobile ? 'gap-3' : 'gap-6'}`}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Veículos</CardTitle>
@@ -219,11 +225,11 @@ const Veiculos = () => {
           ) : (
             <div className="space-y-4">
               {vehicles.map((vehicle) => (
-                <div key={vehicle.id} className="border border-border rounded-lg p-4 hover:bg-muted/50 transition-smooth">
-                  <div className="flex justify-between items-start">
+                 <div key={vehicle.id} className={`border border-border rounded-lg ${isMobile ? 'p-3' : 'p-4'} hover:bg-muted/50 transition-smooth`}>
+                   <div className={`flex ${isMobile ? 'flex-col gap-3' : 'justify-between items-start'}`}>
                     <div className="space-y-2">
                       <h3 className="font-semibold text-lg">{vehicle.name}</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground">
+                      <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 md:grid-cols-4'} gap-2 md:gap-4 text-sm text-muted-foreground`}>
                         {vehicle.brand && vehicle.model && (
                           <div>
                             <span className="font-medium">Modelo:</span> {vehicle.brand} {vehicle.model}
@@ -254,39 +260,46 @@ const Veiculos = () => {
                         )}
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleUpdateKm(vehicle)}
-                        title="Atualizar Quilometragem"
-                      >
-                        <RefreshCw className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleCreateMaintenance(vehicle.id)}
-                        title="Nova Manutenção"
-                      >
-                        <Settings className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditVehicle(vehicle)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setDeleteId(vehicle.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash className="w-4 h-4" />
-                      </Button>
-                    </div>
+                     <div className={`flex ${isMobile ? 'flex-col gap-1' : 'gap-2'}`}>
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => handleUpdateKm(vehicle)}
+                         title="Atualizar Quilometragem"
+                         className={isMobile ? 'justify-start' : ''}
+                       >
+                         <RefreshCw className="w-4 h-4" />
+                         {isMobile && <span className="ml-2">Atualizar KM</span>}
+                       </Button>
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => handleCreateMaintenance(vehicle.id)}
+                         title="Nova Manutenção"
+                         className={isMobile ? 'justify-start' : ''}
+                       >
+                         <Settings className="w-4 h-4" />
+                         {isMobile && <span className="ml-2">Manutenção</span>}
+                       </Button>
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => handleEditVehicle(vehicle)}
+                         className={isMobile ? 'justify-start' : ''}
+                       >
+                         <Edit className="w-4 h-4" />
+                         {isMobile && <span className="ml-2">Editar</span>}
+                       </Button>
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => setDeleteId(vehicle.id)}
+                         className={`text-destructive hover:text-destructive ${isMobile ? 'justify-start' : ''}`}
+                       >
+                         <Trash className="w-4 h-4" />
+                         {isMobile && <span className="ml-2">Excluir</span>}
+                       </Button>
+                     </div>
                   </div>
                 </div>
               ))}
@@ -315,8 +328,8 @@ const Veiculos = () => {
                 .map((maintenance) => {
                   const vehicle = vehicles.find(v => v.id === maintenance.vehicle_id)
                   return (
-                    <div key={maintenance.id} className="border border-border rounded-lg p-4">
-                      <div className="flex justify-between items-start">
+                     <div key={maintenance.id} className={`border border-border rounded-lg ${isMobile ? 'p-3' : 'p-4'}`}>
+                       <div className={`flex ${isMobile ? 'flex-col gap-3' : 'justify-between items-start'}`}>
                         <div className="space-y-1">
                           <h4 className="font-medium">{maintenance.type}</h4>
                           <p className="text-sm text-muted-foreground">
@@ -415,6 +428,12 @@ const Veiculos = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Botões Flutuantes para Mobile */}
+      <VehicleFloatingButtons
+        onNewVehicle={handleCreateVehicle}
+        onNewMaintenance={() => handleCreateMaintenance()}
+      />
     </div>
   )
 }
