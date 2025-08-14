@@ -11,6 +11,7 @@ import {
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { User, Settings, LogOut } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
+import { useNavigate } from "react-router-dom"
 
 interface ProfileDropdownProps {
   userInitial: string
@@ -18,11 +19,20 @@ interface ProfileDropdownProps {
 
 export function ProfileDropdown({ userInitial }: ProfileDropdownProps) {
   const { profile, signOut } = useAuth()
+  const navigate = useNavigate()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
   const handleLogout = async () => {
     await signOut()
     setShowLogoutDialog(false)
+  }
+
+  const handleNavigateToProfile = () => {
+    navigate('/perfil')
+  }
+
+  const handleNavigateToSettings = () => {
+    navigate('/configuracoes')
   }
 
   return (
@@ -50,11 +60,11 @@ export function ProfileDropdown({ userInitial }: ProfileDropdownProps) {
             </div>
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleNavigateToProfile}>
             <User className="mr-2 h-4 w-4" />
             <span>Perfil</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleNavigateToSettings}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Configurações</span>
           </DropdownMenuItem>
