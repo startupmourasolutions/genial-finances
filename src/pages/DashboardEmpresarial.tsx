@@ -87,7 +87,7 @@ export default function DashboardEmpresarial() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
         <Card className="shadow-card hover:shadow-lg transition-smooth">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
@@ -158,13 +158,13 @@ export default function DashboardEmpresarial() {
       </div>
 
       {/* Charts Section - Empresarial */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
         <MonthlyTrendChart />
         <ExpensesByCategoryChart />
       </div>
 
       {/* Business Insights */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
         {/* Cash Flow */}
         <Card className="shadow-card">
           <CardHeader className="pb-2">
