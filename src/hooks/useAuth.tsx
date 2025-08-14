@@ -74,6 +74,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
+      console.log('=== DEBUG useAuth loadUserProfile ===');
+      console.log('Profile carregado:', JSON.stringify(profile, null, 2));
+      console.log('=== FIM DEBUG useAuth ===');
+
       setProfile(profile)
     } catch (error) {
       console.error('Error loading user profile:', error)

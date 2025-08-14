@@ -16,8 +16,24 @@ export function ProfileToggle({
   } = useAuth();
 
   // Verifica se o usuário tem permissão para usar o perfil empresarial
+  console.log('=== DEBUG ProfileToggle ===');
+  console.log('Profile completo:', JSON.stringify(profile, null, 2));
+  console.log('profile?.clients:', profile?.clients);
+  console.log('Array.isArray(profile?.clients):', Array.isArray(profile?.clients));
+  if (profile?.clients) {
+    console.log('profile.clients.length:', profile.clients.length);
+    console.log('profile.clients[0]:', profile.clients[0]);
+    if (profile.clients[0]) {
+      console.log('profile.clients[0].client_type:', profile.clients[0].client_type);
+    }
+  }
+  
   const hasBusinessAccess = (profile?.clients && profile.clients.length > 0 && profile.clients[0].client_type === 'business') || false;
   const isSuperAdmin = (profile?.super_administrators && profile.super_administrators.length > 0) || false;
+  
+  console.log('hasBusinessAccess FINAL:', hasBusinessAccess);
+  console.log('isSuperAdmin FINAL:', isSuperAdmin);
+  console.log('=== FIM DEBUG ===');
 
   const handleToggle = () => {
     const newProfile = selectedProfile === profiles[0] ? profiles[1] : profiles[0];
