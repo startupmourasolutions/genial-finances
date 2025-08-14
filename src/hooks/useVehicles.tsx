@@ -119,7 +119,7 @@ export function useVehicles() {
     }
 
     try {
-      const clientId = profile?.clients?.[0]?.id
+      const clientId = profile?.clients?.id
       
       const { data, error } = await supabase
         .from('vehicles')
@@ -197,7 +197,7 @@ export function useVehicles() {
     }
 
     try {
-      const clientId = profile?.clients?.[0]?.id
+      const clientId = profile?.clients?.id
       
       const { data, error } = await supabase
         .from('vehicle_maintenance')
