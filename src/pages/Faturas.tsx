@@ -12,6 +12,7 @@ import { DollarSign, Calendar, CreditCard, Mail, QrCode, FileText, Download, Eye
 import { useToast } from "@/hooks/use-toast";
 import { useSubscriberData } from "@/hooks/useSubscriberData";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Invoice {
   id: string;
@@ -35,6 +36,7 @@ export default function Faturas() {
   const { toast } = useToast();
   const { user, profile } = useAuth();
   const { subscriberData, invoices, loading, error } = useSubscriberData();
+  const isMobile = useIsMobile();
 
   // Definir método de pagamento com base na assinatura
   const [paymentMethod, setPaymentMethod] = useState("Cartão de Crédito");
@@ -58,16 +60,16 @@ export default function Faturas() {
     return (
       <div className="w-full flex items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Carregando dados da assinatura...</span>
+        <span className={`ml-2 ${isMobile ? 'text-sm' : ''}`}>Carregando dados da assinatura...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="w-full p-6">
+      <div className={`w-full ${isMobile ? 'p-4' : 'p-6'}`}>
         <div className="text-center text-red-600">
-          <p>Erro ao carregar dados: {error}</p>
+          <p className={isMobile ? 'text-sm' : ''}>Erro ao carregar dados: {error}</p>
         </div>
       </div>
     );
@@ -151,9 +153,9 @@ export default function Faturas() {
   };
 
   return (
-    <div className="w-full space-y-6 p-6">
+    <div className={`w-full space-y-6 ${isMobile ? 'p-4' : 'p-6'}`}>
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Minhas Faturas</h1>
+        <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold`}>Minhas Faturas</h1>
       </div>
 
       {/* Fatura em Destaque */}
@@ -166,10 +168,10 @@ export default function Faturas() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'}`}>
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">Valor</Label>
-                <div className="flex items-center text-3xl font-bold text-primary">
+                <div className={`flex items-center ${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-primary`}>
                   {new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL'
@@ -179,7 +181,7 @@ export default function Faturas() {
               
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">Status</Label>
-                <Badge className={`${getStatusBadgeColor(currentInvoice.status)} text-lg px-3 py-1`}>
+                <Badge className={`${getStatusBadgeColor(currentInvoice.status)} ${isMobile ? 'text-base' : 'text-lg'} px-3 py-1`}>
                   {getStatusLabel(currentInvoice.status)}
                 </Badge>
               </div>
@@ -188,7 +190,7 @@ export default function Faturas() {
                 <Label className="text-sm font-medium text-muted-foreground">
                   {currentInvoice.status === 'paga' ? 'Paga em' : isOverdue(currentInvoice.due_date) ? 'Venceu em' : 'Vence em'}
                 </Label>
-                <div className="flex items-center text-lg">
+                <div className={`flex items-center ${isMobile ? 'text-base' : 'text-lg'}`}>
                   <Calendar className="w-4 h-4 mr-2" />
                   {currentInvoice.status === 'paga' && currentInvoice.payment_date 
                     ? format(new Date(currentInvoice.payment_date), "dd/MM/yyyy", { locale: ptBR })
@@ -206,7 +208,7 @@ export default function Faturas() {
               {subscriberData?.subscription_end && (
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-muted-foreground">Próximo Fechamento</Label>
-                  <div className="flex items-center text-lg">
+                  <div className={`flex items-center ${isMobile ? 'text-base' : 'text-lg'}`}>
                     <Calendar className="w-4 h-4 mr-2" />
                     {format(new Date(subscriberData.subscription_end), "dd/MM/yyyy", { locale: ptBR })}
                   </div>
@@ -218,9 +220,9 @@ export default function Faturas() {
             {currentInvoice.status === 'pendente' && (!subscriberData?.subscribed || paymentMethod !== 'Cartão de Crédito') && (
               <div className="mt-6">
                 <Button 
-                  size="lg" 
+                  size={isMobile ? "default" : "lg"}
                   onClick={() => handlePayInvoice(currentInvoice)}
-                  className="w-full md:w-auto"
+                  className="w-full"
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
                   Pagar Fatura
@@ -238,7 +240,7 @@ export default function Faturas() {
             <CardTitle>Configurações de Pagamento</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-6'}`}>
               <div className="space-y-2">
                 <Label htmlFor="payment-method">Método de Pagamento</Label>
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
@@ -280,7 +282,7 @@ export default function Faturas() {
             <CardTitle>Status da Assinatura</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-3 gap-6'}`}>
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">Plano Ativo</Label>
                 <div className="text-lg font-semibold text-green-600">
@@ -290,7 +292,7 @@ export default function Faturas() {
               
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-muted-foreground">Método de Pagamento</Label>
-                <div className="flex items-center text-lg">
+                <div className={`flex items-center ${isMobile ? 'text-base' : 'text-lg'}`}>
                   <CreditCard className="w-4 h-4 mr-2" />
                   Cartão de Crédito
                 </div>
@@ -299,7 +301,7 @@ export default function Faturas() {
               {subscriberData.subscription_end && (
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-muted-foreground">Próxima Cobrança</Label>
-                  <div className="flex items-center text-lg">
+                  <div className={`flex items-center ${isMobile ? 'text-base' : 'text-lg'}`}>
                     <Calendar className="w-4 h-4 mr-2" />
                     {format(new Date(subscriberData.subscription_end), "dd/MM/yyyy", { locale: ptBR })}
                   </div>
@@ -327,17 +329,84 @@ export default function Faturas() {
           <CardTitle>Histórico de Faturas (Últimos 12 meses)</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Número</TableHead>
-                <TableHead>Descrição</TableHead>
-                <TableHead>Valor</TableHead>
-                <TableHead>Vencimento</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
+          {isMobile ? (
+            // Layout para mobile - Cards em vez de tabela
+            <div className="space-y-4">
+              {last12Invoices.map((invoice) => (
+                <Card key={invoice.id} className={`${invoice.id === currentInvoice?.id ? 'border-primary/30 bg-primary/5' : ''}`}>
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-sm text-muted-foreground">Número</p>
+                          <p className="font-semibold">{invoice.invoice_number}</p>
+                        </div>
+                        <Badge className={getStatusBadgeColor(invoice.status)}>
+                          {getStatusLabel(invoice.status)}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="font-medium text-sm text-muted-foreground">Descrição</p>
+                          <p className="text-sm">{invoice.description}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm text-muted-foreground">Vencimento</p>
+                          <p className="text-sm">{format(new Date(invoice.due_date), "dd/MM/yyyy")}</p>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <p className="font-medium text-sm text-muted-foreground">Valor</p>
+                        <p className="text-lg font-bold text-primary">
+                          {new Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL'
+                          }).format(invoice.amount)}
+                        </p>
+                      </div>
+                      
+                      <div className="flex gap-2 pt-2">
+                        {invoice.status === 'pendente' && (!subscriberData?.subscribed || paymentMethod !== 'Cartão de Crédito') && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handlePayInvoice(invoice)}
+                            className="flex-1"
+                          >
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            Pagar
+                          </Button>
+                        )}
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewInvoice(invoice)}
+                          className="flex-1"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Ver detalhes
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            // Layout desktop - Tabela normal
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Número</TableHead>
+                  <TableHead>Descrição</TableHead>
+                  <TableHead>Valor</TableHead>
+                  <TableHead>Vencimento</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
             <TableBody>
               {last12Invoices.map((invoice) => (
                 <TableRow key={invoice.id} className={invoice.id === currentInvoice?.id ? 'bg-primary/5' : ''}>
@@ -382,8 +451,9 @@ export default function Faturas() {
                   </TableCell>
                 </TableRow>
               ))}
-            </TableBody>
-          </Table>
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 
