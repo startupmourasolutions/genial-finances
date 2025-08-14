@@ -50,7 +50,7 @@ export function useProfile() {
       
       const fileExt = file.name.split('.').pop()
       const fileName = `${user.id}-${Math.random()}.${fileExt}`
-      const filePath = `profiles/${fileName}`
+      const filePath = `${user.id}/${fileName}`
 
       const { error: uploadError } = await supabase.storage
         .from('profiles')
