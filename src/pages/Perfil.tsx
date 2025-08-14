@@ -91,20 +91,7 @@ const Perfil = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col items-center space-y-4">
-              <Avatar className="w-32 h-32">
-                <AvatarImage src={profile?.profile_image_url} />
-                <AvatarFallback className="text-2xl">{getUserInitial()}</AvatarFallback>
-              </Avatar>
-              
-              <div className="text-center">
-                <h3 className="font-semibold text-lg">{profile?.full_name || 'Usuário'}</h3>
-                <p className="text-sm text-muted-foreground">{user?.email}</p>
-                <div className="mt-2">
-                  {getAccountTypeBadge()}
-                </div>
-              </div>
-
-              <div className="w-full">
+              <div className="relative">
                 <input
                   type="file"
                   accept="image/*"
@@ -113,19 +100,34 @@ const Perfil = () => {
                   id="profile-image"
                   disabled={uploading}
                 />
-                <Label htmlFor="profile-image" className="cursor-pointer">
-                  <Button 
-                    variant="outline" 
-                    className="w-full" 
-                    disabled={uploading}
-                    asChild
-                  >
-                    <span>
-                      <Camera className="w-4 h-4 mr-2" />
-                      {uploading ? 'Enviando...' : 'Alterar Foto'}
-                    </span>
-                  </Button>
+                <Label 
+                  htmlFor="profile-image" 
+                  className="cursor-pointer relative group"
+                >
+                  <Avatar className="w-32 h-32 transition-all duration-200 group-hover:brightness-75">
+                    <AvatarImage src={profile?.profile_image_url} />
+                    <AvatarFallback className="text-2xl">{getUserInitial()}</AvatarFallback>
+                  </Avatar>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/20 rounded-full">
+                    <Camera className="w-8 h-8 text-white" />
+                  </div>
                 </Label>
+                {uploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="text-center">
+                <h3 className="font-semibold text-lg">{profile?.full_name || 'Usuário'}</h3>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Clique na foto para alterar
+                </p>
+                <div className="mt-2">
+                  {getAccountTypeBadge()}
+                </div>
               </div>
             </div>
 
