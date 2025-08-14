@@ -11,7 +11,7 @@ interface ProfileUpdateData {
 
 export function useProfile() {
   const [uploading, setUploading] = useState(false)
-  const { user, profile } = useAuth()
+  const { user, profile, refreshProfile } = useAuth()
 
   const updateProfile = async (data: ProfileUpdateData) => {
     if (!user) {
@@ -30,7 +30,10 @@ export function useProfile() {
 
       if (error) throw error
 
-      toast.success('Perfil atualizado com sucesso!')
+      // Só mostra sucesso se não for chamada pelo upload de imagem
+      if (!data.profile_image_url) {
+        toast.success('Perfil atualizado com sucesso!')
+      }
       return { error: null }
     } catch (error: any) {
       console.error('Error updating profile:', error)
@@ -69,6 +72,10 @@ export function useProfile() {
         profile_image_url: profileImageUrl 
       })
 
+      // Recarrega o perfil para mostrar a nova imagem
+      await refreshProfile()
+
+      toast.success('Foto de perfil atualizada com sucesso!')
       return { data: profileImageUrl, error: null }
     } catch (error: any) {
       console.error('Error uploading image:', error)
