@@ -91,10 +91,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error
       
       if (data.user) {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo de volta.",
-        })
+        // Se está vindo do cadastro, não mostra mensagem de login
+        const isFromSignup = sessionStorage.getItem('fromSignup')
+        if (!isFromSignup) {
+          toast({
+            title: "Login realizado com sucesso!",
+            description: "Bem-vindo de volta.",
+          })
+        } else {
+          sessionStorage.removeItem('fromSignup')
+        }
         window.location.href = '/dashboard'
       }
       
@@ -168,9 +174,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             })
         }
         
+        // Marca que vem do signup para não mostrar mensagem de login dupla
+        sessionStorage.setItem('fromSignup', 'true')
         toast({
-          title: "Conta criada com sucesso!",
-          description: "Verifique seu email para confirmar a conta.",
+          title: "Cadastro realizado com sucesso!",
+          description: "Bem-vindo ao Gênio Financeiro!",
         })
       }
       

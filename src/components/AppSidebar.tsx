@@ -57,16 +57,26 @@ const superAdminNavItems = [
   { id: "faturas", text: "Faturas", icon: Receipt, path: "/admin/faturas" }
 ]
 
-const clientAreaItems = [
-  { id: "dividas", text: "Dívidas", icon: FileText, path: "/dividas" },
-  { id: "relatorios", text: "Relatórios", icon: PieChart, path: "/relatorios" },
-  { id: "veiculos", text: "Veículos", icon: Car, path: "/veiculos" },
-  { id: "transacoes", text: "Transações", icon: Repeat, path: "/transacoes" },
-  { id: "categorias", text: "Categorias", icon: Tag, path: "/categorias" },
-  { id: "metas", text: "Metas", icon: Target, path: "/metas" },
-  { id: "receitas", text: "Receitas", icon: ArrowUpCircle, path: "/receitas" },
-  { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" }
-]
+// Função para filtrar itens da área do cliente baseado no tipo de conta
+const getClientAreaItems = (isBusinessAccount: boolean) => {
+  const allItems = [
+    { id: "dividas", text: "Dívidas", icon: FileText, path: "/dividas" },
+    { id: "relatorios", text: "Relatórios", icon: PieChart, path: "/relatorios" },
+    { id: "veiculos", text: "Veículos", icon: Car, path: "/veiculos" },
+    { id: "transacoes", text: "Transações", icon: Repeat, path: "/transacoes" },
+    { id: "categorias", text: "Categorias", icon: Tag, path: "/categorias" },
+    { id: "metas", text: "Metas", icon: Target, path: "/metas" },
+    { id: "receitas", text: "Receitas", icon: ArrowUpCircle, path: "/receitas" },
+    { id: "despesas", text: "Despesas", icon: ArrowDownCircle, path: "/despesas" }
+  ]
+  
+  // Para contas pessoais, remove o menu de veículos
+  if (!isBusinessAccount) {
+    return allItems.filter(item => item.id !== 'veiculos')
+  }
+  
+  return allItems
+}
 
 const getFooterItems = (isSuperAdmin: boolean) => [
   { id: "perfil", text: "Perfil", icon: UserCircle, path: "/perfil" },
@@ -90,8 +100,22 @@ export function AppSidebar() {
   // Verifica se é super administrador
   const isSuperAdmin = profile?.user_type === 'super_administrator'
   
-  // Seleciona os itens de navegação baseado no tipo de usuário
-  const navItems = isSuperAdmin ? superAdminNavItems : clientNavItems
+  // Verifica se é conta empresarial
+  const isBusinessAccount = profile?.clients?.[0]?.client_type === 'business'
+  
+  // Filtra os itens de navegação baseado no tipo de conta
+  const getFilteredNavItems = () => {
+    if (isSuperAdmin) return superAdminNavItems
+    
+    // Para contas pessoais, remove o menu de veículos
+    if (!isBusinessAccount) {
+      return clientNavItems.filter(item => item.id !== 'veiculos')
+    }
+    
+    return clientNavItems
+  }
+  
+  const navItems = getFilteredNavItems()
 
   const isActive = (path: string) => currentPath === path
 
@@ -169,7 +193,7 @@ export function AppSidebar() {
               </SidebarGroupLabel>
               <SidebarGroupContent className="space-y-2">
                 <SidebarMenu className="space-y-1">
-                  {clientAreaItems.map((item) => (
+                  {getClientAreaItems(isBusinessAccount).map((item) => (
                     <SidebarMenuItem key={item.id}>
                       <SidebarMenuButton asChild className="h-11">
                         <NavLink 

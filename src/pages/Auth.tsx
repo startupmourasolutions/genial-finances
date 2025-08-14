@@ -15,6 +15,7 @@ export default function Auth() {
   const { signIn, signUp, resetPassword, loading } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [activeTab, setActiveTab] = useState('login')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   
   // Login form
   const [loginEmail, setLoginEmail] = useState('')
@@ -41,6 +42,8 @@ export default function Auth() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    if (isSubmitting) return
+    
     if (signupPassword !== signupConfirmPassword) {
       toast({
         title: "Erro",
@@ -49,6 +52,8 @@ export default function Auth() {
       })
       return
     }
+    
+    setIsSubmitting(true)
     
     const { error } = await signUp(
       signupEmail, 
@@ -61,8 +66,11 @@ export default function Auth() {
     )
     
     if (!error) {
-      // Fazer login automático após cadastro
+      // Fazer login automático após cadastro (sem mostrar mensagem extra)
       await signIn(signupEmail, signupPassword)
+    } else {
+      // Apenas reabilita o botão se houver erro
+      setIsSubmitting(false)
     }
   }
 
@@ -289,9 +297,9 @@ export default function Auth() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={loading}
+                    disabled={loading || isSubmitting}
                   >
-                    {loading ? 'Criando...' : 'Criar Conta'}
+                    {(loading || isSubmitting) ? 'Criando...' : 'Criar Conta'}
                   </Button>
                 </form>
               </CardContent>

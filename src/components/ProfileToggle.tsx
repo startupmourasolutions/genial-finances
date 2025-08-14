@@ -16,8 +16,8 @@ export function ProfileToggle({
   } = useAuth();
 
   // Verifica se o usuário tem permissão para usar o perfil empresarial
-  const hasBusinessAccess = profile?.client_type === 'business' || false;
-  const isSuperAdmin = false; // TODO: Implementar verificação de super admin
+  const hasBusinessAccess = profile?.clients?.[0]?.client_type === 'business' || false;
+  const isSuperAdmin = profile?.super_administrators?.length > 0 || false;
 
   const handleToggle = () => {
     const newProfile = selectedProfile === profiles[0] ? profiles[1] : profiles[0];
