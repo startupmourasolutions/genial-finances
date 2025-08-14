@@ -101,7 +101,7 @@ export function AppSidebar() {
   const isSuperAdmin = profile?.user_type === 'super_administrator'
   
   // Verifica se é conta empresarial
-  const isBusinessAccount = (profile?.clients && profile.clients.length > 0 && profile.clients[0].client_type === 'business') || false;
+  const isBusinessAccount = profile?.clients?.client_type === 'business' || false;
   
   // Filtra os itens de navegação baseado no tipo de conta
   const getFilteredNavItems = () => {
