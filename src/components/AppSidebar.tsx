@@ -107,7 +107,7 @@ export function AppSidebar() {
     return `transition-smooth rounded-lg mx-2 flex items-center ${
       isActiveItem 
         ? "bg-primary text-primary-foreground shadow-lg font-medium" 
-        : "text-foreground hover:bg-accent hover:text-accent-foreground"
+        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
     }`
   }
 
@@ -150,7 +150,7 @@ export function AppSidebar() {
                           onClick={handleNavClick}
                          >
                            <item.icon className="w-5 h-5 flex-shrink-0" />
-                           {!collapsed && <span className="ml-3 text-inherit">{item.text}</span>}
+                           {!collapsed && <span className="ml-3">{item.text}</span>}
                          </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -175,7 +175,7 @@ export function AppSidebar() {
                           onClick={handleNavClick}
                          >
                            <item.icon className="w-5 h-5 flex-shrink-0" />
-                           {!collapsed && <span className="ml-3 text-inherit">{item.text}</span>}
+                           {!collapsed && <span className="ml-3">{item.text}</span>}
                          </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -200,7 +200,7 @@ export function AppSidebar() {
                         onClick={handleNavClick}
                        >
                          <item.icon className="w-5 h-5 flex-shrink-0" />
-                         {!collapsed && <span className="ml-3 text-inherit">{item.text}</span>}
+                         {!collapsed && <span className="ml-3">{item.text}</span>}
                        </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -222,7 +222,7 @@ export function AppSidebar() {
                   onClick={handleNavClick}
                  >
                    <item.icon className="w-4 h-4 flex-shrink-0" />
-                   {!collapsed && <span className="text-inherit">{item.text}</span>}
+                   {!collapsed && <span>{item.text}</span>}
                  </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
