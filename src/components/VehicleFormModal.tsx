@@ -76,12 +76,12 @@ export function VehicleFormModal({ open, onOpenChange, onSubmit, initialData, mo
   }
 
   const fuelTypes = [
-    'Gasolina',
-    'Etanol',
-    'Flex (Gasolina/Etanol)',
-    'Diesel',
-    'Elétrico',
-    'Híbrido'
+    { value: 'gasoline', label: 'Gasolina' },
+    { value: 'ethanol', label: 'Etanol' },
+    { value: 'flex', label: 'Flex (Gasolina/Etanol)' },
+    { value: 'diesel', label: 'Diesel' },
+    { value: 'electric', label: 'Elétrico' },
+    { value: 'hybrid', label: 'Híbrido' }
   ]
 
   return (
@@ -159,8 +159,8 @@ export function VehicleFormModal({ open, onOpenChange, onSubmit, initialData, mo
                   </SelectTrigger>
                   <SelectContent>
                     {fuelTypes.map((fuel) => (
-                      <SelectItem key={fuel} value={fuel}>
-                        {fuel}
+                      <SelectItem key={fuel.value} value={fuel.value}>
+                        {fuel.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
