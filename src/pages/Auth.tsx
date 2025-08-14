@@ -56,7 +56,8 @@ export default function Auth() {
       fullName, 
       'client', // Sempre cliente para cadastros pela tela pública
       clientType,
-      clientType === 'business' ? companyName : undefined
+      clientType === 'business' ? companyName : undefined,
+      phone
     )
     
     if (!error) {

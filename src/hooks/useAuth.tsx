@@ -9,7 +9,7 @@ interface AuthContextType {
   profile: any | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ error: any }>
-  signUp: (email: string, password: string, fullName: string, userType: 'client' | 'super_administrator', clientType?: 'personal' | 'business', companyName?: string) => Promise<{ error: any }>
+  signUp: (email: string, password: string, fullName: string, userType: 'client' | 'super_administrator', clientType?: 'personal' | 'business', companyName?: string, phone?: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error: any }>
   refreshProfile: () => Promise<void>
@@ -117,7 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fullName: string, 
     userType: 'client' | 'super_administrator',
     clientType?: 'personal' | 'business',
-    companyName?: string
+    companyName?: string,
+    phone?: string
   ) => {
     try {
       setLoading(true)
@@ -145,7 +146,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .from('profiles')
           .update({
             full_name: fullName,
-            user_type: userType
+            user_type: userType,
+            phone: phone
           })
           .eq('user_id', data.user.id)
 
