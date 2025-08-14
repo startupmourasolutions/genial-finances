@@ -107,7 +107,7 @@ export function AppSidebar() {
     return `transition-smooth rounded-lg mx-2 flex items-center ${
       isActiveItem 
         ? "bg-primary text-primary-foreground shadow-lg font-medium" 
-        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        : "text-foreground hover:bg-accent hover:text-accent-foreground"
     }`
   }
 

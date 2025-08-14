@@ -8,12 +8,15 @@ import { Plus, Filter, TrendingDown, Calendar, ArrowDownCircle, AlertTriangle, E
 import { useExpenses } from "@/hooks/useExpenses"
 import { ExpenseFormModal } from "@/components/ExpenseFormModal"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
+import { FloatingActionButton } from "@/components/FloatingActionButton"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 const Despesas = () => {
   const { expenses, categories, loading, createExpense, updateExpense, deleteExpense } = useExpenses()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState<any>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const isMobile = useIsMobile()
 
   const totalDespesas = expenses.reduce((sum, expense) => sum + expense.amount, 0)
   const mediaDespesas = expenses.length > 0 ? totalDespesas / expenses.length : 0
@@ -75,10 +78,12 @@ const Despesas = () => {
           </h1>
           <p className="text-muted-foreground">Controle seus gastos e reduza custos</p>
         </div>
-        <Button onClick={handleCreate} className="bg-destructive hover:bg-destructive/90 hover-scale">
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Despesa
-        </Button>
+        {!isMobile && (
+          <Button onClick={handleCreate} className="bg-destructive hover:bg-destructive/90 hover-scale">
+            <Plus className="w-4 h-4 mr-2" />
+            Nova Despesa
+          </Button>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -286,6 +291,13 @@ const Despesas = () => {
         title="Excluir Despesa"
         description="Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita."
       />
+
+      <FloatingActionButton 
+        onClick={handleCreate}
+        className="bg-destructive hover:bg-destructive/90"
+      >
+        <Plus className="w-6 h-6" />
+      </FloatingActionButton>
     </div>
   )
 }

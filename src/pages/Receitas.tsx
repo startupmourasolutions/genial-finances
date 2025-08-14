@@ -8,12 +8,15 @@ import { Plus, Filter, TrendingUp, Calendar, ArrowUpCircle, Edit, Trash2 } from 
 import { useIncomes } from "@/hooks/useIncomes"
 import { IncomeFormModal } from "@/components/IncomeFormModal"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
+import { FloatingActionButton } from "@/components/FloatingActionButton"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 const Receitas = () => {
   const { incomes, categories, loading, createIncome, updateIncome, deleteIncome } = useIncomes()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingIncome, setEditingIncome] = useState<any>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const isMobile = useIsMobile()
 
   const totalReceitas = incomes.reduce((sum, income) => sum + income.amount, 0)
   const mediaReceitas = incomes.length > 0 ? totalReceitas / incomes.length : 0
@@ -57,10 +60,12 @@ const Receitas = () => {
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground">Gerencie suas fontes de renda</p>
         </div>
-        <Button onClick={handleCreate} className="bg-success hover:bg-success/90 hover-scale w-full sm:w-auto" size="sm">
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Receita
-        </Button>
+        {!isMobile && (
+          <Button onClick={handleCreate} className="bg-success hover:bg-success/90 hover-scale w-full sm:w-auto" size="sm">
+            <Plus className="w-4 h-4 mr-2" />
+            Nova Receita
+          </Button>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -241,6 +246,13 @@ const Receitas = () => {
         title="Excluir Receita"
         description="Tem certeza que deseja excluir esta receita? Esta ação não pode ser desfeita."
       />
+
+      <FloatingActionButton 
+        onClick={handleCreate}
+        className="bg-success hover:bg-success/90"
+      >
+        <Plus className="w-6 h-6" />
+      </FloatingActionButton>
     </div>
   )
 }
