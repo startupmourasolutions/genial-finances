@@ -46,7 +46,7 @@ export function useFinancialGoals() {
   useEffect(() => {
     // Aguardar um pouco antes de buscar dados para garantir que profile carregou completamente
     const timer = setTimeout(() => {
-      if (user && profile && profile.clients && profile.clients.length > 0) {
+      if (user && profile && profile.clients) {
         fetchGoals()
         fetchCategories()
       }
@@ -64,7 +64,7 @@ export function useFinancialGoals() {
       // Aguardar um pouco para garantir que o profile carregou completamente
       await new Promise(resolve => setTimeout(resolve, 100))
       
-      const clientId = profile?.clients?.[0]?.id
+      const clientId = profile?.clients?.id
 
       if (!clientId) {
         console.log('Client ID não encontrado no profile:', profile)
@@ -95,7 +95,7 @@ export function useFinancialGoals() {
       // Aguardar um pouco para garantir que o profile carregou completamente
       await new Promise(resolve => setTimeout(resolve, 100))
       
-      const clientId = profile?.clients?.[0]?.id
+      const clientId = profile?.clients?.id
 
       if (!clientId) {
         console.log('Client ID não encontrado para categorias:', profile)
@@ -127,7 +127,7 @@ export function useFinancialGoals() {
       // Aguardar um pouco para garantir que o profile carregou completamente
       await new Promise(resolve => setTimeout(resolve, 200))
       
-      const clientId = profile?.clients?.[0]?.id
+      const clientId = profile?.clients?.id
 
       if (!clientId) {
         console.error('Profile data:', JSON.stringify(profile, null, 2))
