@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
+import { useCurrentProfile } from "@/contexts/ProfileContext"
 import { toast } from "sonner"
 
 export interface SharedAccount {
@@ -9,6 +10,7 @@ export interface SharedAccount {
   name: string
   whatsapp_number: string
   is_active: boolean
+  profile_type: string
   created_at: string
   updated_at: string
 }
@@ -22,12 +24,13 @@ export function useSharedAccounts() {
   const [sharedAccounts, setSharedAccounts] = useState<SharedAccount[]>([])
   const [loading, setLoading] = useState(true)
   const { user, profile } = useAuth()
+  const { currentProfile } = useCurrentProfile()
 
   useEffect(() => {
     if (user && profile) {
       fetchSharedAccounts()
     }
-  }, [user, profile])
+  }, [user, profile, currentProfile]) // Adiciona currentProfile como dependência
 
   const fetchSharedAccounts = async () => {
     try {
@@ -40,11 +43,15 @@ export function useSharedAccounts() {
         return
       }
 
+      // Determinar o profile_type baseado no contexto atual
+      const profileType = currentProfile === "Empresarial" ? "business" : "personal";
+
       const { data, error } = await supabase
         .from('shared_accounts')
         .select('*')
         .eq('client_id', clientData.id)
         .eq('is_active', true)
+        .eq('profile_type', profileType) // Filtrar por tipo de perfil
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -68,12 +75,12 @@ export function useSharedAccounts() {
         return { error: 'Client not found' }
       }
 
-      // Verificar limite baseado no tipo de plano
-      const isBusinessAccount = clientData.client_type === 'business'
-      const maxAccounts = isBusinessAccount ? 4 : 1
+      // Determinar o profile_type baseado no contexto atual
+      const profileType = currentProfile === "Empresarial" ? "business" : "personal";
+      const maxAccounts = getMaxAccounts();
 
       if (sharedAccounts.length >= maxAccounts) {
-        const planType = isBusinessAccount ? 'empresarial' : 'pessoal'
+        const planType = currentProfile === "Empresarial" ? 'empresarial' : 'pessoal'
         const message = `Limite de ${maxAccounts} conta(s) compartilhada(s) atingido para o plano ${planType}.`
         toast.error(message)
         return { error: message }
@@ -83,7 +90,8 @@ export function useSharedAccounts() {
         .from('shared_accounts')
         .insert([{
           ...accountData,
-          client_id: clientData.id
+          client_id: clientData.id,
+          profile_type: profileType
         }])
         .select()
 
@@ -139,9 +147,7 @@ export function useSharedAccounts() {
   }
 
   const getMaxAccounts = () => {
-    const clientData = profile?.clients
-    const isBusinessAccount = clientData?.client_type === 'business'
-    return isBusinessAccount ? 4 : 1
+    return currentProfile === "Empresarial" ? 4 : 1
   }
 
   const getAccountsRemaining = () => {

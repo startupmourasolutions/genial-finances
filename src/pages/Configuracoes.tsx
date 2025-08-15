@@ -22,12 +22,14 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrentProfile } from "@/contexts/ProfileContext";
 import { useSharedAccounts, CreateSharedAccountData } from "@/hooks/useSharedAccounts";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 export default function Configuracoes() {
   const { profile } = useAuth()
+  const { currentProfile } = useCurrentProfile()
   const { 
     sharedAccounts, 
     loading: sharedAccountsLoading, 
@@ -71,8 +73,7 @@ export default function Configuracoes() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Verifica se é conta empresarial
-  const isBusinessAccount = profile?.clients?.client_type === 'business' || false;
+  // Verifica o tipo de conta baseado no toggle atual
   const maxAccounts = getMaxAccounts();
   const accountsRemaining = getAccountsRemaining();
 
@@ -403,7 +404,7 @@ export default function Configuracoes() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">
-                    {isBusinessAccount 
+                    {currentProfile === "Empresarial" 
                       ? `Plano Empresarial: até ${maxAccounts} contas compartilhadas`
                       : `Plano Pessoal: até ${maxAccounts} conta compartilhada`
                     }

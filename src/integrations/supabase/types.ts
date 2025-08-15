@@ -642,6 +642,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           name: string
+          profile_type: string
           updated_at: string
           whatsapp_number: string
         }
@@ -651,6 +652,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name: string
+          profile_type?: string
           updated_at?: string
           whatsapp_number: string
         }
@@ -660,6 +662,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name?: string
+          profile_type?: string
           updated_at?: string
           whatsapp_number?: string
         }
