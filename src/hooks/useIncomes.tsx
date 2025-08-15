@@ -151,6 +151,9 @@ export function useIncomes() {
         return
       }
 
+      // Determinar o profile_type baseado no contexto atual
+      const profileType = currentProfile === "Empresarial" ? "business" : "personal";
+
       const { data, error } = await supabase
         .from('incomes')
         .select(`
@@ -162,6 +165,7 @@ export function useIncomes() {
           )
         `)
         .eq('client_id', clientData.id)
+        .eq('profile_type', profileType)
         .order('created_at', { ascending: false })
 
       if (error) throw error

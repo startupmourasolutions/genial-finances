@@ -75,10 +75,14 @@ export function useVehicles() {
 
     try {
       setLoading(true)
+      // Determinar o profile_type baseado no contexto atual
+      const profileType = currentProfile === "Empresarial" ? "business" : "personal";
+
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
         .eq('user_id', user.id)
+        .eq('profile_type', profileType)
         .order('created_at', { ascending: false })
 
       if (error) throw error

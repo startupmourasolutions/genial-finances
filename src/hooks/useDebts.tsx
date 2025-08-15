@@ -83,11 +83,15 @@ export function useDebts() {
         return
       }
 
-      const { data, error } = await supabase
-        .from('debts')
-        .select('*')
-        .eq('client_id', clientData.id)
-        .order('created_at', { ascending: false })
+    // Determinar o profile_type baseado no contexto atual
+    const profileType = currentProfile === "Empresarial" ? "business" : "personal";
+
+    const { data, error } = await supabase
+      .from('debts')
+      .select('*')
+      .eq('client_id', clientData.id)
+      .eq('profile_type', profileType)
+      .order('created_at', { ascending: false })
 
       if (error) throw error
       setDebts(data || [])
