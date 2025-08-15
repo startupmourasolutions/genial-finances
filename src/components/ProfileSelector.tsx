@@ -15,10 +15,12 @@ export function ProfileSelector({
   userInitial,
   onProfileChange
 }: ProfileSelectorProps) {
-  const {
-    profile
-  } = useAuth();
+  const { profile } = useAuth();
   const [selectedProfile, setSelectedProfile] = useState(profiles[0]);
+  
+  // Verifica se é super administrador
+  const isSuperAdmin = profile?.super_administrators?.length > 0 || false;
+  
   const handleProfileChange = (newProfile: string) => {
     setSelectedProfile(newProfile);
     onProfileChange?.(newProfile);
@@ -34,7 +36,9 @@ export function ProfileSelector({
       </div>
       
       <div className="flex items-center gap-1 sm:gap-2 lg:gap-4 flex-shrink-0">
-        <ProfileToggle profiles={profiles} onProfileChange={handleProfileChange} />
+        {!isSuperAdmin && (
+          <ProfileToggle profiles={profiles} onProfileChange={handleProfileChange} />
+        )}
         
         <ThemeToggle />
         
