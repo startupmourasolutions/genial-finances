@@ -21,7 +21,7 @@ import {
 
 import { useAuth } from "@/hooks/useAuth"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { useCurrentProfile } from "@/components/ProfileSelector"
+import { useCurrentProfile } from "@/contexts/ProfileContext"
 
 import {
   Sidebar,

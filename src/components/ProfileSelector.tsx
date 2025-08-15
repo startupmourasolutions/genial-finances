@@ -5,6 +5,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProfileToggle } from "@/components/ProfileToggle";
+import { useCurrentProfile } from "@/contexts/ProfileContext";
 interface ProfileSelectorProps {
   profiles: string[];
   userInitial: string;
@@ -16,19 +17,19 @@ export function ProfileSelector({
   onProfileChange
 }: ProfileSelectorProps) {
   const { profile } = useAuth();
-  const [selectedProfile, setSelectedProfile] = useState(profiles[0]);
+  const { currentProfile, setCurrentProfile } = useCurrentProfile();
   
   // Verifica se é super administrador
   const isSuperAdmin = profile?.super_administrators?.id ? true : false;
   
   const handleProfileChange = (newProfile: string) => {
-    setSelectedProfile(newProfile);
+    setCurrentProfile(newProfile);
     onProfileChange?.(newProfile);
   };
   return <div className="flex items-center justify-between w-full text-sm font-bold">
       <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         <h1 className="hidden sm:block text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
-          Dashboard {selectedProfile}
+          Dashboard {currentProfile}
         </h1>
         <div className="hidden sm:block">
           <TrialBadge />
@@ -47,13 +48,4 @@ export function ProfileSelector({
         <ProfileDropdown userInitial={userInitial} />
       </div>
     </div>;
-}
-
-// Export the current profile state
-export function useCurrentProfile() {
-  const [currentProfile, setCurrentProfile] = useState("Pessoal");
-  return {
-    currentProfile,
-    setCurrentProfile
-  };
 }

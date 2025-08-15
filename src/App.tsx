@@ -6,6 +6,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster as RadixToaster } from "@/components/ui/toaster";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { ThemeProvider } from "next-themes";
+import { ProfileProvider } from "@/contexts/ProfileContext";
 import { DashboardLayout } from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import Receitas from "./pages/Receitas";
@@ -55,6 +56,7 @@ function App() {
           <RadixToaster />
           <BrowserRouter>
             <AuthProvider>
+              <ProfileProvider>
               
               <Routes>
                 <Route path="/" element={<Index />} />
@@ -191,8 +193,8 @@ function App() {
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            
-          </AuthProvider>
+              </ProfileProvider>
+            </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
       </ThemeProvider>

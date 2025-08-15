@@ -80,12 +80,19 @@ export default function Configuracoes() {
     // Remove todos os caracteres não numéricos
     const numbers = value.replace(/\D/g, '');
     
+    // Limita a 11 dígitos (2 dígitos do código de área + 9 dígitos do número)
+    const limitedNumbers = numbers.slice(0, 11);
+    
     // Aplica a máscara +55 (11) 99999-9999
-    if (numbers.length <= 11) {
-      return numbers.replace(/(\d{2})(\d{2})(\d{4,5})(\d{4})/, '+55 ($1) $2$3-$4');
+    if (limitedNumbers.length === 0) return '';
+    if (limitedNumbers.length <= 2) return `+55 (${limitedNumbers}`;
+    if (limitedNumbers.length <= 4) return `+55 (${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2)}`;
+    if (limitedNumbers.length <= 9) {
+      return `+55 (${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2, 4)}${limitedNumbers.slice(4)}`;
     }
     
-    return numbers.slice(0, 11).replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+55 ($1) $2$3-$4');
+    // Formato completo: +55 (11) 99999-9999
+    return `+55 (${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2, 7)}-${limitedNumbers.slice(7, 11)}`;
   };
 
   const handleWhatsAppChange = (value: string) => {
