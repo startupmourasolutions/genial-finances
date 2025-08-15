@@ -10,8 +10,10 @@ import { ExpenseFormModal } from "@/components/ExpenseFormModal"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 import { FloatingActionButton } from "@/components/FloatingActionButton"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useCurrentProfile } from "@/contexts/ProfileContext"
 
 const Despesas = () => {
+  const { currentProfile } = useCurrentProfile()
   const { expenses, categories, loading, createExpense, updateExpense, deleteExpense } = useExpenses()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState<any>(null)
@@ -74,7 +76,7 @@ const Despesas = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
             <ArrowDownCircle className="w-8 h-8 text-destructive" />
-            Despesas
+            Despesas {currentProfile}
           </h1>
           <p className="text-muted-foreground">Controle seus gastos e reduza custos</p>
         </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
-import { useProfileContext } from "@/components/DashboardLayout"
+import { useCurrentProfile } from "@/contexts/ProfileContext"
 import { toast } from "sonner"
 
 interface Expense {
@@ -35,7 +35,7 @@ export function useExpenses() {
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<any[]>([])
   const { user, profile } = useAuth()
-  const { currentProfile } = useProfileContext()
+  const { currentProfile } = useCurrentProfile()
 
   useEffect(() => {
     let cleanup: (() => void) | undefined
@@ -54,7 +54,7 @@ export function useExpenses() {
     return () => {
       if (cleanup) cleanup()
     }
-  }, [user, profile])
+  }, [user, profile, currentProfile])
 
   const setupRealtimeSubscription = async () => {
     if (!user || !profile) return
