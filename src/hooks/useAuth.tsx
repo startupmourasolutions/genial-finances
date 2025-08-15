@@ -80,9 +80,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const cleanupAuthState = () => {
+    // Remove todas as chaves relacionadas ao Supabase do localStorage
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        localStorage.removeItem(key)
+      }
+    })
+    
+    // Remove do sessionStorage também se existir
+    if (typeof sessionStorage !== 'undefined') {
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          sessionStorage.removeItem(key)
+        }
+      })
+    }
+  }
+
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true)
+      
+      // Limpar estado antes de fazer login para evitar conflitos
+      cleanupAuthState()
+      
+      // Tentar logout global primeiro (para limpar sessões antigas)
+      try {
+        await supabase.auth.signOut({ scope: 'global' })
+      } catch (err) {
+        // Continuar mesmo se falhar
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -101,6 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           sessionStorage.removeItem('fromSignup')
         }
+        // Forçar refresh completo para garantir estado limpo
         window.location.href = '/dashboard'
       }
       
@@ -198,21 +228,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true)
-      await supabase.auth.signOut()
+      
+      // Limpar estado de autenticação primeiro
+      cleanupAuthState()
+      
+      // Tentar logout global (mesmo se falhar, continuamos)
+      try {
+        await supabase.auth.signOut({ scope: 'global' })
+      } catch (err) {
+        console.warn('Global signout failed, continuing with local cleanup:', err)
+      }
+      
+      // Limpar estado local
       setUser(null)
       setSession(null)
       setProfile(null)
+      
       toast({
         title: "Logout realizado com sucesso!",
         description: "Até logo!",
       })
+      
+      // Forçar refresh completo da página
       window.location.href = '/auth'
     } catch (error: any) {
+      console.error('Logout error:', error)
+      
+      // Mesmo com erro, limpar tudo e redirecionar
+      cleanupAuthState()
+      setUser(null)
+      setSession(null)
+      setProfile(null)
+      
       toast({
-        title: "Erro no logout",
-        description: error.message,
-        variant: "destructive",
+        title: "Sessão encerrada",
+        description: "Você foi desconectado do sistema.",
       })
+      
+      window.location.href = '/auth'
     } finally {
       setLoading(false)
     }
