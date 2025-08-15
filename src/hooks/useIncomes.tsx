@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
@@ -54,7 +55,7 @@ export function useIncomes() {
     return () => {
       if (cleanup) cleanup()
     }
-  }, [user, profile])
+  }, [user, profile, currentProfile]) // Adicionei currentProfile aqui
 
   const setupRealtimeSubscription = async () => {
     if (!user || !profile) return
@@ -154,6 +155,12 @@ export function useIncomes() {
       // Determinar o profile_type baseado no contexto atual
       const profileType = currentProfile === "Empresarial" ? "business" : "personal";
 
+      console.log('Fetching incomes with filters:', {
+        client_id: clientData.id,
+        profile_type: profileType,
+        currentProfile
+      });
+
       const { data, error } = await supabase
         .from('incomes')
         .select(`
@@ -169,6 +176,8 @@ export function useIncomes() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
+      
+      console.log('Fetched incomes:', data);
       setIncomes(data || [])
     } catch (error: any) {
       console.error('Error fetching incomes:', error)
@@ -221,13 +230,22 @@ export function useIncomes() {
         return { error: 'Client not found' }
       }
 
+      const profileType = currentProfile === "Empresarial" ? "business" : "personal";
+
+      console.log('Creating income with data:', {
+        ...incomeData,
+        client_id: clientData.id,
+        profile_type: profileType,
+        currentProfile
+      });
+
       const { data, error } = await supabase
         .from('incomes')
         .insert([{
           ...incomeData,
           user_id: user.id,
           client_id: clientData.id,
-          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
+          profile_type: profileType
         }])
         .select()
 
@@ -245,7 +263,7 @@ export function useIncomes() {
           category_id: incomeData.category_id,
           user_id: user.id,
           client_id: clientData.id,
-          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
+          profile_type: profileType
         }])
 
       toast.success('Receita criada com sucesso!')
