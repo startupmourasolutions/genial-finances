@@ -14,11 +14,35 @@ import {
   CreditCard,
   Globe,
   User,
-  Calendar
+  Calendar,
+  UserPlus,
+  Phone,
+  Trash2,
+  Plus
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useSharedAccounts, CreateSharedAccountData } from "@/hooks/useSharedAccounts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 export default function Configuracoes() {
+  const { profile } = useAuth()
+  const { 
+    sharedAccounts, 
+    loading: sharedAccountsLoading, 
+    createSharedAccount, 
+    deleteSharedAccount,
+    getMaxAccounts,
+    getAccountsRemaining 
+  } = useSharedAccounts()
+  
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [newAccount, setNewAccount] = useState<CreateSharedAccountData>({
+    name: '',
+    whatsapp_number: ''
+  })
+  
   const [settings, setSettings] = useState({
     // Configurações de Perfil
     displayName: "João Silva Santos",
@@ -46,6 +70,49 @@ export default function Configuracoes() {
 
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Verifica se é conta empresarial
+  const isBusinessAccount = profile?.clients?.client_type === 'business' || false;
+  const maxAccounts = getMaxAccounts();
+  const accountsRemaining = getAccountsRemaining();
+
+  const formatWhatsAppNumber = (value: string) => {
+    // Remove todos os caracteres não numéricos
+    const numbers = value.replace(/\D/g, '');
+    
+    // Aplica a máscara +55 (11) 99999-9999
+    if (numbers.length <= 11) {
+      return numbers.replace(/(\d{2})(\d{2})(\d{4,5})(\d{4})/, '+55 ($1) $2$3-$4');
+    }
+    
+    return numbers.slice(0, 11).replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+55 ($1) $2$3-$4');
+  };
+
+  const handleWhatsAppChange = (value: string) => {
+    const formatted = formatWhatsAppNumber(value);
+    setNewAccount(prev => ({ ...prev, whatsapp_number: formatted }));
+  };
+
+  const handleCreateAccount = async () => {
+    if (!newAccount.name.trim() || !newAccount.whatsapp_number.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const result = await createSharedAccount(newAccount);
+    if (!result.error) {
+      setNewAccount({ name: '', whatsapp_number: '' });
+      setIsDialogOpen(false);
+    }
+  };
+
+  const handleDeleteAccount = async (accountId: string) => {
+    await deleteSharedAccount(accountId);
+  };
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -315,6 +382,133 @@ export default function Configuracoes() {
                   <SelectItem value="Europe/London">Londres (GMT+0)</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Configurações de Conta Compartilhada */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <UserPlus className="w-5 h-5" />
+              <span>Conta Compartilhada</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {isBusinessAccount 
+                      ? `Plano Empresarial: até ${maxAccounts} contas compartilhadas`
+                      : `Plano Pessoal: até ${maxAccounts} conta compartilhada`
+                    }
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {accountsRemaining > 0 
+                      ? `${accountsRemaining} ${accountsRemaining === 1 ? 'conta disponível' : 'contas disponíveis'}`
+                      : 'Limite atingido'
+                    }
+                  </p>
+                </div>
+                
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      size="sm" 
+                      disabled={accountsRemaining <= 0}
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Adicionar
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Nova Conta Compartilhada</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="accountName">Nome</Label>
+                        <Input
+                          id="accountName"
+                          value={newAccount.name}
+                          onChange={(e) => setNewAccount(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="Digite o nome da pessoa"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="whatsappNumber">WhatsApp</Label>
+                        <Input
+                          id="whatsappNumber"
+                          value={newAccount.whatsapp_number}
+                          onChange={(e) => handleWhatsAppChange(e.target.value)}
+                          placeholder="+55 (11) 99999-9999"
+                        />
+                      </div>
+                      <div className="flex gap-2 pt-4">
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1">
+                          Cancelar
+                        </Button>
+                        <Button onClick={handleCreateAccount} className="flex-1">
+                          Adicionar
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {sharedAccountsLoading ? (
+                <div className="space-y-2">
+                  <div className="h-4 bg-muted rounded animate-pulse" />
+                  <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
+                </div>
+              ) : sharedAccounts.length > 0 ? (
+                <div className="space-y-2">
+                  {sharedAccounts.map((account) => (
+                    <div key={account.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+                      <div className="flex items-center gap-3">
+                        <Phone className="w-4 h-4 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium">{account.name}</p>
+                          <p className="text-sm text-muted-foreground">{account.whatsapp_number}</p>
+                        </div>
+                      </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remover conta compartilhada?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Esta ação irá remover {account.name} da lista de contas compartilhadas. 
+                              Esta ação não pode ser desfeita.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => handleDeleteAccount(account.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Remover
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-muted-foreground">
+                  <UserPlus className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">Nenhuma conta compartilhada cadastrada</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

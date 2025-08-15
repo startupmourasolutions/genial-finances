@@ -21,6 +21,7 @@ import {
 
 import { useAuth } from "@/hooks/useAuth"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useCurrentProfile } from "@/components/ProfileSelector"
 
 import {
   Sidebar,
@@ -96,12 +97,13 @@ export function AppSidebar() {
   const currentPath = location.pathname
   const collapsed = state === "collapsed"
   const isMobile = useIsMobile()
+  const { currentProfile } = useCurrentProfile()
 
   // Verifica se é super administrador
   const isSuperAdmin = profile?.user_type === 'super_administrator'
   
-  // Verifica se é conta empresarial
-  const isBusinessAccount = profile?.clients?.client_type === 'business' || false;
+  // Verifica se é conta empresarial baseado no toggle atual
+  const isBusinessAccount = (profile?.clients?.client_type === 'business' && currentProfile === "Empresarial") || false;
   
   // Filtra os itens de navegação baseado no tipo de conta
   const getFilteredNavItems = () => {

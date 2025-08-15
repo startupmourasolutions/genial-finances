@@ -635,6 +635,36 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_accounts: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string
+          whatsapp_number: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string
+          whatsapp_number: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string
+          whatsapp_number?: string
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string
