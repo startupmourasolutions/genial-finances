@@ -58,12 +58,20 @@ export function useExpenses() {
     if (!user || !profile) return
 
     try {
+      // Verificar se é super admin
+      const isSuperAdmin = profile?.super_administrators?.id ? true : false;
+      
+      if (isSuperAdmin) {
+        // Super admin não precisa de subscription específica
+        return;
+      }
+
       // Buscar o client_id do usuário atual
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('id')
         .eq('profile_id', profile.id)
-        .single()
+        .maybeSingle()
 
       if (clientError || !clientData) return
 
@@ -105,12 +113,36 @@ export function useExpenses() {
 
     try {
       setLoading(true)
+      
+      // Verificar se é super admin
+      const isSuperAdmin = profile?.super_administrators?.id ? true : false;
+      
+      if (isSuperAdmin) {
+        // Super admin pode ver todas as despesas
+        const { data, error } = await supabase
+          .from('expenses')
+          .select(`
+            *,
+            categories (
+              name,
+              type,
+              icon,
+              color
+            )
+          `)
+          .order('date', { ascending: false });
+
+        if (error) throw error;
+        setExpenses((data as Expense[]) || []);
+        return;
+      }
+
       // Buscar o client_id do usuário atual
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('id')
         .eq('profile_id', profile.id)
-        .single()
+        .maybeSingle()
 
       if (clientError || !clientData) {
         setExpenses([])
@@ -163,12 +195,20 @@ export function useExpenses() {
     }
 
     try {
+      // Verificar se é super admin
+      const isSuperAdmin = profile?.super_administrators?.id ? true : false;
+      
+      if (isSuperAdmin) {
+        toast.error('Super administradores não podem criar despesas')
+        return { error: 'Super admin cannot create expenses' }
+      }
+
       // Buscar o client_id do usuário atual
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('id')
         .eq('profile_id', profile.id)
-        .single()
+        .maybeSingle()
 
       if (clientError || !clientData) {
         toast.error('Cliente não encontrado')

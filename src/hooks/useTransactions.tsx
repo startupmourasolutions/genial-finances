@@ -60,12 +60,20 @@ export function useTransactions() {
     if (!user || !profile) return
 
     try {
+      // Verificar se é super admin
+      const isSuperAdmin = profile?.super_administrators?.id ? true : false;
+      
+      if (isSuperAdmin) {
+        // Super admin não precisa de subscription específica
+        return;
+      }
+
       // Buscar o client_id do usuário atual
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('id')
         .eq('profile_id', profile.id)
-        .single()
+        .maybeSingle()
 
       if (clientError || !clientData) return
 
@@ -109,12 +117,34 @@ export function useTransactions() {
     if (!user || !profile) return
 
     try {
+      // Verificar se é super admin
+      const isSuperAdmin = profile?.super_administrators?.id ? true : false;
+      
+      if (isSuperAdmin) {
+        // Super admin pode ver todas as transações
+        const { data, error } = await supabase
+          .from('transactions')
+          .select(`
+            *,
+            categories (
+              name,
+              color,
+              icon
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setTransactions((data as Transaction[]) || []);
+        return;
+      }
+
       // Buscar o client_id do usuário atual
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('id')
         .eq('profile_id', profile.id)
-        .single()
+        .maybeSingle()
 
       if (clientError || !clientData) {
         console.log('No client found for profile:', profile.id)
@@ -174,12 +204,24 @@ export function useTransactions() {
     }
 
     try {
+      // Verificar se é super admin
+      const isSuperAdmin = profile?.super_administrators?.id ? true : false;
+      
+      if (isSuperAdmin) {
+        toast({
+          title: "Erro",
+          description: "Super administradores não podem criar transações",
+          variant: "destructive"
+        })
+        return { success: false, error: 'Super admin cannot create transactions' }
+      }
+
       // Buscar o client_id do usuário atual
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('id')
         .eq('profile_id', profile.id)
-        .single()
+        .maybeSingle()
 
       if (clientError || !clientData) {
         toast({

@@ -19,7 +19,7 @@ export function ProfileSelector({
   const [selectedProfile, setSelectedProfile] = useState(profiles[0]);
   
   // Verifica se é super administrador
-  const isSuperAdmin = profile?.super_administrators?.length > 0 || false;
+  const isSuperAdmin = profile?.super_administrators?.id ? true : false;
   
   const handleProfileChange = (newProfile: string) => {
     setSelectedProfile(newProfile);

@@ -53,12 +53,28 @@ export function useDebts() {
 
     try {
       setLoading(true)
+      
+      // Verificar se é super admin
+      const isSuperAdmin = profile?.super_administrators?.id ? true : false;
+      
+      if (isSuperAdmin) {
+        // Super admin pode ver todas as dívidas
+        const { data, error } = await supabase
+          .from('debts')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setDebts(data || []);
+        return;
+      }
+
       // Buscar o client_id do usuário atual
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('id')
         .eq('profile_id', profile.id)
-        .single()
+        .maybeSingle()
 
       if (clientError || !clientData) {
         setDebts([])
@@ -88,12 +104,20 @@ export function useDebts() {
     }
 
     try {
+      // Verificar se é super admin
+      const isSuperAdmin = profile?.super_administrators?.id ? true : false;
+      
+      if (isSuperAdmin) {
+        toast.error('Super administradores não podem criar dívidas')
+        return { error: 'Super admin cannot create debts' }
+      }
+
       // Buscar o client_id do usuário atual
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('id')
         .eq('profile_id', profile.id)
-        .single()
+        .maybeSingle()
 
       if (clientError || !clientData) {
         toast.error('Cliente não encontrado')
