@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -175,6 +175,7 @@ export type Database = {
           monthly_payment: number | null
           original_amount: number | null
           payment_frequency: string | null
+          profile_type: string
           remaining_amount: number
           status: string | null
           title: string
@@ -194,6 +195,7 @@ export type Database = {
           monthly_payment?: number | null
           original_amount?: number | null
           payment_frequency?: string | null
+          profile_type?: string
           remaining_amount: number
           status?: string | null
           title: string
@@ -213,6 +215,7 @@ export type Database = {
           monthly_payment?: number | null
           original_amount?: number | null
           payment_frequency?: string | null
+          profile_type?: string
           remaining_amount?: number
           status?: string | null
           title?: string
@@ -260,6 +263,7 @@ export type Database = {
           date: string
           description: string | null
           id: string
+          profile_type: string
           title: string
           updated_at: string
           user_id: string
@@ -272,6 +276,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          profile_type?: string
           title: string
           updated_at?: string
           user_id: string
@@ -284,6 +289,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          profile_type?: string
           title?: string
           updated_at?: string
           user_id?: string
@@ -316,6 +322,7 @@ export type Database = {
           current_amount: number | null
           description: string | null
           id: string
+          profile_type: string
           status: string | null
           target_amount: number
           target_date: string | null
@@ -333,6 +340,7 @@ export type Database = {
           current_amount?: number | null
           description?: string | null
           id?: string
+          profile_type?: string
           status?: string | null
           target_amount: number
           target_date?: string | null
@@ -350,6 +358,7 @@ export type Database = {
           current_amount?: number | null
           description?: string | null
           id?: string
+          profile_type?: string
           status?: string | null
           target_amount?: number
           target_date?: string | null
@@ -376,6 +385,7 @@ export type Database = {
           date: string
           description: string | null
           id: string
+          profile_type: string
           title: string
           updated_at: string
           user_id: string
@@ -388,6 +398,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          profile_type?: string
           title: string
           updated_at?: string
           user_id: string
@@ -400,6 +411,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          profile_type?: string
           title?: string
           updated_at?: string
           user_id?: string
@@ -752,6 +764,7 @@ export type Database = {
           date: string
           description: string | null
           id: string
+          profile_type: string
           title: string
           type: string
           updated_at: string
@@ -765,6 +778,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          profile_type?: string
           title: string
           type: string
           updated_at?: string
@@ -778,6 +792,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          profile_type?: string
           title?: string
           type?: string
           updated_at?: string
@@ -851,6 +866,7 @@ export type Database = {
           description: string | null
           id: string
           odometer: number | null
+          profile_type: string
           title: string
           type: string
           updated_at: string
@@ -865,6 +881,7 @@ export type Database = {
           description?: string | null
           id?: string
           odometer?: number | null
+          profile_type?: string
           title: string
           type: string
           updated_at?: string
@@ -879,6 +896,7 @@ export type Database = {
           description?: string | null
           id?: string
           odometer?: number | null
+          profile_type?: string
           title?: string
           type?: string
           updated_at?: string
@@ -914,6 +932,7 @@ export type Database = {
           due_km: number | null
           id: string
           notes: string | null
+          profile_type: string
           status: string
           system_category: string | null
           type: string
@@ -932,6 +951,7 @@ export type Database = {
           due_km?: number | null
           id?: string
           notes?: string | null
+          profile_type?: string
           status?: string
           system_category?: string | null
           type: string
@@ -950,6 +970,7 @@ export type Database = {
           due_km?: number | null
           id?: string
           notes?: string | null
+          profile_type?: string
           status?: string
           system_category?: string | null
           type?: string
@@ -972,6 +993,7 @@ export type Database = {
           model: string | null
           name: string
           plate: string | null
+          profile_type: string
           status: string | null
           updated_at: string
           user_id: string
@@ -989,6 +1011,7 @@ export type Database = {
           model?: string | null
           name: string
           plate?: string | null
+          profile_type?: string
           status?: string | null
           updated_at?: string
           user_id: string
@@ -1006,6 +1029,7 @@ export type Database = {
           model?: string | null
           name?: string
           plate?: string | null
+          profile_type?: string
           status?: string | null
           updated_at?: string
           user_id?: string
@@ -1095,10 +1119,10 @@ export type Database = {
         Returns: unknown
       }
       match_documents: {
-        Args: { query_embedding: string; match_count?: number; filter?: Json }
+        Args: { filter?: Json; match_count?: number; query_embedding: string }
         Returns: {
-          id: number
           content: string
+          id: number
           metadata: Json
           similarity: number
         }[]
@@ -1106,8 +1130,8 @@ export type Database = {
       process_automation_event: {
         Args: {
           p_client_id: string
-          p_event_type: string
           p_event_data?: Json
+          p_event_type: string
           p_source_platform?: string
         }
         Returns: string
