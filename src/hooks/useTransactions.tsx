@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
+import { useProfileContext } from "@/components/DashboardLayout"
 import { useToast } from "@/hooks/use-toast"
 
 interface Transaction {
@@ -35,6 +36,7 @@ export function useTransactions() {
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<any[]>([])
   const { user, profile } = useAuth()
+  const { currentProfile } = useProfileContext()
   const { toast } = useToast()
 
   useEffect(() => {
@@ -237,7 +239,8 @@ export function useTransactions() {
         .insert([{
           ...transactionData,
           user_id: user.id,
-          client_id: clientData.id
+          client_id: clientData.id,
+          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
         }])
         .select()
 

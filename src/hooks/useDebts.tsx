@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
+import { useProfileContext } from "@/components/DashboardLayout"
 import { toast } from "sonner"
 
 interface Debt {
@@ -41,6 +42,7 @@ export function useDebts() {
   const [debts, setDebts] = useState<Debt[]>([])
   const [loading, setLoading] = useState(true)
   const { user, profile } = useAuth()
+  const { currentProfile } = useProfileContext()
 
   useEffect(() => {
     if (user && profile) {
@@ -133,7 +135,8 @@ export function useDebts() {
           remaining_amount: debtData.remaining_amount || debtData.total_amount,
           status: 'active',
           debt_type: debtData.debt_type || 'loan',
-          payment_frequency: debtData.payment_frequency || 'monthly'
+          payment_frequency: debtData.payment_frequency || 'monthly',
+          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
         }])
         .select()
 

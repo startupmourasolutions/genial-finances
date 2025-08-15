@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
+import { useProfileContext } from '@/components/DashboardLayout'
 import { toast } from 'sonner'
 
 interface Vehicle {
@@ -67,6 +68,7 @@ export function useVehicles() {
   const [maintenances, setMaintenances] = useState<VehicleMaintenance[]>([])
   const [loading, setLoading] = useState(true)
   const { user, profile } = useAuth()
+  const { currentProfile } = useProfileContext()
 
   const fetchVehicles = async () => {
     if (!user) return
@@ -128,7 +130,8 @@ export function useVehicles() {
           user_id: user.id,
           client_id: clientId,
           current_km: vehicleData.current_km || 0,
-          status: 'active'
+          status: 'active',
+          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
         }])
         .select()
 
@@ -205,7 +208,8 @@ export function useVehicles() {
           ...maintenanceData,
           user_id: user.id,
           client_id: clientId,
-          status: 'pending'
+          status: 'pending',
+          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
         }])
         .select()
 

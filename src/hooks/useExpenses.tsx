@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
+import { useProfileContext } from "@/components/DashboardLayout"
 import { toast } from "sonner"
 
 interface Expense {
@@ -34,6 +35,7 @@ export function useExpenses() {
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<any[]>([])
   const { user, profile } = useAuth()
+  const { currentProfile } = useProfileContext()
 
   useEffect(() => {
     let cleanup: (() => void) | undefined
@@ -220,7 +222,8 @@ export function useExpenses() {
         .insert([{
           ...expenseData,
           user_id: user.id,
-          client_id: clientData.id
+          client_id: clientData.id,
+          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
         }])
         .select()
 
@@ -237,7 +240,8 @@ export function useExpenses() {
           date: expenseData.date,
           category_id: expenseData.category_id,
           user_id: user.id,
-          client_id: clientData.id
+          client_id: clientData.id,
+          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
         }])
 
       toast.success('Despesa criada com sucesso!')

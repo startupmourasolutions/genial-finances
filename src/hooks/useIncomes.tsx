@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
+import { useProfileContext } from "@/components/DashboardLayout"
 import { toast } from "sonner"
 
 interface Income {
@@ -34,6 +35,7 @@ export function useIncomes() {
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<any[]>([])
   const { user, profile } = useAuth()
+  const { currentProfile } = useProfileContext()
 
   useEffect(() => {
     let cleanup: (() => void) | undefined
@@ -220,7 +222,8 @@ export function useIncomes() {
         .insert([{
           ...incomeData,
           user_id: user.id,
-          client_id: clientData.id
+          client_id: clientData.id,
+          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
         }])
         .select()
 
@@ -237,7 +240,8 @@ export function useIncomes() {
           date: incomeData.date,
           category_id: incomeData.category_id,
           user_id: user.id,
-          client_id: clientData.id
+          client_id: clientData.id,
+          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
         }])
 
       toast.success('Receita criada com sucesso!')

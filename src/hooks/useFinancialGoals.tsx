@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
+import { useProfileContext } from "@/components/DashboardLayout"
 import { toast } from "sonner"
 
 interface FinancialGoal {
@@ -42,6 +43,7 @@ export function useFinancialGoals() {
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const { user, profile } = useAuth()
+  const { currentProfile } = useProfileContext()
 
   useEffect(() => {
     // Aguardar um pouco antes de buscar dados para garantir que profile carregou completamente
@@ -146,7 +148,8 @@ export function useFinancialGoals() {
           status: 'active',
           auto_contribution: goalData.auto_contribution || false,
           contribution_amount: goalData.contribution_amount || 0,
-          contribution_frequency: goalData.contribution_frequency || 'monthly'
+          contribution_frequency: goalData.contribution_frequency || 'monthly',
+          profile_type: currentProfile === "Empresarial" ? "business" : "personal"
         }])
         .select()
 
