@@ -83,16 +83,13 @@ export default function Configuracoes() {
     // Limita a 11 dígitos (2 dígitos do código de área + 9 dígitos do número)
     const limitedNumbers = numbers.slice(0, 11);
     
-    // Aplica a máscara +55 (11) 99999-9999
+    // Aplica a máscara (11) 99999-9999
     if (limitedNumbers.length === 0) return '';
-    if (limitedNumbers.length <= 2) return `+55 (${limitedNumbers}`;
-    if (limitedNumbers.length <= 4) return `+55 (${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2)}`;
-    if (limitedNumbers.length <= 9) {
-      return `+55 (${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2, 4)}${limitedNumbers.slice(4)}`;
-    }
+    if (limitedNumbers.length <= 2) return `(${limitedNumbers}`;
+    if (limitedNumbers.length <= 6) return `(${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2)}`;
     
-    // Formato completo: +55 (11) 99999-9999
-    return `+55 (${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2, 7)}-${limitedNumbers.slice(7, 11)}`;
+    // Formato completo: (11) 99999-9999
+    return `(${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2, 7)}-${limitedNumbers.slice(7, 11)}`;
   };
 
   const handleWhatsAppChange = (value: string) => {
@@ -450,7 +447,7 @@ export default function Configuracoes() {
                           id="whatsappNumber"
                           value={newAccount.whatsapp_number}
                           onChange={(e) => handleWhatsAppChange(e.target.value)}
-                          placeholder="+55 (11) 99999-9999"
+                          placeholder="(11) 99999-9999"
                         />
                       </div>
                       <div className="flex gap-2 pt-4">
