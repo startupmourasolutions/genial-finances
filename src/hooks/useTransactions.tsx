@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
-import { useProfileContext } from "@/components/DashboardLayout"
+import { useCurrentProfile } from "@/contexts/ProfileContext"
 import { useToast } from "@/hooks/use-toast"
 
 interface Transaction {
@@ -11,6 +11,24 @@ interface Transaction {
   title: string
   amount: number
   type: 'income' | 'expense'
+  description?: string
+  date: string
+  created_at: string
+  updated_at: string
+  categories?: {
+    name: string
+    color?: string
+    icon?: string
+  }
+}
+
+interface DatabaseTransaction {
+  id: string
+  user_id: string
+  category_id?: string
+  title: string
+  amount: number
+  type_transaction: 'income' | 'expense'
   description?: string
   date: string
   created_at: string
@@ -36,7 +54,7 @@ export function useTransactions() {
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<any[]>([])
   const { user, profile } = useAuth()
-  const { currentProfile } = useProfileContext()
+  const { currentProfile } = useCurrentProfile()
   const { toast } = useToast()
 
   useEffect(() => {
@@ -56,7 +74,7 @@ export function useTransactions() {
     return () => {
       if (cleanup) cleanup()
     }
-  }, [user, profile])
+  }, [user, profile, currentProfile])
 
   const setupRealtimeSubscription = async () => {
     if (!user || !profile) return
@@ -124,20 +142,27 @@ export function useTransactions() {
       
       if (isSuperAdmin) {
         // Super admin pode ver todas as transações
-        const { data, error } = await supabase
-          .from('transactions')
-          .select(`
-            *,
-            categories (
-              name,
-              color,
-              icon
-            )
-          `)
-          .order('created_at', { ascending: false });
+      const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+          *,
+          categories (
+            name,
+            color,
+            icon
+          )
+        `)
+        .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setTransactions((data as Transaction[]) || []);
+        
+        // Mapear type_transaction para type
+        const mappedData = (data as any)?.map((transaction: any) => ({
+          ...transaction,
+          type: transaction.type_transaction
+        })) || [];
+        
+        setTransactions(mappedData as Transaction[]);
         return;
       }
 
@@ -172,7 +197,14 @@ export function useTransactions() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setTransactions((data as Transaction[]) || [])
+      
+      // Mapear type_transaction para type
+      const mappedData = (data as any)?.map((transaction: any) => ({
+        ...transaction,
+        type: transaction.type_transaction
+      })) || [];
+      
+      setTransactions(mappedData as Transaction[])
     } catch (error: any) {
       toast({
         title: "Erro ao carregar transações",
@@ -242,6 +274,7 @@ export function useTransactions() {
         .from('transactions')
         .insert([{
           ...transactionData,
+          type_transaction: transactionData.type, // Mapear type para type_transaction
           user_id: user.id,
           client_id: clientData.id,
           profile_type: currentProfile === "Empresarial" ? "business" : "personal"
@@ -269,9 +302,15 @@ export function useTransactions() {
 
   const updateTransaction = async (id: string, transactionData: Partial<CreateTransactionData>) => {
     try {
+      const updateData: any = { ...transactionData };
+      if (updateData.type) {
+        updateData.type_transaction = updateData.type; // Mapear type para type_transaction
+        delete updateData.type; // Remove o campo type do update
+      }
+      
       const { data, error } = await supabase
         .from('transactions')
-        .update(transactionData)
+        .update(updateData)
         .eq('id', id)
         .eq('user_id', user?.id)
         .select()

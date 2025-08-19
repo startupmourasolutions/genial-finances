@@ -4,15 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Filter, Edit, Trash2, TrendingUp, TrendingDown, ArrowUpCircle, ArrowDownCircle } from "lucide-react"
+import { Plus, Filter, Edit, Trash2, ArrowUpCircle, ArrowDownCircle } from "lucide-react"
 import { useTransactions } from "@/hooks/useTransactions"
 import { TransactionFormModal } from "@/components/TransactionFormModal"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 import { format } from "date-fns"
-import { ptBR } from "date-fns/locale" 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ptBR } from "date-fns/locale"
+import { useCurrentProfile } from "@/contexts/ProfileContext"
 
 const Transacoes = () => {
+  const { currentProfile } = useCurrentProfile()
   const { transactions, categories, loading, createTransaction, updateTransaction, deleteTransaction } = useTransactions()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<any>(null)
@@ -24,7 +25,6 @@ const Transacoes = () => {
   const [endDate, setEndDate] = useState<string>('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedType, setSelectedType] = useState<string>('all')
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
   const handleEdit = (transaction: any) => {
     setEditingTransaction(transaction)
@@ -74,186 +74,146 @@ const Transacoes = () => {
   }
 
   return (
-    <div className="p-3 md:p-8 space-y-3 md:space-y-6 overflow-x-hidden max-w-full">
-      <div className="flex justify-between items-center">
+    <div className="p-3 md:p-8 space-y-4 md:space-y-6 overflow-x-hidden max-w-full">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Transações</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Transações {currentProfile}</h1>
           <p className="text-sm md:text-base text-muted-foreground">Visualize e gerencie suas receitas e despesas</p>
         </div>
-        <div className="flex gap-1 flex-shrink-0">
-          <Button size="sm" onClick={() => handleCreate('income')} className="h-8 px-2 md:h-10 md:px-4 whitespace-nowrap bg-success hover:bg-success/90">
+        <div className="flex gap-2">
+          <Button 
+            size="sm" 
+            onClick={() => handleCreate('income')} 
+            className="flex-1 sm:flex-none h-9 bg-success hover:bg-success/90"
+          >
             <Plus className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Nova Receita</span>
+            <span className="sm:inline">Nova Receita</span>
           </Button>
-          <Button size="sm" onClick={() => handleCreate('expense')} className="h-8 px-2 md:h-10 md:px-4 whitespace-nowrap bg-destructive hover:bg-destructive/90">
+          <Button 
+            size="sm" 
+            onClick={() => handleCreate('expense')} 
+            className="flex-1 sm:flex-none h-9 bg-destructive hover:bg-destructive/90"
+          >
             <Plus className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Nova Despesa</span>
+            <span className="sm:inline">Nova Despesa</span>
           </Button>
         </div>
       </div>
 
+      {/* Filtros sempre visíveis no mobile */}
       <Card className="shadow-card">
-        <CardHeader className="py-2 px-3 md:py-4 md:px-6">
-          <CardTitle className="flex items-center gap-2 text-sm md:text-lg">
-            <Filter className="w-5 h-5" />
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Filter className="w-4 h-4" />
             Filtros
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3 md:px-6 md:pb-6 overflow-x-hidden">
-          {/* Mobile: filtros colapsáveis */}
-          <div className="md:hidden">
-            <Collapsible open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
-              <div className="flex items-center justify-between">
-                <CollapsibleTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8">
-                    <Filter className="w-4 h-4 mr-2" />
-                    {mobileFiltersOpen ? 'Ocultar filtros' : 'Mostrar filtros'}
-                  </Button>
-                </CollapsibleTrigger>
-              </div>
-              <CollapsibleContent className="mt-2">
-                <div className="grid grid-cols-1 gap-2">
-                  <Input 
-                    type="date" 
-                    placeholder="Data inicial" 
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="h-8 text-xs"
-                  />
-                  <Input 
-                    type="date" 
-                    placeholder="Data final" 
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="h-8 text-xs"
-                  />
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder="Categoria" />
-                    </SelectTrigger>
-                    <SelectContent className="z-50">
-                      <SelectItem value="all">Todas as Categorias</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={selectedType} onValueChange={setSelectedType}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder="Tipo" />
-                    </SelectTrigger>
-                    <SelectContent className="z-50">
-                      <SelectItem value="all">Todos os Tipos</SelectItem>
-                      <SelectItem value="income">Receitas</SelectItem>
-                      <SelectItem value="expense">Despesas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-
-          {/* Desktop: filtros sempre visíveis */}
-          <div className="hidden md:block">
-            <div className="grid grid-cols-4 gap-4">
-              <Input 
-                type="date" 
-                placeholder="Data inicial" 
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-              <Input 
-                type="date" 
-                placeholder="Data final" 
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as Categorias</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os Tipos</SelectItem>
-                  <SelectItem value="income">Receitas</SelectItem>
-                  <SelectItem value="expense">Despesas</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <Input 
+              type="date" 
+              placeholder="Data inicial" 
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="h-9"
+            />
+            <Input 
+              type="date" 
+              placeholder="Data final" 
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="h-9"
+            />
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder="Categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as Categorias</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedType} onValueChange={setSelectedType}>
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder="Tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Tipos</SelectItem>
+                <SelectItem value="income">Receitas</SelectItem>
+                <SelectItem value="expense">Despesas</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
 
+      {/* Lista de Transações */}
       <Card className="shadow-card">
-        <CardHeader className="hidden md:flex py-2 px-6">
-          <CardTitle className="text-sm md:text-lg">Lista de Transações</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Lista de Transações</CardTitle>
         </CardHeader>
-        <CardContent className="px-3 pb-3 md:px-6 md:pb-6 overflow-x-hidden">
-          <div className="space-y-1 md:space-y-3">
-            {filteredTransactions.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                {transactions.length === 0 
-                  ? "Nenhuma transação cadastrada ainda." 
-                  : "Nenhuma transação encontrada com os filtros aplicados."
-                }
-              </div>
-            ) : (
-              filteredTransactions.map((transaction) => (
-                <div key={transaction.id} className="group flex items-center justify-between gap-2 p-1.5 md:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-                    <div className={`p-1.5 md:p-2 rounded-full ${
+        <CardContent>
+          {filteredTransactions.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              {transactions.length === 0 
+                ? "Nenhuma transação cadastrada ainda." 
+                : "Nenhuma transação encontrada com os filtros aplicados."
+              }
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredTransactions.map((transaction) => (
+                <div 
+                  key={transaction.id} 
+                  className="group flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className={`p-2 rounded-full ${
                       transaction.type === 'income' 
                         ? 'bg-success/20 text-success' 
                         : 'bg-destructive/20 text-destructive'
                     }`}>
                       {transaction.type === 'income' ? (
-                        <ArrowUpCircle className="h-3 w-3 md:h-4 md:w-4" />
+                        <ArrowUpCircle className="h-4 w-4" />
                       ) : (
-                        <ArrowDownCircle className="h-3 w-3 md:h-4 md:w-4" />
+                        <ArrowDownCircle className="h-4 w-4" />
                       )}
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-medium text-foreground text-xs md:text-base truncate">{transaction.title}</p>
-                      <p className="text-[10px] md:text-xs text-muted-foreground">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-foreground truncate">{transaction.title}</p>
+                      <p className="text-xs text-muted-foreground">
                         {format(new Date(transaction.date), 'dd/MM/yyyy', { locale: ptBR })}
                       </p>
                       {transaction.description && (
-                        <p className="hidden md:block text-xs text-muted-foreground truncate max-w-48">
+                        <p className="text-xs text-muted-foreground truncate">
                           {transaction.description}
                         </p>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+                  
+                  <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className={`text-xs md:text-base font-semibold ${
+                      <p className={`font-semibold ${
                         transaction.type === 'income' ? 'text-success' : 'text-destructive'
                       }`}>
                         {transaction.type === 'income' ? '+' : '-'}R$ {Number(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
-                      <Badge variant="outline" className="hidden sm:inline-flex text-[10px] md:text-xs px-2 py-0.5">
+                      <Badge variant="outline" className="text-xs">
                         {transaction.type === 'income' ? 'Receita' : 'Despesa'}
                       </Badge>
                     </div>
-                    <div className="flex gap-1 md:gap-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity shrink-0">
+                    
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                       <Button 
                         size="icon" 
                         variant="outline"
-                        className="h-6 w-6 md:h-9 md:w-9"
+                        className="h-8 w-8"
                         onClick={() => handleEdit(transaction)}
                       >
                         <Edit className="w-4 h-4" />
@@ -261,7 +221,7 @@ const Transacoes = () => {
                       <Button 
                         size="icon" 
                         variant="destructive" 
-                        className="h-6 w-6 md:h-9 md:w-9"
+                        className="h-8 w-8"
                         onClick={() => setDeleteId(transaction.id)}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -269,9 +229,9 @@ const Transacoes = () => {
                     </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
