@@ -56,12 +56,14 @@ const Dividas = () => {
     name: category,
     value,
     fill: [
-      "hsl(var(--brand-orange))",
-      "hsl(var(--destructive))", 
-      "hsl(var(--warning))",
-      "hsl(var(--success))",
-      "hsl(var(--primary))"
-    ][index % 5]
+      "hsl(24, 95%, 53%)",    // Laranja vibrante  
+      "hsl(0, 84%, 60%)",     // Vermelho
+      "hsl(38, 92%, 50%)",    // Amarelo/dourado
+      "hsl(142, 76%, 36%)",   // Verde
+      "hsl(221, 83%, 53%)",   // Azul
+      "hsl(271, 81%, 56%)",   // Roxo
+      "hsl(168, 76%, 42%)",   // Turquesa
+    ][index % 7]
   }))
 
   const totalDividas = filteredDebts.reduce((sum, debt) => sum + Number(debt.total_amount || 0), 0)
@@ -277,19 +279,19 @@ const Dividas = () => {
                 variant={viewMode === "table" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setViewMode("table")}
-                className="flex-1"
+                className="flex-1 px-2"
               >
-                <TableIcon className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Tabela</span>
+                <TableIcon className="w-4 h-4" />
+                <span className="hidden sm:inline ml-1">Lista</span>
               </Button>
               <Button
                 variant={viewMode === "chart" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setViewMode("chart")}
-                className="flex-1"
+                className="flex-1 px-2"
               >
-                <BarChart3 className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Gráfico</span>
+                <BarChart3 className="w-4 h-4" />
+                <span className="hidden sm:inline ml-1">Gráfico</span>
               </Button>
             </div>
           </div>
@@ -567,16 +569,16 @@ const Dividas = () => {
                 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
-                      >
+                       <Pie
+                         data={pieData}
+                         cx="50%"
+                         cy="50%"
+                         labelLine={false}
+                         outerRadius={80}
+                         fill="#8884d8"
+                         dataKey="value"
+                         label={({ name, percent }) => percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
+                       >
                         {pieData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
                         ))}
