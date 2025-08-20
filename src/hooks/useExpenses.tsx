@@ -236,17 +236,17 @@ export function useExpenses() {
       // Automaticamente criar transação correspondente
       await supabase
         .from('transactions')
-        .insert([{
+        .insert({
           title: expenseData.title,
           amount: expenseData.amount,
-          type: 'expense',
+          type_transaction: 'expense',
           description: expenseData.description,
           date: expenseData.date,
           category_id: expenseData.category_id,
           user_id: user.id,
           client_id: clientData.id,
           profile_type: currentProfile === "Empresarial" ? "business" : "personal"
-        }])
+        })
 
       toast.success('Despesa criada com sucesso!')
       await fetchExpenses()

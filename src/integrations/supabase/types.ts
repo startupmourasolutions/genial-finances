@@ -164,66 +164,64 @@ export type Database = {
       }
       debts: {
         Row: {
+          category_id: string | null
           client_id: string | null
           created_at: string
-          creditor_name: string | null
           debt_type: string | null
           description: string | null
           due_date: string | null
           id: string
-          interest_rate: number | null
-          monthly_payment: number | null
           original_amount: number | null
           payment_frequency: string | null
           profile_type: string
-          remaining_amount: number
           status: string | null
           title: string
-          total_amount: number
+          total_amount: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          category_id?: string | null
           client_id?: string | null
           created_at?: string
-          creditor_name?: string | null
           debt_type?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
-          interest_rate?: number | null
-          monthly_payment?: number | null
           original_amount?: number | null
           payment_frequency?: string | null
           profile_type?: string
-          remaining_amount: number
           status?: string | null
           title: string
-          total_amount: number
+          total_amount?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          category_id?: string | null
           client_id?: string | null
           created_at?: string
-          creditor_name?: string | null
           debt_type?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
-          interest_rate?: number | null
-          monthly_payment?: number | null
           original_amount?: number | null
           payment_frequency?: string | null
           profile_type?: string
-          remaining_amount?: number
           status?: string | null
           title?: string
-          total_amount?: number
+          total_amount?: number | null
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "debts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "debts_client_id_fkey"
             columns: ["client_id"]
@@ -263,6 +261,7 @@ export type Database = {
           date: string
           description: string | null
           id: string
+          IDPROPRIO: string | null
           profile_type: string
           title: string
           updated_at: string
@@ -276,6 +275,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          IDPROPRIO?: string | null
           profile_type?: string
           title: string
           updated_at?: string
@@ -289,6 +289,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          IDPROPRIO?: string | null
           profile_type?: string
           title?: string
           updated_at?: string
@@ -385,6 +386,7 @@ export type Database = {
           date: string
           description: string | null
           id: string
+          IDPROPRIO: string | null
           profile_type: string
           title: string
           updated_at: string
@@ -398,6 +400,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          IDPROPRIO?: string | null
           profile_type?: string
           title: string
           updated_at?: string
@@ -411,6 +414,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          IDPROPRIO?: string | null
           profile_type?: string
           title?: string
           updated_at?: string
@@ -797,9 +801,10 @@ export type Database = {
           date: string
           description: string | null
           id: string
+          idproprio: string | null
           profile_type: string
           title: string
-          type: string
+          type_transaction: string
           updated_at: string
           user_id: string
         }
@@ -811,9 +816,10 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          idproprio?: string | null
           profile_type?: string
           title: string
-          type: string
+          type_transaction: string
           updated_at?: string
           user_id: string
         }
@@ -825,9 +831,10 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          idproprio?: string | null
           profile_type?: string
           title?: string
-          type?: string
+          type_transaction?: string
           updated_at?: string
           user_id?: string
         }

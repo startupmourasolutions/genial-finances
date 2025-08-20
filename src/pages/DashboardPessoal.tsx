@@ -56,7 +56,7 @@ export default function DashboardPessoal() {
   }, [incomes, expenses, goals])
 
   const activeDebts = debts.filter(debt => debt.status === 'active')
-  const totalDebt = activeDebts.reduce((sum, debt) => sum + debt.remaining_amount, 0)
+  const totalDebt = activeDebts.reduce((sum, debt) => sum + (debt.total_amount || 0), 0)
 
   return (
     <div className="space-y-4 animate-fade-in">

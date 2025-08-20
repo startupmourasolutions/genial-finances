@@ -21,7 +21,7 @@ export function DebtsOverview() {
     })
     .slice(0, 6) || []
 
-  const totalRemaining = activeDebts.reduce((sum, debt) => sum + Number(debt.remaining_amount), 0)
+  const totalRemaining = activeDebts.reduce((sum, debt) => sum + Number(debt.total_amount || 0), 0)
 
   return (
     <Card className="shadow-card">
@@ -63,7 +63,7 @@ export function DebtsOverview() {
                 </div>
                 <div className="text-right">
                   <p className="font-semibold text-destructive">
-                    R$ {Number(debt.remaining_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    R$ {Number(debt.total_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </p>
                   <Badge 
                     variant={

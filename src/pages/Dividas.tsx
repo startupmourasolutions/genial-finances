@@ -22,13 +22,13 @@ const Dividas = () => {
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   
-  const { debts, loading, createDebt, updateDebt, deleteDebt, makePayment } = useDebts()
+  const { debts, categories, loading, createDebt, updateDebt, deleteDebt, makePayment } = useDebts()
 
   // Filter debts
   const filteredDebts = debts.filter(debt => {
     const matchesSearch = !searchFilter || 
-      debt.creditor_name?.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      debt.title.toLowerCase().includes(searchFilter.toLowerCase())
+      debt.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      (debt.categories?.name && debt.categories.name.toLowerCase().includes(searchFilter.toLowerCase()))
     
     const matchesCategory = categoryFilter === "all" || debt.debt_type === categoryFilter
     const matchesStatus = statusFilter === "all" || debt.status === statusFilter
@@ -37,15 +37,15 @@ const Dividas = () => {
   })
 
   const chartData = filteredDebts.map(debt => ({
-    name: debt.creditor_name || debt.title,
-    valor: Number(debt.remaining_amount),
+    name: debt.title,
+    valor: Number(debt.total_amount || 0),
     status: debt.status
   }))
 
   // Group debts by type for pie chart
   const debtsByType = filteredDebts.reduce((acc, debt) => {
     const type = debt.debt_type || 'outros'
-    acc[type] = (acc[type] || 0) + Number(debt.remaining_amount)
+    acc[type] = (acc[type] || 0) + Number(debt.total_amount || 0)
     return acc
   }, {} as Record<string, number>)
 
@@ -61,7 +61,7 @@ const Dividas = () => {
     ][index % 5]
   }))
 
-  const totalDividas = filteredDebts.reduce((sum, debt) => sum + Number(debt.remaining_amount), 0)
+  const totalDividas = filteredDebts.reduce((sum, debt) => sum + Number(debt.total_amount || 0), 0)
   const dividasVencidas = filteredDebts.filter(d => d.due_date && new Date(d.due_date) < new Date()).length
   const proximosVencimentos = filteredDebts.filter(d => {
     if (!d.due_date) return false
@@ -317,9 +317,9 @@ const Dividas = () => {
                              <div className={`w-3 h-3 rounded-full flex-shrink-0 ${isOverdue(debt.due_date) ? 'bg-destructive' : debt.status === 'paid' ? 'bg-success' : 'bg-warning'}`} />
                              <div className="min-w-0 flex-1">
                                <h4 className="font-medium text-foreground truncate">{debt.title}</h4>
-                               <p className="text-sm text-muted-foreground truncate">
-                                 {debt.creditor_name || debt.description}
-                               </p>
+                                <p className="text-sm text-muted-foreground truncate">
+                                  {debt.categories?.name || debt.description}
+                                </p>
                              </div>
                            </div>
                          </div>
@@ -337,16 +337,14 @@ const Dividas = () => {
                                )}
                              </div>
                              
-                             <div className="text-right">
-                               <span className="text-base sm:text-lg font-semibold text-destructive">
-                                 R$ {Number(debt.remaining_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                               </span>
-                               {debt.total_amount !== debt.remaining_amount && (
-                                 <p className="text-xs sm:text-sm text-muted-foreground">
-                                   de R$ {Number(debt.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                 </p>
-                               )}
-                             </div>
+                              <div className="text-right">
+                                <span className="text-base sm:text-lg font-semibold text-destructive">
+                                  R$ {Number(debt.total_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </span>
+                                <p className="text-xs sm:text-sm text-muted-foreground">
+                                  {debt.status === 'active' ? 'Ativo' : debt.status === 'paid' ? 'Pago' : 'Pendente'}
+                                </p>
+                              </div>
                            </div>
                            
                            <div className="flex gap-2 w-full sm:w-auto">
@@ -355,7 +353,7 @@ const Dividas = () => {
                                  size="sm" 
                                  variant="default" 
                                  className="hover-scale flex-1 sm:flex-none"
-                                 onClick={() => handlePayment(debt.id, Number(debt.remaining_amount))}
+                                 onClick={() => handlePayment(debt.id, Number(debt.total_amount || 0))}
                                >
                                  <span className="sm:hidden">Pagar</span>
                                  <span className="hidden sm:inline">Pagar</span>
@@ -476,6 +474,7 @@ const Dividas = () => {
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         onSubmit={handleSubmit}
+        categories={categories}
         initialData={editingDebt}
         mode={editingDebt ? 'edit' : 'create'}
       />

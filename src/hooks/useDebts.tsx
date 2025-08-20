@@ -8,31 +8,30 @@ interface Debt {
   id: string
   user_id: string
   client_id?: string
+  category_id?: string
   title: string
   description?: string
-  total_amount: number
-  remaining_amount: number
+  total_amount?: number
   due_date?: string
   status: string
-  interest_rate?: number
-  monthly_payment?: number
-  creditor_name?: string
   debt_type: string
   original_amount?: number
   payment_frequency: string
   created_at: string
   updated_at: string
+  categories?: {
+    name: string
+    color?: string
+    icon?: string
+  }
 }
 
 interface CreateDebtData {
   title: string
   description?: string
-  total_amount: number
-  remaining_amount?: number
+  category_id?: string
+  total_amount?: number
   due_date?: string
-  interest_rate?: number
-  monthly_payment?: number
-  creditor_name?: string
   debt_type?: string
   original_amount?: number
   payment_frequency?: string
@@ -40,6 +39,7 @@ interface CreateDebtData {
 
 export function useDebts() {
   const [debts, setDebts] = useState<Debt[]>([])
+  const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const { user, profile } = useAuth()
   const { currentProfile } = useProfileContext()
@@ -47,8 +47,9 @@ export function useDebts() {
   useEffect(() => {
     if (user && profile) {
       fetchDebts()
+      fetchCategories()
     }
-  }, [user, profile])
+  }, [user, profile, currentProfile])
 
   const fetchDebts = async () => {
     if (!user || !profile) return
@@ -63,7 +64,14 @@ export function useDebts() {
         // Super admin pode ver todas as dívidas
         const { data, error } = await supabase
           .from('debts')
-          .select('*')
+          .select(`
+            *,
+            categories (
+              name,
+              color,
+              icon
+            )
+          `)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -88,7 +96,14 @@ export function useDebts() {
 
     const { data, error } = await supabase
       .from('debts')
-      .select('*')
+      .select(`
+        *,
+        categories (
+          name,
+          color,
+          icon
+        )
+      `)
       .eq('client_id', clientData.id)
       .eq('profile_type', profileType)
       .order('created_at', { ascending: false })
@@ -100,6 +115,20 @@ export function useDebts() {
       toast.error('Erro ao carregar dívidas')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name')
+
+      if (error) throw error
+      setCategories(data || [])
+    } catch (error: any) {
+      console.error('Error fetching categories:', error)
     }
   }
 
@@ -136,7 +165,6 @@ export function useDebts() {
           ...debtData,
           user_id: user.id,
           client_id: clientData.id,
-          remaining_amount: debtData.remaining_amount || debtData.total_amount,
           status: 'active',
           debt_type: debtData.debt_type || 'loan',
           payment_frequency: debtData.payment_frequency || 'monthly',
@@ -182,23 +210,22 @@ export function useDebts() {
 
   const makePayment = async (id: string, paymentAmount: number) => {
     try {
-      // Buscar a dívida atual
+      // Buscar a dívida atual para atualizar o status se necessário
       const { data: currentDebt, error: fetchError } = await supabase
         .from('debts')
-        .select('remaining_amount')
+        .select('total_amount')
         .eq('id', id)
         .eq('user_id', user?.id)
         .single()
 
       if (fetchError) throw fetchError
 
-      const newRemainingAmount = Math.max(0, currentDebt.remaining_amount - paymentAmount)
-      const newStatus = newRemainingAmount === 0 ? 'paid' : 'active'
+      // Se a dívida tem valor total, consideramos como paga se o pagamento for igual ou maior
+      const newStatus = currentDebt.total_amount && paymentAmount >= currentDebt.total_amount ? 'paid' : 'active'
 
       const { data, error } = await supabase
         .from('debts')
         .update({
-          remaining_amount: newRemainingAmount,
           status: newStatus,
           updated_at: new Date().toISOString()
         })
@@ -240,11 +267,13 @@ export function useDebts() {
 
   return {
     debts,
+    categories,
     loading,
     createDebt,
     updateDebt,
     makePayment,
     deleteDebt,
-    refreshDebts: fetchDebts
+    refreshDebts: fetchDebts,
+    refreshCategories: fetchCategories
   }
 }

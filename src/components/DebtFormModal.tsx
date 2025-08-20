@@ -5,6 +5,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { CalendarIcon, ArrowLeft, ArrowRight } from "lucide-react"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
+import { cn } from "@/lib/utils"
 import CurrencyInput from 'react-currency-input-field'
 import { toast } from "sonner"
 
@@ -12,23 +18,25 @@ interface DebtFormModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (data: any) => Promise<{ error: any }>
+  categories: any[]
   initialData?: any
   mode: 'create' | 'edit'
 }
 
-export function DebtFormModal({ open, onOpenChange, onSubmit, initialData, mode }: DebtFormModalProps) {
+type FormStep = 'basic' | 'frequency' | 'date'
+
+export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initialData, mode }: DebtFormModalProps) {
+  const [currentStep, setCurrentStep] = useState<FormStep>('basic')
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    category_id: '',
     total_amount: 0,
-    remaining_amount: 0,
     due_date: '',
-    interest_rate: 0,
-    monthly_payment: 0,
-    creditor_name: '',
     debt_type: 'loan',
     payment_frequency: 'monthly'
   })
+  const [selectedDate, setSelectedDate] = useState<Date>()
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -36,41 +44,53 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, initialData, mode 
       setFormData({
         title: initialData.title || '',
         description: initialData.description || '',
+        category_id: initialData.category_id || '',
         total_amount: initialData.total_amount || 0,
-        remaining_amount: initialData.remaining_amount || 0,
         due_date: initialData.due_date || '',
-        interest_rate: initialData.interest_rate || 0,
-        monthly_payment: initialData.monthly_payment || 0,
-        creditor_name: initialData.creditor_name || '',
         debt_type: initialData.debt_type || 'loan',
         payment_frequency: initialData.payment_frequency || 'monthly'
       })
+      if (initialData.due_date) {
+        setSelectedDate(new Date(initialData.due_date))
+      }
     } else {
       setFormData({
         title: '',
         description: '',
+        category_id: '',
         total_amount: 0,
-        remaining_amount: 0,
         due_date: '',
-        interest_rate: 0,
-        monthly_payment: 0,
-        creditor_name: '',
         debt_type: 'loan',
         payment_frequency: 'monthly'
       })
+      setSelectedDate(undefined)
     }
+    setCurrentStep('basic')
   }, [initialData, mode, open])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!formData.title.trim()) {
-      toast.error('Título da dívida é obrigatório')
-      return
+  const handleNext = () => {
+    if (currentStep === 'basic') {
+      if (!formData.title.trim()) {
+        toast.error('Nome da dívida é obrigatório')
+        return
+      }
+      setCurrentStep('frequency')
+    } else if (currentStep === 'frequency') {
+      setCurrentStep('date')
     }
+  }
 
-    if (formData.total_amount <= 0) {
-      toast.error('Valor total deve ser maior que zero')
+  const handleBack = () => {
+    if (currentStep === 'date') {
+      setCurrentStep('frequency')
+    } else if (currentStep === 'frequency') {
+      setCurrentStep('basic')
+    }
+  }
+
+  const handleSubmit = async () => {
+    if (!formData.title.trim()) {
+      toast.error('Nome da dívida é obrigatório')
       return
     }
 
@@ -78,7 +98,7 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, initialData, mode 
     
     const submitData = {
       ...formData,
-      remaining_amount: formData.remaining_amount || formData.total_amount
+      due_date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null
     }
     
     const { error } = await onSubmit(submitData)
@@ -97,185 +117,224 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, initialData, mode 
     { value: 'other', label: 'Outros' }
   ]
 
-  const paymentFrequencies = [
-    { value: 'weekly', label: 'Semanal' },
-    { value: 'monthly', label: 'Mensal' },
-    { value: 'quarterly', label: 'Trimestral' },
-    { value: 'yearly', label: 'Anual' }
-  ]
+  const renderBasicStep = () => (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="title">Nome da Dívida *</Label>
+        <Input
+          id="title"
+          value={formData.title}
+          onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+          placeholder="Ex: Financiamento do Carro, Cartão de Crédito..."
+          className="mt-2"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="category_id">Categoria</Label>
+        <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
+          <SelectTrigger className="mt-2">
+            <SelectValue placeholder="Selecione uma categoria..." />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="debt_type">Tipo de Dívida</Label>
+        <Select value={formData.debt_type} onValueChange={(value) => setFormData(prev => ({ ...prev, debt_type: value }))}>
+          <SelectTrigger className="mt-2">
+            <SelectValue placeholder="Selecione..." />
+          </SelectTrigger>
+          <SelectContent>
+            {debtTypes.map((type) => (
+              <SelectItem key={type.value} value={type.value}>
+                {type.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="total_amount">Valor (opcional)</Label>
+        <CurrencyInput
+          id="total_amount"
+          placeholder="R$ 0,00"
+          value={formData.total_amount}
+          decimalsLimit={2}
+          decimalSeparator=","
+          groupSeparator="."
+          prefix="R$ "
+          allowDecimals={true}
+          allowNegativeValue={false}
+          onValueChange={(value) => setFormData(prev => ({ ...prev, total_amount: parseFloat(value || '0') }))}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="description">Descrição (opcional)</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          placeholder="Detalhes sobre a dívida..."
+          rows={3}
+          className="mt-2"
+        />
+      </div>
+    </div>
+  )
+
+  const renderFrequencyStep = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h3 className="text-lg font-medium mb-2">Como você quer configurar o pagamento?</h3>
+        <p className="text-sm text-muted-foreground">Escolha se é um pagamento recorrente ou uma data específica</p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        <Button
+          type="button"
+          variant={formData.payment_frequency === 'monthly' ? 'default' : 'outline'}
+          onClick={() => setFormData(prev => ({ ...prev, payment_frequency: 'monthly' }))}
+          className="h-16 text-left justify-start"
+        >
+          <div>
+            <div className="font-medium">Todo mês</div>
+            <div className="text-sm text-muted-foreground">Pagamento recorrente mensal</div>
+          </div>
+        </Button>
+
+        <Button
+          type="button"
+          variant={formData.payment_frequency === 'one-time' ? 'default' : 'outline'}
+          onClick={() => setFormData(prev => ({ ...prev, payment_frequency: 'one-time' }))}
+          className="h-16 text-left justify-start"
+        >
+          <div>
+            <div className="font-medium">Data específica</div>
+            <div className="text-sm text-muted-foreground">Pagamento único em uma data</div>
+          </div>
+        </Button>
+      </div>
+    </div>
+  )
+
+  const renderDateStep = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h3 className="text-lg font-medium mb-2">
+          {formData.payment_frequency === 'monthly' 
+            ? 'Escolha o dia do mês para pagamento' 
+            : 'Escolha a data do pagamento'
+          }
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {formData.payment_frequency === 'monthly' 
+            ? 'Selecione o dia que você quer pagar todo mês' 
+            : 'Selecione quando você vai quitar esta dívida'
+          }
+        </p>
+      </div>
+
+      <div className="flex justify-center">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !selectedDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {selectedDate ? (
+                formData.payment_frequency === 'monthly' 
+                  ? `Todo dia ${format(selectedDate, 'd')}`
+                  : format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+              ) : (
+                <span>Selecione uma data</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
+  )
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            {currentStep !== 'basic' && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleBack}
+                className="p-1 h-8 w-8"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
             {mode === 'create' ? 'Adicionar Dívida' : 'Editar Dívida'}
           </DialogTitle>
         </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <Label htmlFor="title">Título da Dívida *</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Ex: Financiamento do Carro, Cartão de Crédito..."
-                required
-              />
-            </div>
 
-            <div>
-              <Label htmlFor="description">Descrição</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Detalhes sobre a dívida..."
-                rows={3}
-              />
-            </div>
+        <div className="py-4">
+          {currentStep === 'basic' && renderBasicStep()}
+          {currentStep === 'frequency' && renderFrequencyStep()}
+          {currentStep === 'date' && renderDateStep()}
+        </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="debt_type">Tipo de Dívida</Label>
-                <Select value={formData.debt_type} onValueChange={(value) => setFormData(prev => ({ ...prev, debt_type: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {debtTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="creditor_name">Credor</Label>
-                <Input
-                  id="creditor_name"
-                  value={formData.creditor_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, creditor_name: e.target.value }))}
-                  placeholder="Nome do banco/instituição"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="total_amount">Valor Total *</Label>
-                <CurrencyInput
-                  id="total_amount"
-                  placeholder="R$ 0,00"
-                  value={formData.total_amount}
-                  decimalsLimit={2}
-                  decimalSeparator=","
-                  groupSeparator="."
-                  prefix="R$ "
-                  allowDecimals={true}
-                  allowNegativeValue={false}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, total_amount: parseFloat(value || '0') }))}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                />
-              </div>
-              <div>
-                <Label htmlFor="remaining_amount">Valor Restante</Label>
-                <CurrencyInput
-                  id="remaining_amount"
-                  placeholder="R$ 0,00 (Se vazio, usa o valor total)"
-                  value={formData.remaining_amount}
-                  decimalsLimit={2}
-                  decimalSeparator=","
-                  groupSeparator="."
-                  prefix="R$ "
-                  allowDecimals={true}
-                  allowNegativeValue={false}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, remaining_amount: parseFloat(value || '0') }))}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="monthly_payment">Pagamento Mensal</Label>
-                <CurrencyInput
-                  id="monthly_payment"
-                  placeholder="R$ 0,00"
-                  value={formData.monthly_payment}
-                  decimalsLimit={2}
-                  decimalSeparator=","
-                  groupSeparator="."
-                  prefix="R$ "
-                  allowDecimals={true}
-                  allowNegativeValue={false}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, monthly_payment: parseFloat(value || '0') }))}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                />
-              </div>
-              <div>
-                <Label htmlFor="payment_frequency">Frequência de Pagamento</Label>
-                <Select value={formData.payment_frequency} onValueChange={(value) => setFormData(prev => ({ ...prev, payment_frequency: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {paymentFrequencies.map((freq) => (
-                      <SelectItem key={freq.value} value={freq.value}>
-                        {freq.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="interest_rate">Taxa de Juros (% a.m.)</Label>
-                <Input
-                  id="interest_rate"
-                  type="number"
-                  step="0.01"
-                  value={formData.interest_rate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, interest_rate: parseFloat(e.target.value) || 0 }))}
-                  min="0"
-                  max="100"
-                />
-              </div>
-              <div>
-                <Label htmlFor="due_date">Data de Vencimento</Label>
-                <Input
-                  id="due_date"
-                  type="date"
-                  value={formData.due_date}
-                  onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-4">
+        <div className="flex justify-end gap-2 pt-4 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+          
+          {currentStep === 'date' ? (
             <Button
               type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={handleSubmit}
               disabled={loading}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
               className="bg-primary text-primary-foreground hover:bg-primary/90"
-              disabled={loading}
             >
               {loading ? 'Salvando...' : mode === 'create' ? 'Adicionar' : 'Salvar'}
             </Button>
-          </div>
-        </form>
+          ) : (
+            <Button
+              type="button"
+              onClick={handleNext}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Próximo
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   )
