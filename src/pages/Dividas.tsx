@@ -297,17 +297,23 @@ const Dividas = () => {
       </Card>
 
       {/* Conteúdo Principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-        <div className="lg:col-span-2">
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle>
-                {viewMode === "table" ? "Lista de Dívidas" : "Gráfico de Dívidas"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {viewMode === "table" ? (
-                <div className="space-y-3">
+      {viewMode === "table" ? (
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 lg:gap-6">
+          {/* Lista de Dívidas - ocupa mais espaço no desktop */}  
+          <div className="xl:col-span-3">
+            <Card className="shadow-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                <CardTitle>Lista de Dívidas</CardTitle>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setStatusFilter(statusFilter === "paid" ? "all" : "paid")}
+                >
+                  {statusFilter === "paid" ? "Ver Todas" : "Histórico Pagas"}
+                </Button>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="space-y-3 max-h-[600px] overflow-y-auto">
                   {loading ? (
                     <div className="text-center py-8">
                       <p className="text-muted-foreground">Carregando dívidas...</p>
@@ -319,133 +325,244 @@ const Dividas = () => {
                     </div>
                   ) : (
                      filteredDebts.map((debt) => (
-                       <div key={debt.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-smooth">
-                         <div className="flex-1 min-w-0">
-                           <div className="flex items-center gap-3">
-                             <div className={`w-3 h-3 rounded-full flex-shrink-0 ${isOverdue(debt.due_date) ? 'bg-destructive' : debt.status === 'paid' ? 'bg-success' : 'bg-warning'}`} />
-                             <div className="min-w-0 flex-1">
-                               <h4 className="font-medium text-foreground truncate">{debt.title}</h4>
-                                <p className="text-sm text-muted-foreground truncate">
-                                  {debt.categories?.name || debt.description}
-                                </p>
-                             </div>
-                           </div>
-                         </div>
-                         
-                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                           <div className="flex items-center justify-between w-full sm:w-auto gap-4">
-                             <div className="text-center">
-                               <Badge variant="outline" className={getStatusColor(isOverdue(debt.due_date) ? 'overdue' : debt.status)}>
-                                 {isOverdue(debt.due_date) ? 'Vencida' : getStatusLabel(debt.status)}
-                               </Badge>
-                               {debt.due_date && (
-                                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                                   {new Date(debt.due_date).toLocaleDateString('pt-BR')}
-                                 </p>
-                               )}
-                             </div>
+                       <div key={debt.id} className="p-4 bg-card rounded-lg border border-border hover:shadow-md transition-all">
+                         <div className="flex items-start justify-between gap-4">
+                           <div className="flex items-start gap-3 flex-1 min-w-0">
+                             {/* Indicador visual de status mais claro */}
+                             <div className={`w-4 h-4 rounded-full flex-shrink-0 mt-1 ${
+                               debt.status === 'paid' ? 'bg-success shadow-lg shadow-success/50' : 
+                               isOverdue(debt.due_date) ? 'bg-destructive animate-pulse shadow-lg shadow-destructive/50' : 
+                               'bg-warning shadow-lg shadow-warning/50'
+                             }`} />
                              
-                              <div className="text-right">
-                                <span className="text-base sm:text-lg font-semibold text-destructive">
-                                  R$ {Number(debt.total_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </span>
-                                <p className="text-xs sm:text-sm text-muted-foreground">
-                                  {debt.status === 'active' ? 'Ativo' : debt.status === 'paid' ? 'Pago' : 'Pendente'}
-                                </p>
-                              </div>
+                             <div className="min-w-0 flex-1">
+                               <div className="flex items-center gap-2 mb-1">
+                                 <h4 className="font-semibold text-foreground">{debt.title}</h4>
+                                 <Badge 
+                                   variant="secondary" 
+                                   className={`text-xs font-medium ${
+                                     debt.status === 'paid' ? 'bg-success/15 text-success border-success/30' : 
+                                     isOverdue(debt.due_date) ? 'bg-destructive/15 text-destructive border-destructive/30' : 
+                                     'bg-warning/15 text-warning border-warning/30'
+                                   }`}
+                                 >
+                                   {debt.status === 'paid' ? '✓ PAGA' : 
+                                    isOverdue(debt.due_date) ? '⚠ VENCIDA' : 
+                                    '⏳ PENDENTE'}
+                                 </Badge>
+                               </div>
+                               
+                               <p className="text-sm text-muted-foreground mb-2">
+                                 {debt.categories?.name || debt.description}
+                               </p>
+                               
+                               {/* Informações de pagamento mais detalhadas */}
+                               <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                                 {debt.due_date && (
+                                   <div className="flex items-center gap-1">
+                                     <Calendar className="w-3 h-3" />
+                                     <span className={`${isOverdue(debt.due_date) ? 'text-destructive font-medium' : ''}`}>
+                                       {debt.status === 'paid' ? 'Paga em' : 'Vence em'}: {new Date(debt.due_date).toLocaleDateString('pt-BR')}
+                                     </span>
+                                   </div>
+                                 )}
+                                 <div className="flex items-center gap-1">
+                                   <span>Frequência: {debt.payment_frequency === 'monthly' ? 'Mensal' : debt.payment_frequency === 'weekly' ? 'Semanal' : 'Única'}</span>
+                                 </div>
+                               </div>
+                             </div>
                            </div>
                            
-                            <div className="flex gap-2 w-full sm:w-auto">
-                              {debt.status === 'active' && (
-                                <Button 
-                                  size="sm" 
-                                  variant="default" 
-                                  className="hover-scale flex-1 sm:flex-none"
-                                  onClick={() => handlePayment(debt.id, Number(debt.total_amount || 0))}
-                                >
-                                  <span className="sm:hidden">Pagar</span>
-                                  <span className="hidden sm:inline">Pagar</span>
-                                </Button>
-                              )}
-                              <Button 
-                                size="sm" 
-                                variant="secondary" 
-                                className="hover-scale flex-1 sm:flex-none"
-                                onClick={() => handleViewHistory(debt)}
-                              >
-                                <span className="sm:hidden">📋</span>
-                                <span className="hidden sm:inline">Histórico</span>
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="hover-scale flex-1 sm:flex-none"
-                                onClick={() => handleEdit(debt)}
-                              >
-                                <Edit className="w-3 h-3 sm:mr-1" />
-                                <span className="hidden sm:inline">Editar</span>
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="destructive" 
-                                className="hover-scale"
-                                onClick={() => setDeleteDebtId(debt.id)}
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
-                            </div>
+                           <div className="text-right flex-shrink-0">
+                             <div className={`text-lg font-bold mb-1 ${debt.status === 'paid' ? 'text-success' : 'text-destructive'}`}>
+                               R$ {Number(debt.total_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                             </div>
+                             
+                             <div className="flex gap-2">
+                               {debt.status !== 'paid' && (
+                                 <Button 
+                                   size="sm" 
+                                   variant="default" 
+                                   className="text-xs px-3"
+                                   onClick={() => handlePayment(debt.id, Number(debt.total_amount || 0))}
+                                 >
+                                   💳 Pagar
+                                 </Button>
+                               )}
+                               <Button 
+                                 size="sm" 
+                                 variant="secondary" 
+                                 className="text-xs px-3"
+                                 onClick={() => handleViewHistory(debt)}
+                               >
+                                 📋 Histórico
+                               </Button>
+                               <Button 
+                                 size="sm" 
+                                 variant="outline" 
+                                 className="text-xs px-2"
+                                 onClick={() => handleEdit(debt)}
+                               >
+                                 <Edit className="w-3 h-3" />
+                               </Button>
+                               <Button 
+                                 size="sm" 
+                                 variant="destructive" 
+                                 className="text-xs px-2"
+                                 onClick={() => setDeleteDebtId(debt.id)}
+                               >
+                                 <Trash2 className="w-3 h-3" />
+                               </Button>
+                             </div>
+                           </div>
                          </div>
                        </div>
                      ))
                   )}
                 </div>
-              ) : (
-                <div className="h-80">
-                  <ChartContainer config={{
-                    valor: {
-                      label: "Valor",
-                      color: "hsl(var(--brand-orange))",
-                    },
-                  }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="valor" fill="hsl(var(--brand-orange))" radius={4} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
-                </div>
-              )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Resumo lateral - mais compacto */}
+          <div className="xl:col-span-1">
+            <div className="space-y-4">
+              <Card className="shadow-card">
+                <CardHeader>
+                  <CardTitle className="text-lg">Situação Atual</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-center p-3 bg-destructive/5 rounded-lg border border-destructive/20">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
+                      <p className="text-sm font-medium text-destructive">Vencidas</p>
+                    </div>
+                    <p className="text-2xl font-bold text-destructive">{dividasVencidas}</p>
+                    <p className="text-xs text-muted-foreground">precisam atenção</p>
+                  </div>
+                  
+                  <div className="text-center p-3 bg-warning/5 rounded-lg border border-warning/20">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <Calendar className="w-4 h-4 text-warning" />
+                      <p className="text-sm font-medium text-warning">Próximos</p>
+                    </div>
+                    <p className="text-2xl font-bold text-warning">{proximosVencimentos}</p>
+                    <p className="text-xs text-muted-foreground">em 7 dias</p>
+                  </div>
+                  
+                  <div className="text-center p-3 bg-success/5 rounded-lg border border-success/20">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <CreditCard className="w-4 h-4 text-success" />
+                      <p className="text-sm font-medium text-success">Pagas</p>
+                    </div>
+                    <p className="text-2xl font-bold text-success">
+                      {debts.filter(d => d.status === 'paid').length}
+                    </p>
+                    <p className="text-xs text-muted-foreground">este período</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-card">
+                <CardHeader>
+                  <CardTitle className="text-lg">Por Categoria</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-48">
+                    <ChartContainer config={{
+                      value: {
+                        label: "Valor",
+                        color: "hsl(var(--primary))",
+                      },
+                    }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={pieData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={25}
+                            outerRadius={60}
+                            dataKey="value"
+                          >
+                            {pieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.fill} />
+                            ))}
+                          </Pie>
+                          <ChartTooltip 
+                            content={<ChartTooltipContent />}
+                            formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, "Valor"]}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+                  <div className="space-y-2 mt-3">
+                    {pieData.slice(0, 3).map((item, index) => (
+                      <div key={index} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill }} />
+                          <span className="truncate">{item.name}</span>
+                        </div>
+                        <span className="font-medium">
+                          R$ {Number(item.value).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Modo Gráfico - Layout otimizado para desktop */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle>Valores por Dívida</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ChartContainer config={{
+                  valor: {
+                    label: "Valor",
+                    color: "hsl(var(--brand-orange))",
+                  },
+                }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis 
+                        dataKey="name" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        fontSize={12}
+                      />
+                      <YAxis fontSize={12} />
+                      <ChartTooltip 
+                        content={<ChartTooltipContent />}
+                        formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, "Valor"]}
+                      />
+                      <Bar dataKey="valor" fill="hsl(var(--brand-orange))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
             </CardContent>
           </Card>
-        </div>
 
-        <div>
           <Card className="shadow-card">
             <CardHeader>
               <CardTitle>Distribuição por Categoria</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64">
+              <div className="h-80">
                 <ChartContainer config={{
-                  financiamento: {
-                    label: "Financiamento",
-                    color: "hsl(var(--brand-orange))",
-                  },
-                  cartao: {
-                    label: "Cartão",
-                    color: "hsl(var(--destructive))",
-                  },
-                  emprestimo: {
-                    label: "Empréstimo",
-                    color: "hsl(var(--warning))",
-                  },
-                  parcelamento: {
-                    label: "Parcelamento",
-                    color: "hsl(var(--success))",
+                  value: {
+                    label: "Valor",
+                    color: "hsl(var(--primary))",
                   },
                 }}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -454,15 +571,20 @@ const Dividas = () => {
                         data={pieData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={40}
-                        outerRadius={80}
+                        labelLine={false}
+                        outerRadius={100}
+                        fill="#8884d8"
                         dataKey="value"
+                        label={({ name, percent }) => percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
                       >
                         {pieData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
                         ))}
                       </Pie>
-                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartTooltip 
+                        content={<ChartTooltipContent />}
+                        formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, "Valor"]}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -483,7 +605,7 @@ const Dividas = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      )}
 
       <FloatingActionButton onClick={() => setIsModalOpen(true)} />
 
