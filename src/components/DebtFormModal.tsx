@@ -33,7 +33,6 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
     category_id: '',
     total_amount: 0,
     due_date: '',
-    debt_type: 'loan',
     payment_frequency: 'monthly'
   })
   const [selectedDate, setSelectedDate] = useState<Date>()
@@ -47,7 +46,6 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
         category_id: initialData.category_id || '',
         total_amount: initialData.total_amount || 0,
         due_date: initialData.due_date || '',
-        debt_type: initialData.debt_type || 'loan',
         payment_frequency: initialData.payment_frequency || 'monthly'
       })
       if (initialData.due_date) {
@@ -60,7 +58,6 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
         category_id: '',
         total_amount: 0,
         due_date: '',
-        debt_type: 'loan',
         payment_frequency: 'monthly'
       })
       setSelectedDate(undefined)
@@ -110,13 +107,6 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
     setLoading(false)
   }
 
-  const debtTypes = [
-    { value: 'loan', label: 'Empréstimo' },
-    { value: 'credit_card', label: 'Cartão de Crédito' },
-    { value: 'financing', label: 'Financiamento' },
-    { value: 'other', label: 'Outros' }
-  ]
-
   const renderBasicStep = () => (
     <div className="space-y-4">
       <div>
@@ -148,22 +138,6 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
                 {categories ? 'Nenhuma categoria disponível' : 'Carregando categorias...'}
               </SelectItem>
             )}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <Label htmlFor="debt_type">Tipo de Dívida</Label>
-        <Select value={formData.debt_type} onValueChange={(value) => setFormData(prev => ({ ...prev, debt_type: value }))}>
-          <SelectTrigger className="mt-2">
-            <SelectValue placeholder="Selecione..." />
-          </SelectTrigger>
-          <SelectContent>
-            {debtTypes.map((type) => (
-              <SelectItem key={type.value} value={type.value}>
-                {type.label}
-              </SelectItem>
-            ))}
           </SelectContent>
         </Select>
       </div>

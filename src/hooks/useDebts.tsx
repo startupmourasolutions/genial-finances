@@ -14,7 +14,6 @@ interface Debt {
   total_amount?: number
   due_date?: string
   status: string
-  debt_type: string
   original_amount?: number
   payment_frequency: string
   created_at: string
@@ -24,6 +23,19 @@ interface Debt {
     color?: string
     icon?: string
   }
+  payments?: DebtPayment[]
+}
+
+interface DebtPayment {
+  id: string
+  debt_id: string
+  user_id: string
+  client_id?: string
+  amount: number
+  payment_date: string
+  notes?: string
+  created_at: string
+  updated_at: string
 }
 
 interface CreateDebtData {
@@ -32,7 +44,6 @@ interface CreateDebtData {
   category_id?: string
   total_amount?: number
   due_date?: string
-  debt_type?: string
   original_amount?: number
   payment_frequency?: string
 }
@@ -40,6 +51,7 @@ interface CreateDebtData {
 export function useDebts() {
   const [debts, setDebts] = useState<Debt[]>([])
   const [categories, setCategories] = useState<any[]>([])
+  const [debtPayments, setDebtPayments] = useState<DebtPayment[]>([])
   const [loading, setLoading] = useState(true)
   const { user, profile } = useAuth()
   const { currentProfile } = useProfileContext()
@@ -48,6 +60,7 @@ export function useDebts() {
     if (user && profile) {
       fetchDebts()
       fetchCategories()
+      fetchDebtPayments()
     }
   }, [user, profile, currentProfile])
 
@@ -132,6 +145,49 @@ export function useDebts() {
     }
   }
 
+  const fetchDebtPayments = async () => {
+    if (!user || !profile) return
+
+    try {
+      // Verificar se é super admin
+      const isSuperAdmin = profile?.super_administrators?.id ? true : false;
+      
+      if (isSuperAdmin) {
+        const { data, error } = await supabase
+          .from('debt_payments')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setDebtPayments(data || []);
+        return;
+      }
+
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile.id)
+        .maybeSingle()
+
+      if (clientError || !clientData) {
+        setDebtPayments([])
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('debt_payments')
+        .select('*')
+        .eq('client_id', clientData.id)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setDebtPayments(data || [])
+    } catch (error: any) {
+      console.error('Error fetching debt payments:', error)
+    }
+  }
+
   const createDebt = async (debtData: CreateDebtData) => {
     if (!user || !profile) {
       toast.error('Usuário não autenticado')
@@ -161,15 +217,14 @@ export function useDebts() {
 
       const { data, error } = await supabase
         .from('debts')
-        .insert([{
+        .insert({
           ...debtData,
           user_id: user.id,
           client_id: clientData.id,
           status: 'active',
-          debt_type: debtData.debt_type || 'loan',
           payment_frequency: debtData.payment_frequency || 'monthly',
           profile_type: currentProfile === "Empresarial" ? "business" : "personal"
-        }])
+        })
         .select()
 
       if (error) throw error
@@ -210,34 +265,88 @@ export function useDebts() {
 
   const makePayment = async (id: string, paymentAmount: number) => {
     try {
-      // Buscar a dívida atual para atualizar o status se necessário
+      // Buscar a dívida atual
       const { data: currentDebt, error: fetchError } = await supabase
         .from('debts')
-        .select('total_amount')
+        .select('*')
         .eq('id', id)
         .eq('user_id', user?.id)
         .single()
 
       if (fetchError) throw fetchError
 
-      // Se a dívida tem valor total, consideramos como paga se o pagamento for igual ou maior
-      const newStatus = currentDebt.total_amount && paymentAmount >= currentDebt.total_amount ? 'paid' : 'active'
+      // Buscar o client_id do usuário atual
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('profile_id', profile?.id)
+        .maybeSingle()
 
-      const { data, error } = await supabase
-        .from('debts')
-        .update({
-          status: newStatus,
-          updated_at: new Date().toISOString()
+      if (clientError || !clientData) {
+        toast.error('Cliente não encontrado')
+        return { error: 'Client not found' }
+      }
+
+      // Registrar o pagamento no histórico
+      const { error: paymentError } = await supabase
+        .from('debt_payments')
+        .insert({
+          debt_id: id,
+          user_id: user?.id,
+          client_id: clientData.id,
+          amount: paymentAmount,
+          payment_date: new Date().toISOString().split('T')[0],
         })
-        .eq('id', id)
-        .eq('user_id', user?.id)
-        .select()
 
-      if (error) throw error
+      if (paymentError) throw paymentError
 
-      toast.success('Pagamento registrado com sucesso!')
+      // Lógica baseada na frequência de pagamento
+      if (currentDebt.payment_frequency === 'monthly') {
+        // Para pagamentos mensais: marcar como pago e criar nova dívida para próximo mês
+        await supabase
+          .from('debts')
+          .update({
+            status: 'paid',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', id)
+
+        // Criar nova dívida para o próximo mês
+        const nextMonthDate = new Date(currentDebt.due_date)
+        nextMonthDate.setMonth(nextMonthDate.getMonth() + 1)
+
+        await supabase
+          .from('debts')
+          .insert({
+            title: currentDebt.title,
+            description: currentDebt.description,
+            category_id: currentDebt.category_id,
+            total_amount: currentDebt.total_amount,
+            due_date: nextMonthDate.toISOString().split('T')[0],
+            payment_frequency: 'monthly',
+            status: 'active',
+            user_id: user?.id,
+            client_id: clientData.id,
+            profile_type: currentProfile === "Empresarial" ? "business" : "personal"
+          })
+
+        toast.success('Pagamento registrado! Nova dívida criada para o próximo mês.')
+      } else {
+        // Para pagamentos únicos: apenas marcar como pago
+        await supabase
+          .from('debts')
+          .update({
+            status: 'paid',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', id)
+
+        toast.success('Dívida quitada com sucesso!')
+      }
+
       await fetchDebts()
-      return { data: data[0], error: null }
+      await fetchDebtPayments()
+      return { data: null, error: null }
     } catch (error: any) {
       console.error('Error making payment:', error)
       toast.error('Erro ao registrar pagamento')
@@ -268,12 +377,14 @@ export function useDebts() {
   return {
     debts,
     categories,
+    debtPayments,
     loading,
     createDebt,
     updateDebt,
     makePayment,
     deleteDebt,
     refreshDebts: fetchDebts,
-    refreshCategories: fetchCategories
+    refreshCategories: fetchCategories,
+    refreshDebtPayments: fetchDebtPayments
   }
 }

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 import { DebtFormModal } from "@/components/DebtFormModal"
+import { DebtPaymentHistoryModal } from "@/components/DebtPaymentHistoryModal"
 import { useDebts } from "@/hooks/useDebts"
 import { Plus, Filter, BarChart3, Table as TableIcon, AlertTriangle, Calendar, DollarSign, Edit, Trash2, CreditCard } from "lucide-react"
 import { FloatingActionButton } from "@/components/FloatingActionButton"
@@ -18,11 +19,13 @@ const Dividas = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingDebt, setEditingDebt] = useState<any>(null)
   const [deleteDebtId, setDeleteDebtId] = useState<string | null>(null)
+  const [historyModalOpen, setHistoryModalOpen] = useState(false)
+  const [selectedDebtForHistory, setSelectedDebtForHistory] = useState<any>(null)
   const [searchFilter, setSearchFilter] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   
-  const { debts, categories, loading, createDebt, updateDebt, deleteDebt, makePayment } = useDebts()
+  const { debts, categories, debtPayments, loading, createDebt, updateDebt, deleteDebt, makePayment } = useDebts()
 
   // Filter debts
   const filteredDebts = debts.filter(debt => {
@@ -30,7 +33,7 @@ const Dividas = () => {
       debt.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
       (debt.categories?.name && debt.categories.name.toLowerCase().includes(searchFilter.toLowerCase()))
     
-    const matchesCategory = categoryFilter === "all" || debt.debt_type === categoryFilter
+    const matchesCategory = categoryFilter === "all" || debt.category_id === categoryFilter
     const matchesStatus = statusFilter === "all" || debt.status === statusFilter
     
     return matchesSearch && matchesCategory && matchesStatus
@@ -42,15 +45,15 @@ const Dividas = () => {
     status: debt.status
   }))
 
-  // Group debts by type for pie chart
-  const debtsByType = filteredDebts.reduce((acc, debt) => {
-    const type = debt.debt_type || 'outros'
-    acc[type] = (acc[type] || 0) + Number(debt.total_amount || 0)
+  // Group debts by category for pie chart
+  const debtsByCategory = filteredDebts.reduce((acc, debt) => {
+    const category = debt.categories?.name || 'Sem categoria'
+    acc[category] = (acc[category] || 0) + Number(debt.total_amount || 0)
     return acc
   }, {} as Record<string, number>)
 
-  const pieData = Object.entries(debtsByType).map(([type, value], index) => ({
-    name: type,
+  const pieData = Object.entries(debtsByCategory).map(([category, value], index) => ({
+    name: category,
     value,
     fill: [
       "hsl(var(--brand-orange))",
@@ -128,6 +131,11 @@ const Dividas = () => {
     } catch (error) {
       console.error('Error making payment:', error)
     }
+  }
+
+  const handleViewHistory = (debt: any) => {
+    setSelectedDebtForHistory(debt)
+    setHistoryModalOpen(true)
   }
 
   const isOverdue = (dueDate: string | null) => {
@@ -235,11 +243,11 @@ const Dividas = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="loan">Empréstimo</SelectItem>
-                <SelectItem value="credit_card">Cartão</SelectItem>
-                <SelectItem value="financing">Financiamento</SelectItem>
-                <SelectItem value="installment">Parcelamento</SelectItem>
-                <SelectItem value="other">Outros</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -347,36 +355,45 @@ const Dividas = () => {
                               </div>
                            </div>
                            
-                           <div className="flex gap-2 w-full sm:w-auto">
-                             {debt.status === 'active' && (
-                               <Button 
-                                 size="sm" 
-                                 variant="default" 
-                                 className="hover-scale flex-1 sm:flex-none"
-                                 onClick={() => handlePayment(debt.id, Number(debt.total_amount || 0))}
-                               >
-                                 <span className="sm:hidden">Pagar</span>
-                                 <span className="hidden sm:inline">Pagar</span>
-                               </Button>
-                             )}
-                             <Button 
-                               size="sm" 
-                               variant="outline" 
-                               className="hover-scale flex-1 sm:flex-none"
-                               onClick={() => handleEdit(debt)}
-                             >
-                               <Edit className="w-3 h-3 sm:mr-1" />
-                               <span className="hidden sm:inline">Editar</span>
-                             </Button>
-                             <Button 
-                               size="sm" 
-                               variant="destructive" 
-                               className="hover-scale"
-                               onClick={() => setDeleteDebtId(debt.id)}
-                             >
-                               <Trash2 className="w-3 h-3" />
-                             </Button>
-                           </div>
+                            <div className="flex gap-2 w-full sm:w-auto">
+                              {debt.status === 'active' && (
+                                <Button 
+                                  size="sm" 
+                                  variant="default" 
+                                  className="hover-scale flex-1 sm:flex-none"
+                                  onClick={() => handlePayment(debt.id, Number(debt.total_amount || 0))}
+                                >
+                                  <span className="sm:hidden">Pagar</span>
+                                  <span className="hidden sm:inline">Pagar</span>
+                                </Button>
+                              )}
+                              <Button 
+                                size="sm" 
+                                variant="secondary" 
+                                className="hover-scale flex-1 sm:flex-none"
+                                onClick={() => handleViewHistory(debt)}
+                              >
+                                <span className="sm:hidden">📋</span>
+                                <span className="hidden sm:inline">Histórico</span>
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="hover-scale flex-1 sm:flex-none"
+                                onClick={() => handleEdit(debt)}
+                              >
+                                <Edit className="w-3 h-3 sm:mr-1" />
+                                <span className="hidden sm:inline">Editar</span>
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="destructive" 
+                                className="hover-scale"
+                                onClick={() => setDeleteDebtId(debt.id)}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
                          </div>
                        </div>
                      ))
@@ -458,7 +475,7 @@ const Dividas = () => {
                       <span className="text-sm">{item.name}</span>
                     </div>
                     <span className="text-sm font-medium">
-                      R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      R$ {Number(item.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                 ))}
@@ -477,6 +494,12 @@ const Dividas = () => {
         categories={categories}
         initialData={editingDebt}
         mode={editingDebt ? 'edit' : 'create'}
+      />
+
+      <DebtPaymentHistoryModal
+        open={historyModalOpen}
+        onOpenChange={setHistoryModalOpen}
+        debt={selectedDebtForHistory}
       />
 
       <DeleteConfirmationDialog
