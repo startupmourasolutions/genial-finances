@@ -5,54 +5,34 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Download, Filter, TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, LineChart, FileText } from "lucide-react"
+import { Download, Filter, TrendingUp, TrendingDown, BarChart3, PieChart as PieChartIcon, LineChart, FileText, Loader2 } from "lucide-react"
 import { FloatingActionButton } from "@/components/FloatingActionButton"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, LineChart as RechartsLineChart, Line, AreaChart, Area } from "recharts"
+import { useReports } from "@/hooks/useReports"
 
 const Relatorios = () => {
   const [viewMode, setViewMode] = useState<"chart" | "table">("chart")
-  const [periodo, setPeriodo] = useState("mensal")
+  
+  const {
+    loading,
+    filters,
+    monthlyData,
+    incomeCategories,
+    expenseCategories,
+    patrimonyData,
+    totals,
+    updateFilters,
+    exportToPDF,
+    exportToExcel
+  } = useReports()
 
-  // Dados mensais
-  const dadosMensais = [
-    { mes: "Jan", receitas: 4500, despesas: 3200, lucro: 1300 },
-    { mes: "Fev", receitas: 3800, despesas: 2900, lucro: 900 },
-    { mes: "Mar", receitas: 5200, despesas: 3800, lucro: 1400 },
-    { mes: "Abr", receitas: 4100, despesas: 3100, lucro: 1000 },
-    { mes: "Mai", receitas: 4800, despesas: 3500, lucro: 1300 },
-    { mes: "Jun", receitas: 5500, despesas: 4200, lucro: 1300 }
-  ]
-
-  // Dados de categorias
-  const categoriasReceitas = [
-    { name: "Salário", value: 3500, fill: "hsl(var(--success))" },
-    { name: "Freelance", value: 1200, fill: "hsl(var(--brand-orange))" },
-    { name: "Investimentos", value: 800, fill: "hsl(var(--warning))" },
-    { name: "Outros", value: 300, fill: "hsl(var(--muted-foreground))" }
-  ]
-
-  const categoriasDespesas = [
-    { name: "Alimentação", value: 1200, fill: "hsl(var(--destructive))" },
-    { name: "Transporte", value: 800, fill: "hsl(var(--warning))" },
-    { name: "Moradia", value: 1500, fill: "hsl(var(--brand-orange))" },
-    { name: "Saúde", value: 400, fill: "hsl(var(--success))" },
-    { name: "Lazer", value: 500, fill: "hsl(var(--muted-foreground))" }
-  ]
-
-  // Evolução patrimônio
-  const patrimonioData = [
-    { mes: "Jan", valor: 15000 },
-    { mes: "Fev", valor: 15900 },
-    { mes: "Mar", valor: 17300 },
-    { mes: "Abr", valor: 18300 },
-    { mes: "Mai", valor: 19600 },
-    { mes: "Jun", valor: 20900 }
-  ]
-
-  const totalReceitas = dadosMensais.reduce((sum, item) => sum + item.receitas, 0)
-  const totalDespesas = dadosMensais.reduce((sum, item) => sum + item.despesas, 0)
-  const saldoTotal = totalReceitas - totalDespesas
-  const crescimentoMensal = ((dadosMensais[5].lucro - dadosMensais[0].lucro) / dadosMensais[0].lucro * 100).toFixed(1)
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="p-2 sm:p-4 lg:p-8 space-y-4 lg:space-y-6 animate-fade-in">
@@ -62,11 +42,11 @@ const Relatorios = () => {
           <p className="text-sm sm:text-base text-muted-foreground">Análise completa da sua situação financeira</p>
         </div>
         <div className="hidden sm:flex gap-3">
-          <Button variant="outline" className="hover-scale">
+          <Button variant="outline" className="hover-scale" onClick={exportToPDF}>
             <FileText className="w-4 h-4 mr-2" />
             Exportar PDF
           </Button>
-          <Button className="bg-brand-orange hover:bg-brand-orange/90 hover-scale">
+          <Button className="bg-brand-orange hover:bg-brand-orange/90 hover-scale" onClick={exportToExcel}>
             <Download className="w-4 h-4 mr-2" />
             Exportar Excel
           </Button>
@@ -84,7 +64,7 @@ const Relatorios = () => {
               <div className="min-w-0 flex-1">
                 <p className="text-xs lg:text-sm text-muted-foreground">Total Receitas</p>
                 <p className="text-lg lg:text-2xl font-bold text-success truncate">
-                  R$ {totalReceitas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  R$ {totals.totalIncomes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -100,7 +80,7 @@ const Relatorios = () => {
               <div className="min-w-0 flex-1">
                 <p className="text-xs lg:text-sm text-muted-foreground">Total Despesas</p>
                 <p className="text-lg lg:text-2xl font-bold text-destructive truncate">
-                  R$ {totalDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  R$ {totals.totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -115,8 +95,8 @@ const Relatorios = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs lg:text-sm text-muted-foreground">Saldo Total</p>
-                <p className={`text-lg lg:text-2xl font-bold truncate ${saldoTotal >= 0 ? 'text-success' : 'text-destructive'}`}>
-                  R$ {saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                <p className={`text-lg lg:text-2xl font-bold truncate ${totals.balance >= 0 ? 'text-success' : 'text-destructive'}`}>
+                  R$ {totals.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -131,7 +111,9 @@ const Relatorios = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs lg:text-sm text-muted-foreground">Crescimento</p>
-                <p className="text-lg lg:text-2xl font-bold text-success">+{crescimentoMensal}%</p>
+                <p className={`text-lg lg:text-2xl font-bold ${totals.growth >= 0 ? 'text-success' : 'text-destructive'}`}>
+                  {totals.growth >= 0 ? '+' : ''}{totals.growth.toFixed(1)}%
+                </p>
               </div>
             </div>
           </CardContent>
@@ -148,27 +130,37 @@ const Relatorios = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-            <Input type="date" placeholder="Data inicial" />
-            <Input type="date" placeholder="Data final" />
-            <Select value={periodo} onValueChange={setPeriodo}>
+            <Input 
+              type="date" 
+              placeholder="Data inicial" 
+              value={filters.startDate || ''}
+              onChange={(e) => updateFilters({ startDate: e.target.value })}
+            />
+            <Input 
+              type="date" 
+              placeholder="Data final" 
+              value={filters.endDate || ''}
+              onChange={(e) => updateFilters({ endDate: e.target.value })}
+            />
+            <Select value={filters.period} onValueChange={(value: any) => updateFilters({ period: value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Período" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="diario">Diário</SelectItem>
-                <SelectItem value="mensal">Mensal</SelectItem>
-                <SelectItem value="trimestral">Trimestral</SelectItem>
-                <SelectItem value="anual">Anual</SelectItem>
+                <SelectItem value="daily">Diário</SelectItem>
+                <SelectItem value="monthly">Mensal</SelectItem>
+                <SelectItem value="quarterly">Trimestral</SelectItem>
+                <SelectItem value="yearly">Anual</SelectItem>
               </SelectContent>
             </Select>
-            <Select>
+            <Select value={filters.categoryFilter} onValueChange={(value: any) => updateFilters({ categoryFilter: value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="receitas">Receitas</SelectItem>
-                <SelectItem value="despesas">Despesas</SelectItem>
+                <SelectItem value="income">Receitas</SelectItem>
+                <SelectItem value="expense">Despesas</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -207,13 +199,13 @@ const Relatorios = () => {
                     },
                   }}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={dadosMensais}>
+                      <BarChart data={monthlyData}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="mes" />
+                        <XAxis dataKey="month" />
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="receitas" fill="hsl(var(--success))" radius={4} />
-                        <Bar dataKey="despesas" fill="hsl(var(--destructive))" radius={4} />
+                        <Bar dataKey="incomes" fill="hsl(var(--success))" radius={4} />
+                        <Bar dataKey="expenses" fill="hsl(var(--destructive))" radius={4} />
                       </BarChart>
                     </ResponsiveContainer>
                   </ChartContainer>
@@ -234,14 +226,14 @@ const Relatorios = () => {
                     },
                   }}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={dadosMensais}>
+                      <AreaChart data={monthlyData}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="mes" />
+                        <XAxis dataKey="month" />
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <Area 
                           type="monotone" 
-                          dataKey="lucro" 
+                          dataKey="balance" 
                           stroke="hsl(var(--brand-orange))" 
                           fill="hsl(var(--brand-orange))" 
                           fillOpacity={0.3}
@@ -284,14 +276,14 @@ const Relatorios = () => {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={categoriasReceitas}
+                          data={incomeCategories}
                           cx="50%"
                           cy="50%"
                           innerRadius={60}
                           outerRadius={120}
                           dataKey="value"
                         >
-                          {categoriasReceitas.map((entry, index) => (
+                          {incomeCategories.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.fill} />
                           ))}
                         </Pie>
@@ -302,7 +294,7 @@ const Relatorios = () => {
                 </div>
                 <div className="space-y-3 lg:space-y-4">
                   <h3 className="text-base lg:text-lg font-semibold">Detalhamento</h3>
-                  {categoriasReceitas.map((item, index) => (
+                  {incomeCategories.length > 0 ? incomeCategories.map((item, index) => (
                     <div key={index} className="flex items-center justify-between p-2 lg:p-3 bg-muted/30 rounded-lg">
                       <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
                         <div className="w-3 h-3 lg:w-4 lg:h-4 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill }} />
@@ -312,7 +304,9 @@ const Relatorios = () => {
                         R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                  ))}
+                  )) : (
+                    <p className="text-muted-foreground text-center">Nenhuma receita encontrada</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -352,14 +346,14 @@ const Relatorios = () => {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={categoriasDespesas}
+                          data={expenseCategories}
                           cx="50%"
                           cy="50%"
                           innerRadius={60}
                           outerRadius={120}
                           dataKey="value"
                         >
-                          {categoriasDespesas.map((entry, index) => (
+                          {expenseCategories.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.fill} />
                           ))}
                         </Pie>
@@ -370,7 +364,7 @@ const Relatorios = () => {
                 </div>
                 <div className="space-y-3 lg:space-y-4">
                   <h3 className="text-base lg:text-lg font-semibold">Detalhamento</h3>
-                  {categoriasDespesas.map((item, index) => (
+                  {expenseCategories.length > 0 ? expenseCategories.map((item, index) => (
                     <div key={index} className="flex items-center justify-between p-2 lg:p-3 bg-muted/30 rounded-lg">
                       <div className="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
                         <div className="w-3 h-3 lg:w-4 lg:h-4 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill }} />
@@ -380,7 +374,9 @@ const Relatorios = () => {
                         R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                  ))}
+                  )) : (
+                    <p className="text-muted-foreground text-center">Nenhuma despesa encontrada</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -401,14 +397,14 @@ const Relatorios = () => {
                   },
                 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <RechartsLineChart data={patrimonioData}>
+                    <RechartsLineChart data={patrimonyData}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="mes" />
+                      <XAxis dataKey="month" />
                       <YAxis />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Line 
                         type="monotone" 
-                        dataKey="valor" 
+                        dataKey="value" 
                         stroke="hsl(var(--brand-orange))" 
                         strokeWidth={3}
                         dot={{ fill: "hsl(var(--brand-orange))", strokeWidth: 2, r: 4 }}
