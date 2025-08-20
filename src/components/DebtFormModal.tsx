@@ -134,7 +134,7 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
                 </SelectItem>
               ))
             ) : (
-              <SelectItem value="" disabled>
+              <SelectItem value="no-categories" disabled>
                 {categories ? 'Nenhuma categoria disponível' : 'Carregando categorias...'}
               </SelectItem>
             )}
