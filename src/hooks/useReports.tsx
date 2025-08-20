@@ -214,6 +214,19 @@ export function useReports() {
     setCategories(data || [])
   }
 
+  const filterDataByDate = (data: any[]) => {
+    if (!filters.startDate && !filters.endDate) return data
+    
+    return data.filter(item => {
+      const itemDate = parseISO(item.date)
+      
+      if (filters.startDate && itemDate < parseISO(filters.startDate)) return false
+      if (filters.endDate && itemDate > parseISO(filters.endDate)) return false
+      
+      return true
+    })
+  }
+
   // Processed data using useMemo for performance
   const monthlyData = useMemo(() => {
     const filteredIncomes = filterDataByDate(incomes)
@@ -316,19 +329,6 @@ export function useReports() {
       }
     })
   }, [monthlyData])
-
-  const filterDataByDate = (data: any[]) => {
-    if (!filters.startDate && !filters.endDate) return data
-    
-    return data.filter(item => {
-      const itemDate = parseISO(item.date)
-      
-      if (filters.startDate && itemDate < parseISO(filters.startDate)) return false
-      if (filters.endDate && itemDate > parseISO(filters.endDate)) return false
-      
-      return true
-    })
-  }
 
   // Totals
   const totals = useMemo(() => {
