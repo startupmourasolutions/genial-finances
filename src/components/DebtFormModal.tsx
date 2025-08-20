@@ -137,11 +137,17 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
             <SelectValue placeholder="Selecione uma categoria..." />
           </SelectTrigger>
           <SelectContent>
-            {categories.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.name}
+            {categories && categories.length > 0 ? (
+              categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="" disabled>
+                {categories ? 'Nenhuma categoria disponível' : 'Carregando categorias...'}
               </SelectItem>
-            ))}
+            )}
           </SelectContent>
         </Select>
       </div>
