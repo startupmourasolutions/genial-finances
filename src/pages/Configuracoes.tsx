@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Settings, 
   Mail, 
@@ -18,7 +19,14 @@ import {
   UserPlus,
   Phone,
   Trash2,
-  Plus
+  Plus,
+  Moon,
+  Sun,
+  Download,
+  Key,
+  Database,
+  Palette,
+  AlertTriangle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,10 +34,13 @@ import { useCurrentProfile } from "@/contexts/ProfileContext";
 import { useSharedAccounts, CreateSharedAccountData } from "@/hooks/useSharedAccounts";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "next-themes";
 
 export default function Configuracoes() {
-  const { profile } = useAuth()
+  const { profile, user } = useAuth()
   const { currentProfile } = useCurrentProfile()
+  const { theme, setTheme } = useTheme()
   const { 
     sharedAccounts, 
     loading: sharedAccountsLoading, 
@@ -40,16 +51,23 @@ export default function Configuracoes() {
   } = useSharedAccounts()
   
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
   const [newAccount, setNewAccount] = useState<CreateSharedAccountData>({
     name: '',
     whatsapp_number: ''
   })
   
+  const [passwordChange, setPasswordChange] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+  
   const [settings, setSettings] = useState({
-    // Configurações de Perfil
-    displayName: "João Silva Santos",
-    email: "joao.silva@empresa1.com.br",
-    phone: "+55 11 99999-1111",
+    // Configurações de Perfil (dados reais do usuário)
+    displayName: profile?.full_name || "",
+    email: user?.email || "",
+    phone: profile?.phone || "",
     
     // Configurações de Notificações
     emailNotifications: true,
@@ -61,17 +79,30 @@ export default function Configuracoes() {
     shareData: false,
     marketingEmails: false,
     
-    // Configurações de Faturamento
-    billingEmail: "financeiro@empresa1.com.br",
-    paymentMethod: "PIX",
+    // Configurações de Sistema
     currency: "BRL",
     timezone: "America/Sao_Paulo",
     language: "pt-BR",
-    dateFormat: "DD/MM/YYYY"
+    dateFormat: "DD/MM/YYYY",
+    
+    // Configurações de Aparência
+    theme: theme || "system"
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Carrega configurações do usuário
+  useEffect(() => {
+    if (profile) {
+      setSettings(prev => ({
+        ...prev,
+        displayName: profile.full_name || "",
+        email: user?.email || "",
+        phone: profile.phone || ""
+      }));
+    }
+  }, [profile, user]);
 
   // Verifica o tipo de conta baseado no toggle atual
   const maxAccounts = getMaxAccounts();
@@ -122,14 +153,42 @@ export default function Configuracoes() {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      // Aqui seria implementada a lógica para salvar as configurações
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulação
+      // Atualiza os dados do perfil no Supabase
+      if (profile?.id) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            full_name: settings.displayName,
+            phone: settings.phone,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', profile.id);
+
+        if (error) {
+          throw error;
+        }
+      }
+
+      // Salva outras configurações (pode ser expandido conforme necessário)
+      localStorage.setItem('user_settings', JSON.stringify({
+        emailNotifications: settings.emailNotifications,
+        smsNotifications: settings.smsNotifications,
+        pushNotifications: settings.pushNotifications,
+        invoiceReminders: settings.invoiceReminders,
+        shareData: settings.shareData,
+        marketingEmails: settings.marketingEmails,
+        currency: settings.currency,
+        timezone: settings.timezone,
+        language: settings.language,
+        dateFormat: settings.dateFormat
+      }));
       
       toast({
         title: "Sucesso",
         description: "Suas configurações foram salvas com sucesso"
       });
     } catch (error) {
+      console.error('Erro ao salvar configurações:', error);
       toast({
         title: "Erro",
         description: "Erro ao salvar configurações",
@@ -137,6 +196,118 @@ export default function Configuracoes() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordChange.newPassword !== passwordChange.confirmPassword) {
+      toast({
+        title: "Erro",
+        description: "As senhas não coincidem",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (passwordChange.newPassword.length < 6) {
+      toast({
+        title: "Erro", 
+        description: "A nova senha deve ter pelo menos 6 caracteres",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: passwordChange.newPassword
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Sucesso",
+        description: "Senha alterada com sucesso"
+      });
+
+      setPasswordChange({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      setIsPasswordDialogOpen(false);
+
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao alterar senha",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const exportData = async () => {
+    try {
+      // Buscar todos os dados do usuário
+      const { data: incomes } = await supabase
+        .from('incomes')
+        .select('*')
+        .eq('client_id', profile?.clients?.id);
+
+      const { data: expenses } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('client_id', profile?.clients?.id);
+
+      const { data: goals } = await supabase
+        .from('financial_goals')
+        .select('*')
+        .eq('client_id', profile?.clients?.id);
+
+      const { data: debts } = await supabase
+        .from('debts')
+        .select('*')
+        .eq('client_id', profile?.clients?.id);
+
+      const exportData = {
+        profile: {
+          name: profile?.full_name,
+          email: user?.email,
+          phone: profile?.phone
+        },
+        incomes: incomes || [],
+        expenses: expenses || [],
+        goals: goals || [],
+        debts: debts || [],
+        exportDate: new Date().toISOString()
+      };
+
+      // Criar arquivo para download
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: 'application/json'
+      });
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `genio-financeiro-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Sucesso",
+        description: "Dados exportados com sucesso"
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao exportar dados",
+        variant: "destructive"
+      });
     }
   };
 
@@ -274,41 +445,173 @@ export default function Configuracoes() {
           </CardContent>
         </Card>
 
-        {/* Configurações de Faturamento */}
+        {/* Configurações de Aparência */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <CreditCard className="w-5 h-5" />
-              <span>Faturamento e Pagamento</span>
+              <Palette className="w-5 h-5" />
+              <span>Aparência</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="billingEmail">Email para Faturamento</Label>
-                <Input
-                  id="billingEmail"
-                  type="email"
-                  value={settings.billingEmail}
-                  onChange={(e) => setSettings({...settings, billingEmail: e.target.value})}
-                />
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
+                <Label>Tema</Label>
+                <p className="text-sm text-muted-foreground">
+                  Escolha entre modo claro, escuro ou automático
+                </p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="paymentMethod">Método de Pagamento Preferido</Label>
-                <Select 
-                  value={settings.paymentMethod} 
-                  onValueChange={(value) => setSettings({...settings, paymentMethod: value})}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PIX">PIX</SelectItem>
-                    <SelectItem value="Boleto">Boleto Bancário</SelectItem>
-                    <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-                  </SelectContent>
-                </Select>
+              <Select value={theme} onValueChange={setTheme}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">
+                    <div className="flex items-center gap-2">
+                      <Sun className="w-4 h-4" />
+                      Claro
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="dark">
+                    <div className="flex items-center gap-2">
+                      <Moon className="w-4 h-4" />
+                      Escuro
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="system">
+                    <div className="flex items-center gap-2">
+                      <Settings className="w-4 h-4" />
+                      Sistema
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Configurações de Segurança */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Key className="w-5 h-5" />
+              <span>Segurança</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
+                <Label>Alterar Senha</Label>
+                <p className="text-sm text-muted-foreground">
+                  Altere sua senha de acesso à plataforma
+                </p>
               </div>
+              <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Alterar Senha</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Alterar Senha</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="currentPassword">Senha Atual</Label>
+                      <Input
+                        id="currentPassword"
+                        type="password"
+                        value={passwordChange.currentPassword}
+                        onChange={(e) => setPasswordChange(prev => ({ ...prev, currentPassword: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="newPassword">Nova Senha</Label>
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        value={passwordChange.newPassword}
+                        onChange={(e) => setPasswordChange(prev => ({ ...prev, newPassword: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={passwordChange.confirmPassword}
+                        onChange={(e) => setPasswordChange(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-4">
+                      <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)} className="flex-1">
+                        Cancelar
+                      </Button>
+                      <Button onClick={handlePasswordChange} className="flex-1">
+                        Alterar Senha
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Backup e Dados */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Database className="w-5 h-5" />
+              <span>Dados e Backup</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
+                <Label>Exportar Dados</Label>
+                <p className="text-sm text-muted-foreground">
+                  Baixe um backup completo dos seus dados financeiros
+                </p>
+              </div>
+              <Button variant="outline" onClick={exportData} className="flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Exportar
+              </Button>
+            </div>
+            <Separator />
+            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div className="space-y-0.5 flex-1">
+                <Label className="text-destructive">Zona de Perigo</Label>
+                <p className="text-sm text-muted-foreground">
+                  Ações irreversíveis que podem afetar permanentemente sua conta
+                </p>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    Excluir Conta
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Tem certeza que deseja excluir sua conta?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta ação é irreversível. Todos os seus dados financeiros, configurações e histórico serão permanentemente removidos.
+                      Para confirmar, digite "EXCLUIR" no campo abaixo.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <div className="my-4">
+                    <Input placeholder="Digite EXCLUIR para confirmar" />
+                  </div>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Excluir Conta
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </CardContent>
         </Card>
