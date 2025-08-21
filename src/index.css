@@ -8,102 +8,100 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Gênio Financeiro Brand Colors - Nova Paleta */
-    --brand-blue: 215 78% 55%;
-    --brand-blue-light: 215 78% 85%;
-    --brand-blue-glow: 215 78% 65%;
-    --brand-green: 147 76% 36%;
-    --brand-dark: 210 9% 17%;
+    /* Gênio Financeiro Brand Colors - Azul Vibrante */
+    --brand-blue: 213 94% 68%;
+    --brand-blue-light: 213 94% 85%;
+    --brand-blue-glow: 213 94% 75%;
+    --brand-green: 147 85% 42%;
+    --brand-orange: 35 91% 62%;
+    --brand-dark: 210 11% 15%;
     
-    /* Core colors based on new specification */
+    /* Core colors - Design Moderno */
     --background: 0 0% 100%;
-    --foreground: 210 9% 17%;
+    --foreground: 210 11% 15%;
     --surface: 0 0% 100%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 9% 17%;
+    --card-foreground: 210 11% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 9% 17%;
+    --popover-foreground: 210 11% 15%;
 
-    --primary: 215 78% 55%;
+    --primary: 213 94% 68%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 17% 93%;
-    --secondary-foreground: 210 9% 17%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 210 11% 15%;
 
-    --muted: 210 17% 93%;
-    --muted-foreground: 210 14% 34%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 210 16% 46%;
 
-    --accent: 147 76% 36%;
+    --accent: 147 85% 42%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 91% 71%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 147 76% 36%;
+    --success: 147 85% 42%;
     --success-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 215 78% 55%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 213 94% 68%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-foreground: 210 11% 15%;
+    --sidebar-primary: 213 94% 68%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 214 32% 95%;
+    --sidebar-accent-foreground: 210 11% 15%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 213 94% 68%;
   }
 
   .dark {
-    --background: 210 9% 17%;
-    --foreground: 0 0% 100%;
-    --surface: 210 9% 17%;
+    --background: 210 11% 15%;
+    --foreground: 0 0% 98%;
+    --surface: 210 11% 15%;
 
-    --card: 210 9% 17%;
-    --card-foreground: 0 0% 100%;
+    --card: 210 11% 18%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 210 9% 17%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 210 11% 18%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 215 78% 55%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 213 94% 68%;
+    --primary-foreground: 210 11% 15%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 210 11% 21%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217.2 32.6% 25%;
-    --muted-foreground: 210 40% 95%;
+    --muted: 210 11% 21%;
+    --muted-foreground: 210 16% 63%;
 
-    --accent: 147 76% 36%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 147 85% 42%;
+    --accent-foreground: 210 11% 15%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 91% 71%;
+    --destructive-foreground: 210 11% 15%;
 
-    --border: 217.2 32.6% 25%;
-    --input: 217.2 32.6% 25%;
-    --ring: 215 78% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --success: 147 85% 42%;
+    --success-foreground: 210 11% 15%;
+
+    --border: 210 11% 21%;
+    --input: 210 11% 21%;
+    --ring: 213 94% 68%;
+    
+    --sidebar-background: 210 11% 12%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 213 94% 68%;
+    --sidebar-primary-foreground: 210 11% 15%;
+    --sidebar-accent: 210 11% 18%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 210 11% 21%;
+    --sidebar-ring: 213 94% 68%;
   }
 }
 
@@ -113,18 +111,21 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 }
 
 /* Custom animations and utilities */
 @layer utilities {
   .font-inter {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
   
   .shadow-card {
-    box-shadow: 0 1px 3px 0 hsl(var(--foreground) / 0.1), 0 1px 2px -1px hsl(var(--foreground) / 0.1);
+    box-shadow: 0 2px 8px -2px hsl(var(--foreground) / 0.08), 0 4px 16px -4px hsl(var(--foreground) / 0.06);
   }
   
   .gradient-brand {
@@ -136,7 +137,14 @@ All colors MUST be HSL.
   }
   
   .hover-scale {
-    @apply transition-transform duration-200 hover:scale-105;
+    @apply transition-transform duration-200 hover:scale-[1.02];
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 @layer base {

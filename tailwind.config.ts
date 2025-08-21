@@ -18,6 +18,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'inter': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -30,6 +33,7 @@ export default {
 					'blue-light': 'hsl(var(--brand-blue-light))',
 					'blue-glow': 'hsl(var(--brand-blue-glow))',
 					green: 'hsl(var(--brand-green))',
+					orange: 'hsl(var(--brand-orange))',
 					dark: 'hsl(var(--brand-dark))'
 				},
 				primary: {
