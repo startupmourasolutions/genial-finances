@@ -85,39 +85,37 @@ export default function DashboardPessoal() {
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Greeting Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{getGreeting()}</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              {getSelectedMonthName()}
-              {!isCurrentMonth && (
-                <Badge variant="secondary" className="ml-2 text-xs">
-                  Histórico
-                </Badge>
-              )}
-            </p>
+      <div className="flex flex-col gap-4 mb-6 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{getGreeting()}</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                {getSelectedMonthName()}
+                {!isCurrentMonth && (
+                  <Badge variant="secondary" className="ml-2 text-xs">
+                    Histórico
+                  </Badge>
+                )}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Transação
+            </Button>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="text-xs">
-            Perfil Individual
-          </Badge>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Transação
-          </Button>
+        
+        {/* Month Navigator */}
+        <div className="border-t pt-4">
+          <MonthNavigator
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onMonthChange={handleMonthChange}
+          />
         </div>
-      </div>
-
-      {/* Month Navigator */}
-      <div className="mb-6">
-        <MonthNavigator
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          onMonthChange={handleMonthChange}
-          className="bg-background/50 backdrop-blur-sm border rounded-lg p-4"
-        />
       </div>
 
       {/* Summary Cards */}
