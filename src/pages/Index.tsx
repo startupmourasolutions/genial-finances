@@ -96,24 +96,20 @@ export default function Index() {
   return (
     <div className="min-h-screen w-full bg-background">
       {/* Hero Section */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-br from-background via-background to-orange-50/30 dark:to-orange-950/20">
+      <section className="relative w-full overflow-hidden bg-gradient-to-br from-background via-background to-blue-50/30 dark:to-blue-950/20">
         <div className="w-full max-w-none px-6 py-20 lg:px-8">
           <div className="text-center space-y-6">
-            <Badge variant="secondary" className="px-4 py-2 text-sm font-medium">
-              🚀 Novo: Dashboard com IA integrada
-            </Badge>
-            
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-blue-600 to-blue-700 bg-clip-text text-transparent font-inter">
               Gênio Financeiro
             </h1>
             
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto font-inter">
               A plataforma mais inteligente para gestão financeira pessoal e empresarial
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               {user ? (
-                <Button size="lg" className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 text-lg" asChild>
+                <Button size="lg" className="bg-primary hover:bg-blue-700 text-white px-8 py-3 text-lg font-inter" asChild>
                   <Link to="/dashboard">
                     Acessar Dashboard
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -121,13 +117,13 @@ export default function Index() {
                 </Button>
               ) : (
                 <>
-                  <Button size="lg" className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 text-lg" asChild>
+                  <Button size="lg" className="bg-primary hover:bg-blue-700 text-white px-8 py-3 text-lg font-inter" asChild>
                     <Link to="/auth">
                       Começar Agora
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
-                  <Button variant="outline" size="lg" className="px-8 py-3 text-lg" asChild>
+                  <Button variant="outline" size="lg" className="px-8 py-3 text-lg font-inter" asChild>
                     <Link to="/auth">
                       <LogIn className="mr-2 h-5 w-5" />
                       Fazer Login
@@ -144,10 +140,10 @@ export default function Index() {
       <section className="w-full py-20 bg-muted/30">
         <div className="w-full max-w-none px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-inter">
               Recursos que transformam sua vida financeira
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-inter">
               Descubra como nossa plataforma pode revolucionar a forma como você gerencia suas finanças
             </p>
           </div>
@@ -155,11 +151,11 @@ export default function Index() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
-                <div className="text-orange-600 mb-4">
+                <div className="text-primary mb-4">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-2 font-inter">{feature.title}</h3>
+                <p className="text-muted-foreground font-inter">{feature.description}</p>
               </Card>
             ))}
           </div>
@@ -170,16 +166,16 @@ export default function Index() {
       <section className="w-full py-20">
         <div className="w-full max-w-none px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-inter">
               Planos do Sistema de Gestão Financeira
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl text-muted-foreground mb-8 font-inter">
               Escolha entre mensal ou anual (25% de desconto)
             </p>
             
             {/* Billing Cycle Toggle */}
             <div className="flex items-center justify-center space-x-4 mb-12">
-              <span className={`text-lg ${billingCycle === 'monthly' ? 'font-semibold text-orange-600' : 'text-muted-foreground'}`}>
+              <span className={`text-lg font-inter ${billingCycle === 'monthly' ? 'font-semibold text-primary' : 'text-muted-foreground'}`}>
                 Mensal
               </span>
               <Button
@@ -188,9 +184,9 @@ export default function Index() {
                 onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
                 className="relative w-16 h-8 p-1"
               >
-                <div className={`absolute w-6 h-6 bg-orange-600 rounded-full transition-transform ${billingCycle === 'yearly' ? 'translate-x-7' : 'translate-x-0'}`} />
+                <div className={`absolute w-6 h-6 bg-primary rounded-full transition-transform ${billingCycle === 'yearly' ? 'translate-x-7' : 'translate-x-0'}`} />
               </Button>
-              <span className={`text-lg ${billingCycle === 'yearly' ? 'font-semibold text-orange-600' : 'text-muted-foreground'}`}>
+              <span className={`text-lg font-inter ${billingCycle === 'yearly' ? 'font-semibold text-primary' : 'text-muted-foreground'}`}>
                 Anual
                 <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">-25%</Badge>
               </span>
@@ -203,29 +199,29 @@ export default function Index() {
               const equivalentMonthlyPrice = billingCycle === 'yearly' ? plan.yearlyPrice / 12 : null;
               
               return (
-                <Card key={index} className={`relative ${plan.popular ? 'border-orange-500 shadow-xl scale-105' : ''}`}>
+                <Card key={index} className={`relative ${plan.popular ? 'border-primary shadow-xl scale-105' : ''}`}>
                   {plan.popular && (
-                    <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-orange-600">
+                    <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary font-inter">
                       <Star className="w-3 h-3 mr-1" />
                       Mais Popular
                     </Badge>
                   )}
                   <CardHeader>
-                    <CardTitle className="text-2xl flex items-center gap-2">
+                    <CardTitle className="text-2xl flex items-center gap-2 font-inter">
                       📌 Plano {plan.name}
                     </CardTitle>
-                    <CardDescription className="text-base">{plan.description}</CardDescription>
+                    <CardDescription className="text-base font-inter">{plan.description}</CardDescription>
                     <div className="space-y-2">
                       <div className="flex items-baseline space-x-2">
-                        <span className="text-4xl font-bold">
+                        <span className="text-4xl font-bold font-inter">
                           R$ {currentPrice.toFixed(2).replace('.', ',')}
                         </span>
-                        <span className="text-muted-foreground">
+                        <span className="text-muted-foreground font-inter">
                           /{billingCycle === 'monthly' ? 'mês' : 'ano'}
                         </span>
                       </div>
                       {billingCycle === 'yearly' && equivalentMonthlyPrice && (
-                        <p className="text-sm text-green-600 font-medium">
+                        <p className="text-sm text-green-600 font-medium font-inter">
                           Equivale a R$ {equivalentMonthlyPrice.toFixed(2).replace('.', ',')}/mês
                         </p>
                       )}
@@ -233,19 +229,19 @@ export default function Index() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div>
-                      <h4 className="font-semibold mb-3 text-green-600">✅ Inclui:</h4>
+                      <h4 className="font-semibold mb-3 text-green-600 font-inter">✅ Inclui:</h4>
                       <ul className="space-y-2">
                         {plan.features.map((feature, featureIndex) => (
                           <li key={featureIndex} className="flex items-start">
                             <span className="text-green-600 mr-2 text-sm">✔</span>
-                            <span className="text-sm leading-relaxed">{feature}</span>
+                            <span className="text-sm leading-relaxed font-inter">{feature}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                     
                     <Button 
-                      className={`w-full ${plan.popular ? 'bg-orange-600 hover:bg-orange-700' : ''}`}
+                      className={`w-full font-inter ${plan.popular ? 'bg-primary hover:bg-blue-700' : ''}`}
                       variant={plan.popular ? 'default' : 'outline'}
                       onClick={() => handlePlanSelection(plan.id)}
                     >
@@ -260,15 +256,15 @@ export default function Index() {
       </section>
 
       {/* CTA Section */}
-      <section className="w-full py-20 bg-gradient-to-r from-orange-600 to-orange-700 text-white">
+      <section className="w-full py-20 bg-gradient-to-r from-primary to-blue-700 text-white">
         <div className="w-full max-w-none px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-inter">
             Pronto para transformar suas finanças?
           </h2>
-          <p className="text-xl mb-8 opacity-90">
+          <p className="text-xl mb-8 opacity-90 font-inter">
             Junte-se a milhares de usuários que já revolucionaram sua vida financeira
           </p>
-          <Button size="lg" variant="secondary" className="px-8 py-3 text-lg" asChild>
+          <Button size="lg" variant="secondary" className="px-8 py-3 text-lg font-inter" asChild>
             <Link to="/auth">
               Começar Agora - Grátis por 7 dias
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -281,14 +277,14 @@ export default function Index() {
       <footer className="w-full py-12 bg-muted/30">
         <div className="w-full max-w-none px-6 lg:px-8 text-center">
           <div className="mb-8">
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-700 bg-clip-text text-transparent">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-700 bg-clip-text text-transparent font-inter">
               Gênio Financeiro
             </h3>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-2 font-inter">
               Sua gestão financeira inteligente
             </p>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground font-inter">
             © 2024 Gênio Financeiro. Todos os direitos reservados.
           </p>
         </div>
