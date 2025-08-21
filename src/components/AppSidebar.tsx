@@ -148,13 +148,14 @@ export function AppSidebar() {
             <img 
               src="/lovable-uploads/5da0cb27-8940-4fcb-86cb-ded708e9a161.png" 
               alt="Gênio Financeiro" 
-              className="w-10 h-10 object-contain"
+              className="w-10 h-10 object-contain bg-transparent"
+              style={{ mixBlendMode: 'multiply' }}
             />
           </div>
           {shouldShowText && (
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">Gênio</h2>
-              <p className="text-xs text-muted-foreground">Financeiro</p>
+            <div className="font-inter">
+              <h2 className="text-lg font-semibold text-foreground tracking-tight">Gênio</h2>
+              <p className="text-xs text-muted-foreground font-medium">Financeiro</p>
             </div>
           )}
         </div>
@@ -165,7 +166,7 @@ export function AppSidebar() {
           <>
             {/* Menu Super Administrador */}
             <SidebarGroup>
-              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2">
+              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2 font-inter font-medium">
                 Super Administrador
               </SidebarGroupLabel>
               <SidebarGroupContent className="space-y-2">
@@ -179,7 +180,7 @@ export function AppSidebar() {
                           onClick={handleNavClick}
                          >
                            <item.icon className="w-5 h-5 flex-shrink-0" />
-                           {shouldShowText && <span className="ml-3">{item.text}</span>}
+                           {shouldShowText && <span className="ml-3 font-inter font-medium">{item.text}</span>}
                          </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -190,7 +191,7 @@ export function AppSidebar() {
             
             {/* Área do Cliente para Super Admin */}
             <SidebarGroup>
-              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2">
+              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2 font-inter font-medium">
                 Área do Cliente
               </SidebarGroupLabel>
               <SidebarGroupContent className="space-y-2">
@@ -204,7 +205,7 @@ export function AppSidebar() {
                           onClick={handleNavClick}
                          >
                            <item.icon className="w-5 h-5 flex-shrink-0" />
-                           {shouldShowText && <span className="ml-3">{item.text}</span>}
+                           {shouldShowText && <span className="ml-3 font-inter font-medium">{item.text}</span>}
                          </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -215,7 +216,7 @@ export function AppSidebar() {
           </>
         ) : (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2">
+            <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground px-2 mb-2 font-inter font-medium">
               Área do Cliente
             </SidebarGroupLabel>
             <SidebarGroupContent className="space-y-2">
@@ -229,7 +230,7 @@ export function AppSidebar() {
                         onClick={handleNavClick}
                        >
                          <item.icon className="w-5 h-5 flex-shrink-0" />
-                         {shouldShowText && <span className="ml-3">{item.text}</span>}
+                         {shouldShowText && <span className="ml-3 font-inter font-medium">{item.text}</span>}
                        </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -251,7 +252,7 @@ export function AppSidebar() {
                   onClick={handleNavClick}
                  >
                    <item.icon className="w-4 h-4 flex-shrink-0" />
-                   {shouldShowText && <span>{item.text}</span>}
+                   {shouldShowText && <span className="font-inter font-medium">{item.text}</span>}
                  </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
