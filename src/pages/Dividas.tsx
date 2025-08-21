@@ -326,9 +326,9 @@ const Dividas = () => {
                                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                                  {debt.due_date && <div className="flex items-center gap-1">
                                      <Calendar className="w-3 h-3" />
-                                     <span className={`${isOverdue(debt.due_date) ? 'text-destructive font-medium' : ''}`}>
-                                       {debt.status === 'paid' ? 'Paga em' : 'Vence em'}: {new Date(debt.due_date).toLocaleDateString('pt-BR')}
-                                     </span>
+                                      <span className={`${debt.status === 'paid' ? 'text-green-600 font-medium' : isOverdue(debt.due_date) ? 'text-red-600 font-medium' : ''}`}>
+                                        {debt.status === 'paid' ? 'Paga em' : 'Vence em'}: {new Date(debt.due_date).toLocaleDateString('pt-BR')}
+                                      </span>
                                    </div>}
                                  <div className="flex items-center gap-1">
                                    <span>Frequência: {debt.payment_frequency === 'monthly' ? 'Mensal' : debt.payment_frequency === 'weekly' ? 'Semanal' : 'Única'}</span>
