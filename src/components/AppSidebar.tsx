@@ -146,7 +146,7 @@ export function AppSidebar() {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 flex items-center justify-center">
             <img 
-              src="/lovable-uploads/e5cda14e-171c-4121-9cee-20d3c20bc6c3.png" 
+              src="/lovable-uploads/5da0cb27-8940-4fcb-86cb-ded708e9a161.png" 
               alt="Gênio Financeiro" 
               className="w-10 h-10 object-contain"
             />
