@@ -7,12 +7,13 @@ import { useExpenses } from "@/hooks/useExpenses"
 import { useFinancialGoals } from "@/hooks/useFinancialGoals"
 import { useDebts } from "@/hooks/useDebts"
 import { useAuth } from "@/hooks/useAuth"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { MonthlyTrendChart } from "@/components/dashboard/MonthlyTrendChart"
 import { ExpensesByCategoryChart } from "@/components/dashboard/ExpensesByCategoryChart"
 import { DebtsOverview } from "@/components/dashboard/DebtsOverview"
 import { FinancialGoalsProgress } from "@/components/dashboard/FinancialGoalsProgress"
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions"
+import { MonthNavigator } from "@/components/MonthNavigator"
 
 export default function DashboardPessoal() {
   const { incomes } = useIncomes()
@@ -21,19 +22,25 @@ export default function DashboardPessoal() {
   const { debts } = useDebts()
   const { profile } = useAuth()
 
-  const currentMonthStats = useMemo(() => {
-    const now = new Date()
-    const currentMonth = now.getMonth()
-    const currentYear = now.getFullYear()
+  // Estado para o mês/ano selecionado
+  const currentDate = new Date()
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth())
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear())
 
+  const handleMonthChange = (month: number, year: number) => {
+    setSelectedMonth(month)
+    setSelectedYear(year)
+  }
+
+  const monthStats = useMemo(() => {
     const monthlyIncomes = incomes.filter(income => {
       const incomeDate = new Date(income.date)
-      return incomeDate.getMonth() === currentMonth && incomeDate.getFullYear() === currentYear
+      return incomeDate.getMonth() === selectedMonth && incomeDate.getFullYear() === selectedYear
     })
 
     const monthlyExpenses = expenses.filter(expense => {
       const expenseDate = new Date(expense.date)
-      return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear
+      return expenseDate.getMonth() === selectedMonth && expenseDate.getFullYear() === selectedYear
     })
 
     const totalIncome = monthlyIncomes.reduce((sum, income) => sum + income.amount, 0)
@@ -53,20 +60,22 @@ export default function DashboardPessoal() {
       incomeCount: monthlyIncomes.length,
       expenseCount: monthlyExpenses.length
     }
-  }, [incomes, expenses, goals])
+  }, [incomes, expenses, goals, selectedMonth, selectedYear])
 
   const activeDebts = debts.filter(debt => debt.status === 'active')
   const totalDebt = activeDebts.reduce((sum, debt) => sum + (debt.total_amount || 0), 0)
 
-  // Get current month name in Portuguese
-  const getCurrentMonthName = () => {
+  // Get selected month name in Portuguese
+  const getSelectedMonthName = () => {
     const months = [
       'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
     ]
-    const now = new Date()
-    return `${months[now.getMonth()]} ${now.getFullYear()}`
+    return `${months[selectedMonth]} ${selectedYear}`
   }
+
+  // Check if it's current month
+  const isCurrentMonth = selectedMonth === currentDate.getMonth() && selectedYear === currentDate.getFullYear()
 
   const getGreeting = () => {
     const firstName = profile?.full_name ? profile.full_name.split(' ')[0] : 'Usuário'
@@ -80,7 +89,14 @@ export default function DashboardPessoal() {
         <div className="flex items-center gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{getGreeting()}</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">{getCurrentMonthName()}</p>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              {getSelectedMonthName()}
+              {!isCurrentMonth && (
+                <Badge variant="secondary" className="ml-2 text-xs">
+                  Histórico
+                </Badge>
+              )}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -94,6 +110,16 @@ export default function DashboardPessoal() {
         </div>
       </div>
 
+      {/* Month Navigator */}
+      <div className="mb-6">
+        <MonthNavigator
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onMonthChange={handleMonthChange}
+          className="bg-background/50 backdrop-blur-sm border rounded-lg p-4"
+        />
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
         <Card className="shadow-card hover:shadow-lg transition-smooth">
@@ -101,14 +127,14 @@ export default function DashboardPessoal() {
             <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               Saldo Atual
             </CardTitle>
-            <TrendingUp className={`h-3 w-3 sm:h-4 sm:w-4 ${currentMonthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'}`} />
+            <TrendingUp className={`h-3 w-3 sm:h-4 sm:w-4 ${monthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'}`} />
           </CardHeader>
           <CardContent className="pb-3">
-            <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${currentMonthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'}`}>
-              R$ {currentMonthStats.currentBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${monthStats.currentBalance >= 0 ? 'text-success' : 'text-destructive'}`}>
+              R$ {monthStats.currentBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Este mês
+              {isCurrentMonth ? 'Este mês' : getSelectedMonthName()}
             </p>
           </CardContent>
         </Card>
@@ -122,10 +148,10 @@ export default function DashboardPessoal() {
           </CardHeader>
           <CardContent className="pb-3">
             <div className="text-lg sm:text-xl lg:text-2xl font-bold text-success">
-              R$ {currentMonthStats.totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              R$ {monthStats.totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {currentMonthStats.incomeCount} receitas este mês
+              {monthStats.incomeCount} receitas {isCurrentMonth ? 'este mês' : 'no período'}
             </p>
           </CardContent>
         </Card>
@@ -139,10 +165,10 @@ export default function DashboardPessoal() {
           </CardHeader>
           <CardContent className="pb-3">
             <div className="text-lg sm:text-xl lg:text-2xl font-bold text-destructive">
-              R$ {currentMonthStats.totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              R$ {monthStats.totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {currentMonthStats.expenseCount} despesas este mês
+              {monthStats.expenseCount} despesas {isCurrentMonth ? 'este mês' : 'no período'}
             </p>
           </CardContent>
         </Card>
@@ -156,7 +182,7 @@ export default function DashboardPessoal() {
           </CardHeader>
           <CardContent className="pb-3">
             <div className="text-lg sm:text-xl lg:text-2xl font-bold text-brand-orange">
-              {currentMonthStats.goalProgress.toFixed(1)}%
+              {monthStats.goalProgress.toFixed(1)}%
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Média das metas ativas
