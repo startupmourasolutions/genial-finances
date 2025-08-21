@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DebtFormModal } from "@/components/DebtFormModal";
 import { DebtPaymentHistoryModal } from "@/components/DebtPaymentHistoryModal";
 import { useDebts } from "@/hooks/useDebts";
@@ -147,10 +148,77 @@ const Dividas = () => {
     setSelectedDebtForHistory(debt);
     setHistoryModalOpen(true);
   };
+
   const isOverdue = (dueDate: string | null) => {
     if (!dueDate) return false;
     return new Date(dueDate) < new Date();
   };
+
+  // Separate debts by status
+  const unpaidDebts = filteredDebts.filter(debt => debt.status !== 'paid');
+  const paidDebts = filteredDebts.filter(debt => debt.status === 'paid');
+
+  const renderDebtCard = (debt: any) => (
+    <div key={debt.id} className="p-4 bg-card rounded-lg border border-border hover:shadow-md transition-all">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          {/* Indicador visual de status mais claro */}
+          <div className={`w-4 h-4 rounded-full flex-shrink-0 mt-1 ${debt.status === 'paid' ? 'bg-green-500 shadow-lg shadow-green-500/50' : isOverdue(debt.due_date) ? 'bg-red-500 animate-pulse shadow-lg shadow-red-500/50' : 'bg-yellow-500 shadow-lg shadow-yellow-500/50'}`} />
+          
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h4 className="font-semibold text-foreground">{debt.title}</h4>
+              <Badge variant="secondary" className={`text-xs font-medium ${debt.status === 'paid' ? 'bg-success/15 text-success border-success/30' : isOverdue(debt.due_date) ? 'bg-destructive/15 text-destructive border-destructive/30' : 'bg-warning/15 text-warning border-warning/30'}`}>
+                {debt.status === 'paid' ? '✓ PAGA' : isOverdue(debt.due_date) ? '⚠ VENCIDA' : '⏳ PENDENTE'}
+              </Badge>
+            </div>
+            
+            <p className="text-sm text-muted-foreground mb-2">
+              {debt.categories?.name || debt.description}
+            </p>
+            
+            {/* Informações de pagamento mais detalhadas */}
+            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+              {debt.due_date && (
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  <span className={`${debt.status === 'paid' ? 'text-green-600 font-medium' : isOverdue(debt.due_date) ? 'text-red-600 font-medium' : ''}`}>
+                    {debt.status === 'paid' ? 'Paga em' : 'Vence em'}: {new Date(debt.due_date).toLocaleDateString('pt-BR')}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center gap-1">
+                <span>Frequência: {debt.payment_frequency === 'monthly' ? 'Mensal' : debt.payment_frequency === 'weekly' ? 'Semanal' : 'Única'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-right flex-shrink-0">
+          <div className={`text-lg font-bold mb-1 ${debt.status === 'paid' ? 'text-success' : 'text-destructive'}`}>
+            R$ {Number(debt.total_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </div>
+          
+          <div className="flex gap-2">
+            {debt.status !== 'paid' && (
+              <Button size="sm" variant="default" className="text-xs px-3" onClick={() => handlePayment(debt.id, Number(debt.total_amount || 0))}>
+                💳 Pagar
+              </Button>
+            )}
+            <Button size="sm" variant="secondary" className="text-xs px-3" onClick={() => handleViewHistory(debt)}>
+              📋 Histórico
+            </Button>
+            <Button size="sm" variant="outline" className="text-xs px-2" onClick={() => handleEdit(debt)}>
+              <Edit className="w-3 h-3" />
+            </Button>
+            <Button size="sm" variant="destructive" className="text-xs px-2" onClick={() => setDeleteDebtId(debt.id)}>
+              <Trash2 className="w-3 h-3" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
   return <div className="p-2 sm:p-4 lg:p-8 space-y-4 lg:space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
         <div>
@@ -287,81 +355,61 @@ const Dividas = () => {
       </Card>
 
       {/* Conteúdo Principal */}
-      {viewMode === "table" ? <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 lg:gap-6">
-          {/* Lista de Dívidas - ocupa mais espaço no desktop */}  
+      {viewMode === "table" ? (
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 lg:gap-6">
+          {/* Lista de Dívidas com Abas - ocupa mais espaço no desktop */}  
           <div className="xl:col-span-3">
             <Card className="shadow-card">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardHeader>
                 <CardTitle>Lista de Dívidas</CardTitle>
-                <Button variant="outline" size="sm" onClick={() => setStatusFilter(statusFilter === "paid" ? "all" : "paid")}>
-                  {statusFilter === "paid" ? "Ver Todas" : "Histórico Pagas"}
-                </Button>
               </CardHeader>
               <CardContent className="p-4">
-                <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                  {loading ? <div className="text-center py-8">
-                      <p className="text-muted-foreground">Carregando dívidas...</p>
-                    </div> : filteredDebts.length === 0 ? <div className="text-center py-8">
-                      <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Nenhuma dívida encontrada</p>
-                    </div> : filteredDebts.map(debt => <div key={debt.id} className="p-4 bg-card rounded-lg border border-border hover:shadow-md transition-all">
-                         <div className="flex items-start justify-between gap-4">
-                           <div className="flex items-start gap-3 flex-1 min-w-0">
-                             {/* Indicador visual de status mais claro */}
-                             <div className={`w-4 h-4 rounded-full flex-shrink-0 mt-1 ${debt.status === 'paid' ? 'bg-green-500 shadow-lg shadow-green-500/50' : isOverdue(debt.due_date) ? 'bg-red-500 animate-pulse shadow-lg shadow-red-500/50' : 'bg-yellow-500 shadow-lg shadow-yellow-500/50'}`} />
-                             
-                             <div className="min-w-0 flex-1">
-                               <div className="flex items-center gap-2 mb-1">
-                                 <h4 className="font-semibold text-foreground">{debt.title}</h4>
-                                 <Badge variant="secondary" className={`text-xs font-medium ${debt.status === 'paid' ? 'bg-success/15 text-success border-success/30' : isOverdue(debt.due_date) ? 'bg-destructive/15 text-destructive border-destructive/30' : 'bg-warning/15 text-warning border-warning/30'}`}>
-                                   {debt.status === 'paid' ? '✓ PAGA' : isOverdue(debt.due_date) ? '⚠ VENCIDA' : '⏳ PENDENTE'}
-                                 </Badge>
-                               </div>
-                               
-                               <p className="text-sm text-muted-foreground mb-2">
-                                 {debt.categories?.name || debt.description}
-                               </p>
-                               
-                               {/* Informações de pagamento mais detalhadas */}
-                               <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                                 {debt.due_date && <div className="flex items-center gap-1">
-                                     <Calendar className="w-3 h-3" />
-                                      <span className={`${debt.status === 'paid' ? 'text-green-600 font-medium' : isOverdue(debt.due_date) ? 'text-red-600 font-medium' : ''}`}>
-                                        {debt.status === 'paid' ? 'Paga em' : 'Vence em'}: {new Date(debt.due_date).toLocaleDateString('pt-BR')}
-                                      </span>
-                                   </div>}
-                                 <div className="flex items-center gap-1">
-                                   <span>Frequência: {debt.payment_frequency === 'monthly' ? 'Mensal' : debt.payment_frequency === 'weekly' ? 'Semanal' : 'Única'}</span>
-                                 </div>
-                               </div>
-                             </div>
-                           </div>
-                           
-                           <div className="text-right flex-shrink-0">
-                             <div className={`text-lg font-bold mb-1 ${debt.status === 'paid' ? 'text-success' : 'text-destructive'}`}>
-                               R$ {Number(debt.total_amount || 0).toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2
-                      })}
-                             </div>
-                             
-                             <div className="flex gap-2">
-                               {debt.status !== 'paid' && <Button size="sm" variant="default" className="text-xs px-3" onClick={() => handlePayment(debt.id, Number(debt.total_amount || 0))}>
-                                   💳 Pagar
-                                 </Button>}
-                               <Button size="sm" variant="secondary" className="text-xs px-3" onClick={() => handleViewHistory(debt)}>
-                                 📋 Histórico
-                               </Button>
-                               <Button size="sm" variant="outline" className="text-xs px-2" onClick={() => handleEdit(debt)}>
-                                 <Edit className="w-3 h-3" />
-                               </Button>
-                               <Button size="sm" variant="destructive" className="text-xs px-2" onClick={() => setDeleteDebtId(debt.id)}>
-                                 <Trash2 className="w-3 h-3" />
-                               </Button>
-                             </div>
-                           </div>
-                         </div>
-                       </div>)}
-                </div>
+                <Tabs defaultValue="unpaid" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="unpaid" className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      A Pagar ({unpaidDebts.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="paid" className="flex items-center gap-2">
+                      <CreditCard className="w-4 h-4" />
+                      Pagas ({paidDebts.length})
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="unpaid" className="mt-4">
+                    <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                      {loading ? (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground">Carregando dívidas...</p>
+                        </div>
+                      ) : unpaidDebts.length === 0 ? (
+                        <div className="text-center py-8">
+                          <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                          <p className="text-muted-foreground">Nenhuma dívida pendente encontrada</p>
+                        </div>
+                      ) : (
+                        unpaidDebts.map(debt => renderDebtCard(debt))
+                      )}
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="paid" className="mt-4">
+                    <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                      {loading ? (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground">Carregando dívidas...</p>
+                        </div>
+                      ) : paidDebts.length === 0 ? (
+                        <div className="text-center py-8">
+                          <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                          <p className="text-muted-foreground">Nenhuma dívida paga encontrada</p>
+                        </div>
+                      ) : (
+                        paidDebts.map(debt => renderDebtCard(debt))
+                      )}
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>
@@ -448,8 +496,10 @@ const Dividas = () => {
               </Card>
             </div>
           </div>
-        </div> : (/* Modo Gráfico - Layout otimizado para desktop */
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        </div>
+      ) : (
+        /* Modo Gráfico - Layout otimizado para desktop */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="shadow-card">
             <CardHeader>
               <CardTitle>Valores por Dívida</CardTitle>
