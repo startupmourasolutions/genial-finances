@@ -308,7 +308,7 @@ const Dividas = () => {
                          <div className="flex items-start justify-between gap-4">
                            <div className="flex items-start gap-3 flex-1 min-w-0">
                              {/* Indicador visual de status mais claro */}
-                             <div className="w-4 h-4 rounded-full flex-shrink-0 mt-1 bg-yellow-500 shadow-lg shadow-yellow-500/50" />
+                             <div className={`w-4 h-4 rounded-full flex-shrink-0 mt-1 ${debt.status === 'paid' ? 'bg-green-500 shadow-lg shadow-green-500/50' : isOverdue(debt.due_date) ? 'bg-red-500 animate-pulse shadow-lg shadow-red-500/50' : 'bg-yellow-500 shadow-lg shadow-yellow-500/50'}`} />
                              
                              <div className="min-w-0 flex-1">
                                <div className="flex items-center gap-2 mb-1">
