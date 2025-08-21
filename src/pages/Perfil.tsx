@@ -14,8 +14,10 @@ import {
   Calendar,
   Building,
   Crown,
-  Shield
+  Shield,
+  Lock
 } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
 import { useProfile } from "@/hooks/useProfile"
 import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
@@ -28,6 +30,12 @@ const Perfil = () => {
     phone: profile?.phone || ''
   })
   const [saving, setSaving] = useState(false)
+  const [securityData, setSecurityData] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: '',
+    two_factor_enabled: false
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -222,6 +230,75 @@ const Perfil = () => {
                 </Button>
               </div>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Card de Segurança */}
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              Segurança
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="current_password">Senha Atual</Label>
+                <Input
+                  id="current_password"
+                  type="password"
+                  value={securityData.current_password}
+                  onChange={(e) => setSecurityData(prev => ({ ...prev, current_password: e.target.value }))}
+                  placeholder="Digite sua senha atual"
+                />
+              </div>
+              <div>
+                <Label htmlFor="new_password">Nova Senha</Label>
+                <Input
+                  id="new_password"
+                  type="password"
+                  value={securityData.new_password}
+                  onChange={(e) => setSecurityData(prev => ({ ...prev, new_password: e.target.value }))}
+                  placeholder="Digite sua nova senha"
+                />
+              </div>
+              <div>
+                <Label htmlFor="confirm_password">Confirmar Nova Senha</Label>
+                <Input
+                  id="confirm_password"
+                  type="password"
+                  value={securityData.confirm_password}
+                  onChange={(e) => setSecurityData(prev => ({ ...prev, confirm_password: e.target.value }))}
+                  placeholder="Confirme sua nova senha"
+                />
+              </div>
+            </div>
+            
+            <div className="border-t pt-4">
+              <div className="flex items-center space-x-2">
+                <Switch 
+                  id="two_factor"
+                  checked={securityData.two_factor_enabled}
+                  onCheckedChange={(checked) => setSecurityData(prev => ({ ...prev, two_factor_enabled: checked }))}
+                />
+                <Label htmlFor="two_factor">Autenticação de dois fatores</Label>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4">
+              <Button 
+                type="button"
+                className="bg-brand-orange hover:bg-brand-orange/90"
+                onClick={() => {
+                  // TODO: Implementar mudança de senha
+                  toast.success('Senha alterada com sucesso!')
+                }}
+              >
+                <Lock className="w-4 h-4 mr-2" />
+                Alterar Senha
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

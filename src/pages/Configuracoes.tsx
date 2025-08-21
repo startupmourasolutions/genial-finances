@@ -343,44 +343,6 @@ export default function Configuracoes() {
       </div>
 
       <div className="grid gap-6">
-        {/* Configurações de Perfil */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <User className="w-5 h-5" />
-              <span>Informações Pessoais</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="displayName">Nome Completo</Label>
-                <Input
-                  id="displayName"
-                  value={settings.displayName}
-                  onChange={(e) => setSettings({...settings, displayName: e.target.value})}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={settings.email}
-                  onChange={(e) => setSettings({...settings, email: e.target.value})}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
-              <Input
-                id="phone"
-                value={settings.phone}
-                onChange={(e) => setSettings({...settings, phone: e.target.value})}
-              />
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Configurações de Notificações */}
         <Card>
@@ -490,72 +452,6 @@ export default function Configuracoes() {
           </CardContent>
         </Card>
 
-        {/* Configurações de Segurança */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Key className="w-5 h-5" />
-              <span>Segurança</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between md:space-y-0">
-              <div className="space-y-0.5 flex-1">
-                <Label>Alterar Senha</Label>
-                <p className="text-sm text-muted-foreground">
-                  Altere sua senha de acesso à plataforma
-                </p>
-              </div>
-              <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline">Alterar Senha</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Alterar Senha</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="currentPassword">Senha Atual</Label>
-                      <Input
-                        id="currentPassword"
-                        type="password"
-                        value={passwordChange.currentPassword}
-                        onChange={(e) => setPasswordChange(prev => ({ ...prev, currentPassword: e.target.value }))}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="newPassword">Nova Senha</Label>
-                      <Input
-                        id="newPassword"
-                        type="password"
-                        value={passwordChange.newPassword}
-                        onChange={(e) => setPasswordChange(prev => ({ ...prev, newPassword: e.target.value }))}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        value={passwordChange.confirmPassword}
-                        onChange={(e) => setPasswordChange(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      />
-                    </div>
-                    <div className="flex gap-2 pt-4">
-                      <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)} className="flex-1">
-                        Cancelar
-                      </Button>
-                      <Button onClick={handlePasswordChange} className="flex-1">
-                        Alterar Senha
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Backup e Dados */}
         <Card>
