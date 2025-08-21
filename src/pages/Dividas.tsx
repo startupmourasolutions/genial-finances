@@ -154,8 +154,30 @@ const Dividas = () => {
     return new Date(dueDate) < new Date();
   };
 
-  // Separate debts by status
-  const unpaidDebts = filteredDebts.filter(debt => debt.status !== 'paid');
+  // Separate debts by status and month
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  
+  // Dívidas a pagar no mês atual
+  const currentMonthDebts = filteredDebts.filter(debt => {
+    if (debt.status === 'paid') return false;
+    if (!debt.due_date) return false;
+    
+    const dueDate = new Date(debt.due_date);
+    return dueDate.getMonth() === currentMonth && dueDate.getFullYear() === currentYear;
+  });
+
+  // Dívidas do próximo mês (futuras)
+  const nextMonthDebts = filteredDebts.filter(debt => {
+    if (debt.status === 'paid') return false;
+    if (!debt.due_date) return false;
+    
+    const dueDate = new Date(debt.due_date);
+    const nextMonth = new Date(currentYear, currentMonth + 1, 1);
+    return dueDate >= nextMonth;
+  });
+
+  // Todas as dívidas pagas
   const paidDebts = filteredDebts.filter(debt => debt.status === 'paid');
 
   const renderDebtCard = (debt: any) => (
@@ -364,11 +386,15 @@ const Dividas = () => {
                 <CardTitle>Lista de Dívidas</CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <Tabs defaultValue="unpaid" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="unpaid" className="flex items-center gap-2">
+                <Tabs defaultValue="current" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="current" className="flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4" />
-                      A Pagar ({unpaidDebts.length})
+                      A Pagar ({currentMonthDebts.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="next" className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      Próximo Mês ({nextMonthDebts.length})
                     </TabsTrigger>
                     <TabsTrigger value="paid" className="flex items-center gap-2">
                       <CreditCard className="w-4 h-4" />
@@ -376,19 +402,36 @@ const Dividas = () => {
                     </TabsTrigger>
                   </TabsList>
                   
-                  <TabsContent value="unpaid" className="mt-4">
+                  <TabsContent value="current" className="mt-4">
                     <div className="space-y-3 max-h-[600px] overflow-y-auto">
                       {loading ? (
                         <div className="text-center py-8">
                           <p className="text-muted-foreground">Carregando dívidas...</p>
                         </div>
-                      ) : unpaidDebts.length === 0 ? (
+                      ) : currentMonthDebts.length === 0 ? (
                         <div className="text-center py-8">
                           <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                          <p className="text-muted-foreground">Nenhuma dívida pendente encontrada</p>
+                          <p className="text-muted-foreground">Nenhuma dívida para este mês</p>
                         </div>
                       ) : (
-                        unpaidDebts.map(debt => renderDebtCard(debt))
+                        currentMonthDebts.map(debt => renderDebtCard(debt))
+                      )}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="next" className="mt-4">
+                    <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                      {loading ? (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground">Carregando dívidas...</p>
+                        </div>
+                      ) : nextMonthDebts.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                          <p className="text-muted-foreground">Nenhuma dívida para os próximos meses</p>
+                        </div>
+                      ) : (
+                        nextMonthDebts.map(debt => renderDebtCard(debt))
                       )}
                     </div>
                   </TabsContent>
