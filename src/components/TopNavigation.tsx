@@ -3,6 +3,7 @@ import { PiggyBank, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import genioLogo from "@/assets/genio-logo.png";
 
 export const TopNavigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,8 +20,8 @@ export const TopNavigation = () => {
       <div className="w-full max-w-none px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <PiggyBank className="h-6 w-6 text-primary" />
+          <Link to="/" className="flex items-center space-x-3">
+            <img src={genioLogo} alt="Gênio Financeiro" className="h-8 w-8" />
             <span className="text-xl font-bold font-inter bg-gradient-to-r from-primary to-blue-700 bg-clip-text text-transparent">
               Gênio Financeiro
             </span>
