@@ -5,7 +5,6 @@ import { Check, Star, Zap, Shield, BarChart3, Users, PiggyBank, TrendingUp, Arro
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
-import { HeroAnimation } from "@/components/HeroAnimation";
 import { TopNavigation } from "@/components/TopNavigation";
 
 export default function Index() {
@@ -103,47 +102,39 @@ export default function Index() {
       {/* Hero Section */}
       <section className="relative w-full overflow-hidden bg-gradient-to-br from-background via-background to-blue-50/30 dark:to-blue-950/20">
         <div className="w-full max-w-none px-6 py-20 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Text Content */}
-            <div className="space-y-6 animate-fade-in">
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-blue-600 to-blue-700 bg-clip-text text-transparent font-inter">
-                Gênio Financeiro
-              </h1>
-              
-              <p className="text-xl md:text-2xl text-muted-foreground font-inter">
-                A plataforma mais inteligente para gestão financeira pessoal e empresarial
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                {user ? (
+          <div className="text-center space-y-6">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-blue-600 to-blue-700 bg-clip-text text-transparent font-inter">
+              Gênio Financeiro
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto font-inter">
+              A plataforma mais inteligente para gestão financeira pessoal e empresarial
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              {user ? (
+                <Button size="lg" className="bg-primary hover:bg-blue-700 text-white px-8 py-3 text-lg font-inter" asChild>
+                  <Link to="/dashboard">
+                    Acessar Dashboard
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              ) : (
+                <>
                   <Button size="lg" className="bg-primary hover:bg-blue-700 text-white px-8 py-3 text-lg font-inter" asChild>
-                    <Link to="/dashboard">
-                      Acessar Dashboard
+                    <Link to="/auth">
+                      Começar Agora
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
-                ) : (
-                  <>
-                    <Button size="lg" className="bg-primary hover:bg-blue-700 text-white px-8 py-3 text-lg font-inter" asChild>
-                      <Link to="/auth">
-                        Começar Agora
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </Link>
-                    </Button>
-                    <Button variant="outline" size="lg" className="px-8 py-3 text-lg font-inter" asChild>
-                      <Link to="/auth">
-                        <LogIn className="mr-2 h-5 w-5" />
-                        Fazer Login
-                      </Link>
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Animation */}
-            <div className="relative">
-              <HeroAnimation />
+                  <Button variant="outline" size="lg" className="px-8 py-3 text-lg font-inter" asChild>
+                    <Link to="/auth">
+                      <LogIn className="mr-2 h-5 w-5" />
+                      Fazer Login
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
