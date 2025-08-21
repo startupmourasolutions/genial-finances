@@ -18,9 +18,9 @@ export const HeroAnimation = () => {
   const [animationPhase, setAnimationPhase] = useState(0);
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([
-    { id: "1", text: "PIX", amount: "R$ 82,90", type: "expense", category: "Mercado", x: 20, y: 20, visible: false },
-    { id: "2", text: "Salário", amount: "+R$ 2.300", type: "income", category: "Entrada", x: 80, y: 30, visible: false },
-    { id: "3", text: "Aluguel", amount: "-R$ 1.200", type: "expense", category: "Moradia", x: 60, y: 80, visible: false }
+    { id: "1", text: "PIX", amount: "R$ 82,90", type: "expense", category: "Mercado", x: 10, y: 15, visible: false },
+    { id: "2", text: "Salário", amount: "+R$ 2.300", type: "income", category: "Entrada", x: 75, y: 20, visible: false },
+    { id: "3", text: "Aluguel", amount: "-R$ 1.200", type: "expense", category: "Moradia", x: 45, y: 75, visible: false }
   ]);
   const [chartProgress, setChartProgress] = useState(0);
   const [goalProgress, setGoalProgress] = useState(0);
@@ -92,11 +92,11 @@ export const HeroAnimation = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-96 flex items-center justify-center">
+    <div className="relative w-full h-96 flex items-center justify-center overflow-hidden">
       {/* Central Dashboard */}
-      <Card className="relative z-10 w-64 h-48 bg-background/80 backdrop-blur-sm border-primary/20 shadow-xl">
+      <Card className="relative z-10 w-72 h-52 bg-card border border-border shadow-xl">
         <CardHeader className="pb-2">
-          <CardTitle className="text-center text-lg font-inter flex items-center justify-center gap-2">
+          <CardTitle className="text-center text-lg font-inter flex items-center justify-center gap-2 text-card-foreground">
             <PiggyBank className="h-5 w-5 text-primary" />
             Gênio Financeiro
           </CardTitle>
@@ -110,17 +110,33 @@ export const HeroAnimation = () => {
           </div>
           
           {/* Mini Chart */}
-          <div className="h-16 bg-muted/50 rounded-lg flex items-end justify-center px-2">
-            <svg width="100%" height="100%" className="overflow-visible">
+          <div className="h-16 bg-muted/30 rounded-lg flex items-center justify-center p-2">
+            <svg width="100%" height="100%" viewBox="0 0 200 60" className="overflow-visible">
+              <defs>
+                <linearGradient id="chartGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="hsl(var(--primary))" />
+                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
+                </linearGradient>
+              </defs>
               <polyline
-                points="10,50 30,40 50,30 70,25 90,20 110,35 130,25 150,20"
+                points="10,45 30,35 50,25 70,20 90,15 110,30 130,20 150,15 170,10 190,15"
                 fill="none"
-                stroke="hsl(var(--primary))"
-                strokeWidth="2"
-                strokeDasharray="200"
-                strokeDashoffset={200 - (chartProgress * 2)}
-                className="transition-all duration-300"
+                stroke="url(#chartGradient)"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeDasharray="300"
+                strokeDashoffset={300 - (chartProgress * 3)}
+                className="transition-all duration-1000 ease-out"
               />
+              {/* Data points */}
+              {animationPhase >= 2 && (
+                <g>
+                  <circle cx="10" cy="45" r="2" fill="hsl(var(--primary))" opacity={chartProgress > 10 ? 1 : 0} />
+                  <circle cx="50" cy="25" r="2" fill="hsl(var(--primary))" opacity={chartProgress > 30 ? 1 : 0} />
+                  <circle cx="90" cy="15" r="2" fill="hsl(var(--primary))" opacity={chartProgress > 60 ? 1 : 0} />
+                  <circle cx="150" cy="15" r="2" fill="hsl(var(--primary))" opacity={chartProgress > 80 ? 1 : 0} />
+                </g>
+              )}
             </svg>
           </div>
 
@@ -128,8 +144,8 @@ export const HeroAnimation = () => {
           {animationPhase >= 3 && (
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Meta Economia</span>
-                <span>{goalProgress}%</span>
+                <span className="font-inter">Meta Economia</span>
+                <span className="font-inter font-medium">{goalProgress}%</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
                 <div 
@@ -142,31 +158,32 @@ export const HeroAnimation = () => {
         </CardContent>
       </Card>
 
-      {/* Floating Transactions */}
+      {/* Floating Transactions - Fixed positioning */}
       {transactions.map((transaction, index) => (
         <div
           key={transaction.id}
-          className={`absolute transition-all duration-1000 transform hero-float-${index} ${
+          className={`absolute transition-all duration-1000 transform hero-float-${index} z-20 ${
             transaction.visible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
           }`}
           style={{
-            left: `${transaction.x}%`,
-            top: `${transaction.y}%`,
+            left: `calc(${transaction.x}% - 80px)`,
+            top: `calc(${transaction.y}% - 40px)`,
+            minWidth: '160px',
           }}
         >
-          <Card className="bg-background/90 backdrop-blur-sm border-primary/10 shadow-lg">
+          <Card className="bg-card/95 backdrop-blur-sm border border-border shadow-lg">
             <CardContent className="p-3">
               <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium font-inter">{transaction.text}</span>
-                  <span className={`text-sm font-bold ${
-                    transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium font-inter text-card-foreground">{transaction.text}</span>
+                  <span className={`text-sm font-bold font-inter ${
+                    transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                   }`}>
                     {transaction.amount}
                   </span>
                 </div>
                 {animationPhase >= 1 && (
-                  <Badge variant="secondary" className="text-xs w-fit">
+                  <Badge variant="secondary" className="text-xs w-fit font-inter">
                     {transaction.category}
                   </Badge>
                 )}
@@ -178,14 +195,14 @@ export const HeroAnimation = () => {
 
       {/* Report Chip */}
       {animationPhase >= 3 && (
-        <div className="absolute bottom-0 right-1/4 animate-fade-in">
+        <div className="absolute bottom-4 right-4 animate-fade-in z-20">
           <Card className="bg-primary text-primary-foreground shadow-lg">
             <CardContent className="p-3">
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 <span className="text-sm font-medium font-inter">Relatório em 1 toque</span>
               </div>
-              <p className="text-xs mt-1 font-inter">Economia 72% da meta</p>
+              <p className="text-xs mt-1 font-inter opacity-90">Economia 72% da meta</p>
             </CardContent>
           </Card>
         </div>

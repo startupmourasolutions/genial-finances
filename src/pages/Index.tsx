@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import { HeroAnimation } from "@/components/HeroAnimation";
+import { TopNavigation } from "@/components/TopNavigation";
 
 export default function Index() {
   const { user } = useAuth();
@@ -96,6 +97,9 @@ export default function Index() {
 
   return (
     <div className="min-h-screen w-full bg-background">
+      {/* Top Navigation */}
+      <TopNavigation />
+      
       {/* Hero Section */}
       <section className="relative w-full overflow-hidden bg-gradient-to-br from-background via-background to-blue-50/30 dark:to-blue-950/20">
         <div className="w-full max-w-none px-6 py-20 lg:px-8">
@@ -146,10 +150,10 @@ export default function Index() {
       </section>
 
       {/* Features Section */}
-      <section className="w-full py-20 bg-muted/30">
+      <section id="recursos" className="w-full py-20 bg-muted/30">
         <div className="w-full max-w-none px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-inter">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-inter text-foreground">
               Recursos que transformam sua vida financeira
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-inter">
@@ -159,11 +163,11 @@ export default function Index() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
+              <Card key={index} className="p-6 hover:shadow-lg transition-shadow border border-border">
                 <div className="text-primary mb-4">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-2 font-inter">{feature.title}</h3>
+                <h3 className="text-xl font-semibold mb-2 font-inter text-card-foreground">{feature.title}</h3>
                 <p className="text-muted-foreground font-inter">{feature.description}</p>
               </Card>
             ))}
@@ -172,10 +176,10 @@ export default function Index() {
       </section>
 
       {/* Pricing Section */}
-      <section className="w-full py-20">
+      <section id="precos" className="w-full py-20">
         <div className="w-full max-w-none px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-inter">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-inter text-foreground">
               Planos do Sistema de Gestão Financeira
             </h2>
             <p className="text-xl text-muted-foreground mb-8 font-inter">
@@ -283,7 +287,7 @@ export default function Index() {
       </section>
 
       {/* Footer */}
-      <footer className="w-full py-12 bg-muted/30">
+      <footer id="contato" className="w-full py-12 bg-muted/30">
         <div className="w-full max-w-none px-6 lg:px-8 text-center">
           <div className="mb-8">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-700 bg-clip-text text-transparent font-inter">
