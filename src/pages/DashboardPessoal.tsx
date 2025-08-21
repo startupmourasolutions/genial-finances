@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { TrendingUp, TrendingDown, PiggyBank, Target, ArrowUpCircle, ArrowDownCircle, Calendar, Plus } from "lucide-react"
+import { TrendingUp, TrendingDown, PiggyBank, Target, ArrowUpCircle, ArrowDownCircle } from "lucide-react"
+import { DynamicHeader } from "@/components/DynamicHeader"
 import { useIncomes } from "@/hooks/useIncomes"
 import { useExpenses } from "@/hooks/useExpenses"
 import { useFinancialGoals } from "@/hooks/useFinancialGoals"
@@ -95,45 +95,28 @@ export default function DashboardPessoal() {
   // Check if it's current month
   const isCurrentMonth = selectedMonth === currentDate.getMonth() && selectedYear === currentDate.getFullYear()
 
-  const getGreeting = () => {
-    const firstName = profile?.full_name ? profile.full_name.split(' ')[0] : 'Usuário'
-    return `Olá, ${firstName}`
-  }
+  const handleNewTransaction = () => {
+    // TODO: Open transaction modal
+    console.log('Nova Transação clicked');
+  };
 
   return (
     <div className="space-y-4 animate-fade-in">
-      {/* Greeting Header */}
-      <div className="flex flex-col gap-4 mb-6 p-6 bg-background rounded-lg border shadow-card">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-inter tracking-tight">{getGreeting()}</h1>
-              <p className="text-sm sm:text-base text-success font-medium font-inter">
-                {getSelectedMonthName()}
-                {!isCurrentMonth && (
-                  <Badge variant="secondary" className="ml-2 text-xs">
-                    Histórico
-                  </Badge>
-                )}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-inter font-medium">
-              <Plus className="w-4 h-4 mr-2" />
-              Nova Transação
-            </Button>
-          </div>
-        </div>
-        
-        {/* Month Navigator */}
-        <div className="border-t pt-4">
-          <MonthNavigator
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            onMonthChange={handleMonthChange}
-          />
-        </div>
+      {/* Dynamic Header */}
+      <DynamicHeader
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        isCurrentMonth={isCurrentMonth}
+        onNewTransaction={handleNewTransaction}
+      />
+      
+      {/* Month Navigator */}
+      <div className="border-t pt-4 px-6 bg-background rounded-lg border shadow-card">
+        <MonthNavigator
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onMonthChange={handleMonthChange}
+        />
       </div>
 
       {/* Summary Cards */}

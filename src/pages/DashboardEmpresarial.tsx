@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Building2, TrendingUp, TrendingDown, Users, DollarSign, BarChart3, Calendar, Target } from "lucide-react"
+import { Building2, TrendingUp, TrendingDown, DollarSign, BarChart3, Calendar, Target } from "lucide-react"
+import { DynamicHeader } from "@/components/DynamicHeader"
 import { useIncomes } from "@/hooks/useIncomes"
 import { useExpenses } from "@/hooks/useExpenses"
 import { useFinancialGoals } from "@/hooks/useFinancialGoals"
@@ -14,6 +15,17 @@ export default function DashboardEmpresarial() {
   const { expenses } = useExpenses()
   const { goals } = useFinancialGoals()
   const { debts } = useDebts()
+
+  // Estado para o mês/ano atual (empresarial sempre mostra mês atual)
+  const currentDate = new Date()
+  const selectedMonth = currentDate.getMonth()
+  const selectedYear = currentDate.getFullYear()
+  const isCurrentMonth = true
+
+  const handleNewTransaction = () => {
+    // TODO: Open transaction modal
+    console.log('Nova Transação clicked');
+  };
 
   const businessStats = useMemo(() => {
     const now = new Date()
@@ -75,11 +87,16 @@ export default function DashboardEmpresarial() {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard Empresarial</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Visão estratégica do seu negócio</p>
-        </div>
+      {/* Dynamic Header */}
+      <DynamicHeader
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        isCurrentMonth={isCurrentMonth}
+        onNewTransaction={handleNewTransaction}
+      />
+      
+      {/* Business Badge */}
+      <div className="flex justify-end">
         <Badge variant="outline" className="text-xs bg-brand-orange/10 text-brand-orange border-brand-orange">
           <Building2 className="w-3 h-3 mr-1" />
           Perfil Empresarial
