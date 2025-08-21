@@ -1,17 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { TrendingUp, TrendingDown, PiggyBank, Target, ArrowUpCircle, ArrowDownCircle, Car, Calendar } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { TrendingUp, TrendingDown, PiggyBank, Target, ArrowUpCircle, ArrowDownCircle, Calendar, Plus } from "lucide-react"
 import { useIncomes } from "@/hooks/useIncomes"
 import { useExpenses } from "@/hooks/useExpenses"
 import { useFinancialGoals } from "@/hooks/useFinancialGoals"
 import { useDebts } from "@/hooks/useDebts"
-import { useVehicles } from "@/hooks/useVehicles"
+import { useAuth } from "@/hooks/useAuth"
 import { useMemo } from "react"
 import { MonthlyTrendChart } from "@/components/dashboard/MonthlyTrendChart"
 import { ExpensesByCategoryChart } from "@/components/dashboard/ExpensesByCategoryChart"
 import { DebtsOverview } from "@/components/dashboard/DebtsOverview"
 import { FinancialGoalsProgress } from "@/components/dashboard/FinancialGoalsProgress"
-import { VehiclesSummary } from "@/components/dashboard/VehiclesSummary"
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions"
 
 export default function DashboardPessoal() {
@@ -19,7 +19,7 @@ export default function DashboardPessoal() {
   const { expenses } = useExpenses()
   const { goals } = useFinancialGoals()
   const { debts } = useDebts()
-  const { vehicles } = useVehicles()
+  const { profile } = useAuth()
 
   const currentMonthStats = useMemo(() => {
     const now = new Date()
@@ -58,16 +58,40 @@ export default function DashboardPessoal() {
   const activeDebts = debts.filter(debt => debt.status === 'active')
   const totalDebt = activeDebts.reduce((sum, debt) => sum + (debt.total_amount || 0), 0)
 
+  // Get current month name in Portuguese
+  const getCurrentMonthName = () => {
+    const months = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ]
+    const now = new Date()
+    return `${months[now.getMonth()]} ${now.getFullYear()}`
+  }
+
+  const getGreeting = () => {
+    const firstName = profile?.full_name ? profile.full_name.split(' ')[0] : 'Usuário'
+    return `Olá, ${firstName}`
+  }
+
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard Pessoal</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Visão geral das suas finanças pessoais</p>
+      {/* Greeting Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border">
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{getGreeting()}</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">{getCurrentMonthName()}</p>
+          </div>
         </div>
-        <Badge variant="outline" className="text-xs">
-          Perfil Individual
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="text-xs">
+            Perfil Individual
+          </Badge>
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Plus className="w-4 h-4 mr-2" />
+            Nova Transação
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -148,7 +172,7 @@ export default function DashboardPessoal() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
         {/* Debts Summary */}
         <Card className="shadow-card">
           <CardHeader className="pb-2">
@@ -164,26 +188,6 @@ export default function DashboardPessoal() {
               </div>
               <div className="text-xs text-muted-foreground">
                 {activeDebts.length} dívida(s) pendente(s)
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Vehicles Summary */}
-        <Card className="shadow-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-              <Car className="w-4 h-4 sm:w-5 sm:h-5 text-brand-orange" />
-              Veículos
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pb-3">
-            <div className="space-y-2">
-              <div className="text-lg sm:text-xl font-bold text-foreground">
-                {vehicles.length}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {vehicles.filter(v => v.status === 'active').length} ativo(s)
               </div>
             </div>
           </CardContent>
@@ -216,8 +220,7 @@ export default function DashboardPessoal() {
         <FinancialGoalsProgress />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-        <VehiclesSummary />
+      <div className="grid grid-cols-1 gap-4 w-full">
         <RecentTransactions />
       </div>
     </div>
