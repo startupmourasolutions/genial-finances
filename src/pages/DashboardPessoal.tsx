@@ -27,9 +27,27 @@ export default function DashboardPessoal() {
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth())
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear())
 
+  // Get the earliest month with data
+  const getEarliestDataMonth = () => {
+    const allDates = [...incomes, ...expenses].map(item => new Date(item.date))
+    if (allDates.length === 0) return { month: currentDate.getMonth(), year: currentDate.getFullYear() }
+    
+    const earliestDate = new Date(Math.min(...allDates.map(date => date.getTime())))
+    return { month: earliestDate.getMonth(), year: earliestDate.getFullYear() }
+  }
+
+  const earliestData = getEarliestDataMonth()
+
   const handleMonthChange = (month: number, year: number) => {
-    setSelectedMonth(month)
-    setSelectedYear(year)
+    // Só permite navegar se há dados para o mês ou se é o mês atual ou posterior
+    const selectedDate = new Date(year, month)
+    const earliestDate = new Date(earliestData.year, earliestData.month)
+    const currentDateObj = new Date(currentDate.getFullYear(), currentDate.getMonth())
+    
+    if (selectedDate >= earliestDate || selectedDate >= currentDateObj) {
+      setSelectedMonth(month)
+      setSelectedYear(year)
+    }
   }
 
   const monthStats = useMemo(() => {
@@ -85,12 +103,12 @@ export default function DashboardPessoal() {
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Greeting Header */}
-      <div className="flex flex-col gap-4 mb-6 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border">
+      <div className="flex flex-col gap-4 mb-6 p-6 bg-white rounded-lg border shadow-card">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div className="flex items-center gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{getGreeting()}</h1>
-              <p className="text-sm sm:text-base text-muted-foreground">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-inter tracking-tight">{getGreeting()}</h1>
+              <p className="text-sm sm:text-base text-success font-medium font-inter">
                 {getSelectedMonthName()}
                 {!isCurrentMonth && (
                   <Badge variant="secondary" className="ml-2 text-xs">
@@ -101,7 +119,7 @@ export default function DashboardPessoal() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-inter font-medium">
               <Plus className="w-4 h-4 mr-2" />
               Nova Transação
             </Button>
