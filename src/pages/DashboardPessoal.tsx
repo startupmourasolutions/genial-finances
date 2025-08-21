@@ -103,7 +103,7 @@ export default function DashboardPessoal() {
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Greeting Header */}
-      <div className="flex flex-col gap-4 mb-6 p-6 bg-white rounded-lg border shadow-card">
+      <div className="flex flex-col gap-4 mb-6 p-6 bg-background rounded-lg border shadow-card">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div className="flex items-center gap-4">
             <div>
