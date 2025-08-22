@@ -119,9 +119,15 @@ export default function DashboardPessoal() {
         />
       </div>
 
-      {/* Summary Cards */}
+      {/* Summary Cards with stagger animation */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
-        <Card className="shadow-card hover:shadow-lg transition-smooth">
+        <Card 
+          className="shadow-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in-up motion-reduce:hover:transform-none motion-reduce:transition-none"
+          style={{ 
+            animationDelay: '100ms',
+            animationFillMode: 'both'
+          }}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               Saldo Atual
@@ -138,7 +144,13 @@ export default function DashboardPessoal() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-card hover:shadow-lg transition-smooth">
+        <Card 
+          className="shadow-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in-up motion-reduce:hover:transform-none motion-reduce:transition-none"
+          style={{ 
+            animationDelay: '200ms',
+            animationFillMode: 'both'
+          }}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               Receitas
@@ -155,7 +167,13 @@ export default function DashboardPessoal() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-card hover:shadow-lg transition-smooth">
+        <Card 
+          className="shadow-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in-up motion-reduce:hover:transform-none motion-reduce:transition-none"
+          style={{ 
+            animationDelay: '300ms',
+            animationFillMode: 'both'
+          }}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               Despesas
@@ -172,7 +190,13 @@ export default function DashboardPessoal() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-card hover:shadow-lg transition-smooth">
+        <Card 
+          className="shadow-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in-up motion-reduce:hover:transform-none motion-reduce:transition-none"
+          style={{ 
+            animationDelay: '400ms',
+            animationFillMode: 'both'
+          }}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               Progresso Metas
@@ -199,7 +223,13 @@ export default function DashboardPessoal() {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
         {/* Debts Summary */}
-        <Card className="shadow-card">
+        <Card 
+          className="shadow-card animate-fade-in-up"
+          style={{ 
+            animationDelay: '200ms',
+            animationFillMode: 'both'
+          }}
+        >
           <CardHeader className="pb-2">
             <CardTitle className="text-base sm:text-lg flex items-center gap-2">
               <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
@@ -219,7 +249,13 @@ export default function DashboardPessoal() {
         </Card>
 
         {/* Goals Summary */}
-        <Card className="shadow-card">
+        <Card 
+          className="shadow-card animate-fade-in-up"
+          style={{ 
+            animationDelay: '300ms',
+            animationFillMode: 'both'
+          }}
+        >
           <CardHeader className="pb-2">
             <CardTitle className="text-base sm:text-lg flex items-center gap-2">
               <PiggyBank className="w-4 h-4 sm:w-5 sm:h-5 text-success" />

@@ -180,12 +180,19 @@ const Dividas = () => {
   // Todas as dívidas pagas
   const paidDebts = filteredDebts.filter(debt => debt.status === 'paid');
 
-  const renderDebtCard = (debt: any) => (
-    <div key={debt.id} className="p-4 bg-card rounded-lg border border-border hover:shadow-md transition-all">
+  const renderDebtCard = (debt: any, index: number = 0) => (
+    <div 
+      key={debt.id} 
+      className="p-4 bg-card rounded-lg border border-border hover:shadow-lg transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 animate-fade-in-up motion-reduce:hover:transform-none motion-reduce:transition-none"
+      style={{ 
+        animationDelay: `${index * 150}ms`,
+        animationFillMode: 'both'
+      }}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           {/* Indicador visual de status mais claro */}
-          <div className={`w-4 h-4 rounded-full flex-shrink-0 mt-1 ${debt.status === 'paid' ? 'bg-green-500 shadow-lg shadow-green-500/50' : isOverdue(debt.due_date) ? 'bg-red-500 animate-pulse shadow-lg shadow-red-500/50' : 'bg-yellow-500 shadow-lg shadow-yellow-500/50'}`} />
+          <div className={`w-4 h-4 rounded-full flex-shrink-0 mt-1 transition-all duration-300 hover:scale-125 motion-reduce:hover:transform-none ${debt.status === 'paid' ? 'bg-green-500 shadow-lg shadow-green-500/50' : isOverdue(debt.due_date) ? 'bg-red-500 animate-pulse shadow-lg shadow-red-500/50' : 'bg-yellow-500 shadow-lg shadow-yellow-500/50'}`} />
           
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-1">
@@ -409,12 +416,12 @@ const Dividas = () => {
                           <p className="text-muted-foreground">Carregando dívidas...</p>
                         </div>
                       ) : currentMonthDebts.length === 0 ? (
-                        <div className="text-center py-8">
-                          <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                        <div className="text-center py-8 animate-fade-in">
+                          <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4 animate-pulse-slow" />
                           <p className="text-muted-foreground">Nenhuma dívida para este mês</p>
                         </div>
                       ) : (
-                        currentMonthDebts.map(debt => renderDebtCard(debt))
+                        currentMonthDebts.map((debt, index) => renderDebtCard(debt, index))
                       )}
                     </div>
                   </TabsContent>
@@ -426,12 +433,12 @@ const Dividas = () => {
                           <p className="text-muted-foreground">Carregando dívidas...</p>
                         </div>
                       ) : nextMonthDebts.length === 0 ? (
-                        <div className="text-center py-8">
-                          <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                        <div className="text-center py-8 animate-fade-in">
+                          <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4 animate-float" />
                           <p className="text-muted-foreground">Nenhuma dívida para os próximos meses</p>
                         </div>
                       ) : (
-                        nextMonthDebts.map(debt => renderDebtCard(debt))
+                        nextMonthDebts.map((debt, index) => renderDebtCard(debt, index))
                       )}
                     </div>
                   </TabsContent>
@@ -443,12 +450,12 @@ const Dividas = () => {
                           <p className="text-muted-foreground">Carregando dívidas...</p>
                         </div>
                       ) : paidDebts.length === 0 ? (
-                        <div className="text-center py-8">
-                          <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                        <div className="text-center py-8 animate-fade-in">
+                          <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-4 animate-bounce-in" />
                           <p className="text-muted-foreground">Nenhuma dívida paga encontrada</p>
                         </div>
                       ) : (
-                        paidDebts.map(debt => renderDebtCard(debt))
+                        paidDebts.map((debt, index) => renderDebtCard(debt, index))
                       )}
                     </div>
                   </TabsContent>

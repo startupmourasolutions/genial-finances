@@ -22,16 +22,20 @@ export function RecentTransactions() {
       <CardContent>
         {recentTransactions.length > 0 ? (
           <div className="space-y-3">
-            {recentTransactions.map((transaction) => (
+            {recentTransactions.map((transaction, index) => (
               <div 
                 key={transaction.id} 
-                className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-sm animate-fade-in-up motion-reduce:hover:transform-none motion-reduce:transition-none"
+                style={{ 
+                  animationDelay: `${index * 100}ms`,
+                  animationFillMode: 'both'
+                }}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${
+                  <div className={`p-2 rounded-full transition-all duration-300 hover:scale-110 motion-reduce:hover:transform-none ${
                     transaction.type === 'income' 
-                      ? 'bg-success/20 text-success' 
-                      : 'bg-destructive/20 text-destructive'
+                      ? 'bg-success/20 text-success hover:bg-success/30' 
+                      : 'bg-destructive/20 text-destructive hover:bg-destructive/30'
                   }`}>
                     {transaction.type === 'income' ? (
                       <ArrowUpCircle className="h-4 w-4" />
