@@ -89,24 +89,26 @@ export default function Index() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-secondary/30 to-background py-20 lg:py-32">
+      <section className="relative overflow-hidden bg-gradient-to-br from-background via-secondary/30 to-background py-8 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-6">
-                <Badge variant="secondary" className="w-fit text-sm">
-                  Nova versão disponível
-                </Badge>
                 <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-tight">
-                  Gerencie suas 
-                  <span className="text-brand-blue"> finanças </span>
-                  de forma 
-                  <span className="text-brand-orange"> simples </span>
-                  e inteligente
+                  <span className="text-brand-blue">Gênio Financeiro</span>
                 </h1>
-                <p className="text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-xl">
-                  Controle total das suas finanças pessoais e empresariais. 
-                  Relatórios automáticos, integração WhatsApp e muito mais.
+                <h2 className="text-2xl lg:text-3xl font-semibold text-muted-foreground leading-relaxed">
+                  Seu assistente financeiro que trabalha para você 24h por dia
+                </h2>
+                <div className="space-y-3 text-lg text-muted-foreground">
+                  <p>• Controle completo de entradas, saídas e dívidas</p>
+                  <p>• Relatórios automáticos e inteligentes</p>
+                  <p>• Lembretes para não esquecer prazos e compromissos</p>
+                  <p>• Integração direta com WhatsApp</p>
+                  <p>• Gestão pessoal e empresarial em um só lugar</p>
+                </div>
+                <p className="text-xl font-medium text-foreground">
+                  Mais do que uma ferramenta: um parceiro financeiro que nunca descansa.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
