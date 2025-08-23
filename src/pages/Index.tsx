@@ -46,12 +46,13 @@ export default function Index() {
               <a href="#contato" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
                 Contato
               </a>
-              <Button 
-                onClick={handleCTAClick} 
-                className="bg-brand-blue hover:bg-brand-blue-glow text-white font-medium px-6 py-2 rounded-lg transition-all hover-scale"
-              >
-                Começar Agora
-              </Button>
+              <Link to="/payment?plan=basico&cycle=monthly">
+                <Button 
+                  className="bg-brand-blue hover:bg-brand-blue-glow text-white font-medium px-6 py-2 rounded-lg transition-all hover-scale"
+                >
+                  Começar Agora
+                </Button>
+              </Link>
             </div>
 
             {/* Mobile menu button */}
@@ -79,9 +80,11 @@ export default function Index() {
                 <a href="#planos" className="text-sm font-medium text-muted-foreground hover:text-primary">
                   Planos
                 </a>
-                <Button onClick={handleCTAClick} className="bg-brand-blue text-white w-full">
+              <Link to="/payment?plan=basico&cycle=monthly">
+                <Button className="bg-brand-blue text-white w-full">
                   Começar Agora
                 </Button>
+              </Link>
               </div>
             </div>
           )}
@@ -112,14 +115,15 @@ export default function Index() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  size="lg" 
-                  onClick={handleCTAClick}
-                  className="bg-brand-blue hover:bg-brand-blue-glow text-white font-medium px-8 py-4 text-lg transition-all hover-scale rounded-lg"
-                >
-                  Começar Gratuitamente
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                <Link to="/payment?plan=basico&cycle=monthly">
+                  <Button 
+                    size="lg" 
+                    className="bg-brand-blue hover:bg-brand-blue-glow text-white font-medium px-8 py-4 text-lg transition-all hover-scale rounded-lg"
+                  >
+                    Começar Agora
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
                 <Button 
                   variant="outline" 
                   size="lg"
@@ -215,13 +219,14 @@ export default function Index() {
                 </div>
               </div>
               
-              <Button 
-                onClick={handleCTAClick}
-                className="bg-brand-green hover:bg-brand-green/90 text-white font-medium px-8 py-3 hover-scale rounded-lg"
-              >
-                Testar Gratuitamente
-                <MessageSquare className="ml-2 h-5 w-5" />
-              </Button>
+              <Link to="/payment?plan=basico&cycle=monthly">
+                <Button 
+                  className="bg-brand-green hover:bg-brand-green/90 text-white font-medium px-8 py-3 hover-scale rounded-lg"
+                >
+                  Começar Agora
+                  <MessageSquare className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -577,10 +582,10 @@ export default function Index() {
                 <CardTitle className="text-2xl font-bold text-foreground">Básico</CardTitle>
                 <div className="space-y-2">
                   <div className="flex items-baseline justify-center gap-2">
-                    <span className="text-3xl font-bold text-foreground">R$ 19,99</span>
+                    <span className="text-3xl font-bold text-foreground">R$ 14,90</span>
                     <span className="text-muted-foreground">/mês</span>
                   </div>
-                  <p className="text-sm text-muted-foreground">ou R$ 179,90/ano (25% desconto)</p>
+                  <p className="text-sm text-muted-foreground">ou R$ 134,10/ano (25% desconto)</p>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -704,33 +709,36 @@ export default function Index() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-brand-blue via-brand-blue-glow to-brand-blue text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-blue/95 to-brand-blue-glow/95"></div>
+      <section className="py-24 bg-gradient-to-br from-brand-orange via-brand-orange to-brand-blue text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/95 via-brand-orange/90 to-brand-blue/95"></div>
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold mb-6 leading-tight">
-            Simples de usar, poderoso nos resultados
+            Transforme suas finanças hoje mesmo
           </h2>
           <p className="text-lg lg:text-xl mb-10 opacity-90 max-w-2xl mx-auto leading-relaxed">
-            Comece hoje mesmo a transformar a gestão das suas finanças. 
-            Milhares de usuários já confiam no Gênio Financeiro.
+            Junte-se a milhares de usuários que já revolucionaram sua gestão financeira. 
+            Simples de usar, poderoso nos resultados.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button 
-              size="lg" 
-              variant="secondary"
-              onClick={handleCTAClick}
-              className="px-10 py-4 text-lg font-semibold hover-scale bg-white text-brand-blue hover:bg-gray-50"
-            >
-              Começar Gratuitamente
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="px-10 py-4 text-lg font-semibold hover-scale border-white/30 text-white hover:bg-white/10"
-            >
-              Falar com Consultor
-            </Button>
+            <Link to="/payment?plan=basico&cycle=monthly">
+              <Button 
+                size="lg" 
+                className="px-10 py-4 text-lg font-semibold hover-scale bg-white text-brand-orange hover:bg-gray-50"
+              >
+                Começar por R$ 14,90/mês
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <Link to="/payment?plan=genio&cycle=monthly">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="px-10 py-4 text-lg font-semibold hover-scale border-white text-white hover:bg-white/20"
+              >
+                Plano Gênio - R$ 45,99/mês
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
           
           {/* Social Proof */}

@@ -52,8 +52,8 @@ export default function Payment() {
   const plans = {
     basico: {
       name: "Básico",
-      monthlyPrice: 19.99,
-      yearlyPrice: 179.90,
+      monthlyPrice: 14.90,
+      yearlyPrice: 134.10,
       features: [
         "Sistema web com gráficos interativos",
         "Controle via WhatsApp (texto, áudio, imagem)",

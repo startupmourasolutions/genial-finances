@@ -46,8 +46,8 @@ serve(async (req) => {
     // Plan pricing
     const plans = {
       basico: {
-        monthlyPrice: 1999, // R$ 19.99 in cents
-        yearlyPrice: 17990,  // R$ 179.90 in cents
+        monthlyPrice: 1490, // R$ 14.90 in cents
+        yearlyPrice: 13410,  // R$ 134.10 in cents
         name: "Plano Básico"
       },
       genio: {
