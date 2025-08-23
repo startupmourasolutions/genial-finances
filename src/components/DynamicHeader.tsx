@@ -77,7 +77,7 @@ export function DynamicHeader({
     `Olá! Sou ${displayName || 'usuário'}. Quero falar com o Gênio sobre minhas finanças.`
   );
   
-  const whatsAppUrl = `https://wa.me/559185389056?text=${whatsAppMessage}`;
+  const whatsAppUrl = `https://wa.me/5591985389056?text=${whatsAppMessage}`;
 
   return (
     <div className="flex flex-col gap-4 mb-6 p-6 bg-background rounded-lg border shadow-card">
