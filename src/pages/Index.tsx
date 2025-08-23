@@ -303,15 +303,221 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* Features Detailed Section */}
       <section id="recursos" className="py-20 bg-secondary/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-20">
             <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
-              Tudo o que você precisa para controlar suas finanças
+              Conheça todas as funcionalidades
             </h2>
             <p className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
               Recursos completos para gestão financeira pessoal e empresarial
+            </p>
+          </div>
+
+          {/* Feature 1: Dashboard Intuitivo */}
+          <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div className="w-16 h-16 bg-brand-blue/10 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-8 h-8 text-brand-blue" />
+                </div>
+                <h3 className="text-2xl lg:text-3xl font-bold text-foreground">
+                  Dashboard Intuitivo e Completo
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Visualize todas as suas informações financeiras de forma clara, organizada e em tempo real. 
+                  Gráficos intuitivos, métricas importantes e uma interface que facilita a tomada de decisões.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Relatórios visuais em tempo real</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Métricas personalizáveis por perfil</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Alertas inteligentes de gastos</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <div className="bg-gradient-to-br from-brand-blue/5 to-brand-blue/10 rounded-2xl p-8 border border-border aspect-[4/3] flex items-center justify-center shadow-xl">
+                <div className="text-center space-y-4">
+                  <div className="w-20 h-20 bg-brand-blue/10 rounded-2xl flex items-center justify-center mx-auto">
+                    <BarChart3 className="w-10 h-10 text-brand-blue" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">
+                    [GIF: Dashboard em ação]
+                  </p>
+                  <p className="text-sm text-muted-foreground opacity-70">
+                    Demonstração interativa do dashboard
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 2: WhatsApp Integration */}
+          <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+            <div className="relative order-2 lg:order-1">
+              <div className="bg-gradient-to-br from-brand-green/5 to-brand-green/10 rounded-2xl p-8 border border-border aspect-[4/3] flex items-center justify-center shadow-xl">
+                <div className="text-center space-y-4">
+                  <div className="w-20 h-20 bg-brand-green/10 rounded-2xl flex items-center justify-center mx-auto">
+                    <MessageSquare className="w-10 h-10 text-brand-green" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">
+                    [GIF: Registro via WhatsApp]
+                  </p>
+                  <p className="text-sm text-muted-foreground opacity-70">
+                    Processo de registro de transação
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-8 order-1 lg:order-2">
+              <div className="space-y-4">
+                <div className="w-16 h-16 bg-brand-green/10 rounded-xl flex items-center justify-center">
+                  <MessageSquare className="w-8 h-8 text-brand-green" />
+                </div>
+                <h3 className="text-2xl lg:text-3xl font-bold text-foreground">
+                  Integração Total com WhatsApp
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Registre transações diretamente pelo WhatsApp de forma rápida, prática e automatizada. 
+                  Nossa IA processa suas mensagens e categoriza automaticamente cada transação.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Processamento por inteligência artificial</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Categorização automática inteligente</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Confirmação instantânea de registro</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 3: Financial Goals */}
+          <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <div className="w-16 h-16 bg-brand-orange/10 rounded-xl flex items-center justify-center">
+                  <Target className="w-8 h-8 text-brand-orange" />
+                </div>
+                <h3 className="text-2xl lg:text-3xl font-bold text-foreground">
+                  Metas Financeiras Inteligentes
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Defina e acompanhe suas metas financeiras com progresso em tempo real. 
+                  Receba notificações e sugestões personalizadas para alcançar seus objetivos.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Acompanhamento visual do progresso</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Notificações inteligentes de progresso</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Sugestões personalizadas de economia</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <div className="bg-gradient-to-br from-brand-orange/5 to-brand-orange/10 rounded-2xl p-8 border border-border aspect-[4/3] flex items-center justify-center shadow-xl">
+                <div className="text-center space-y-4">
+                  <div className="w-20 h-20 bg-brand-orange/10 rounded-2xl flex items-center justify-center mx-auto">
+                    <Target className="w-10 h-10 text-brand-orange" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">
+                    [GIF: Metas em ação]
+                  </p>
+                  <p className="text-sm text-muted-foreground opacity-70">
+                    Criação e acompanhamento de metas
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 4: Multi-Profile Management */}
+          <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+            <div className="relative order-2 lg:order-1">
+              <div className="bg-gradient-to-br from-brand-blue/5 to-brand-blue/10 rounded-2xl p-8 border border-border aspect-[4/3] flex items-center justify-center shadow-xl">
+                <div className="text-center space-y-4">
+                  <div className="w-20 h-20 bg-brand-blue/10 rounded-2xl flex items-center justify-center mx-auto">
+                    <Users className="w-10 h-10 text-brand-blue" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">
+                    [GIF: Gestão de perfis]
+                  </p>
+                  <p className="text-sm text-muted-foreground opacity-70">
+                    Alternando entre perfis e permissões
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-8 order-1 lg:order-2">
+              <div className="space-y-4">
+                <div className="w-16 h-16 bg-brand-blue/10 rounded-xl flex items-center justify-center">
+                  <Users className="w-8 h-8 text-brand-blue" />
+                </div>
+                <h3 className="text-2xl lg:text-3xl font-bold text-foreground">
+                  Gestão Multi-Perfil Avançada
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Gerencie diferentes perfis de usuário com permissões específicas. 
+                  Ideal para empresas que precisam controlar acesso às informações financeiras.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Controle granular de permissões</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Perfis personalizados por função</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Auditoria completa de acessos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid Summary */}
+      <section className="py-20 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
+              E muito mais funcionalidades
+            </h2>
+            <p className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Descubra todos os recursos que fazem do Gênio a melhor escolha
             </p>
           </div>
           
