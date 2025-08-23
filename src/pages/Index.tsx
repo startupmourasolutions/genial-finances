@@ -321,25 +321,29 @@ export default function Index() {
                   <MessageSquare className="w-8 h-8 text-brand-green" />
                 </div>
                 <h3 className="text-2xl lg:text-3xl font-bold text-foreground">
-                  Integração Total com WhatsApp
+                  Gênio no WhatsApp
                 </h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  Registre transações diretamente pelo WhatsApp de forma rápida, prática e automatizada. 
-                  Nossa IA processa suas mensagens e categoriza automaticamente cada transação.
+                  Registre transações, dívidas e configure lembretes diretamente pelo WhatsApp. 
+                  Nossa IA processa suas mensagens e organiza tudo automaticamente no sistema.
                 </p>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Registro de transações via mensagem</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Cadastro de dívidas e parcelamentos</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                  <span className="text-foreground">Lembretes automáticos de vencimentos</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
                   <span className="text-foreground">Processamento por inteligência artificial</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
-                  <span className="text-foreground">Categorização automática inteligente</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle2 className="w-5 h-5 text-brand-green" />
-                  <span className="text-foreground">Confirmação instantânea de registro</span>
                 </div>
               </div>
             </div>
