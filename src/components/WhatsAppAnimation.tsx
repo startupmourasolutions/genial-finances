@@ -18,11 +18,11 @@ export const WhatsAppAnimation = () => {
   }, [step]);
 
   return (
-    <div className="relative max-w-xs mx-auto">
+    <div className="relative max-w-sm mx-auto">
       {/* Phone Frame */}
-      <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-[2.5rem] p-px shadow-2xl">
-        <div className="bg-black rounded-[2.2rem] p-px">
-          <div className="bg-white rounded-[2rem] overflow-hidden h-[520px] w-[260px] mx-auto relative">
+      <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-[2.5rem] p-0.5 shadow-2xl">
+        <div className="bg-black rounded-[2.2rem] p-0.5">
+          <div className="bg-white rounded-[2rem] overflow-hidden h-[640px] w-[320px] mx-auto relative">
             
             {/* Notch */}
             <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-10 flex items-center justify-center">
@@ -44,7 +44,7 @@ export const WhatsAppAnimation = () => {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 bg-gradient-to-b from-gray-50 to-gray-100 p-4 space-y-4 h-[360px] overflow-hidden relative">
+            <div className="flex-1 bg-gradient-to-b from-gray-50 to-gray-100 p-4 space-y-4 h-[440px] overflow-hidden relative">
               {/* Welcome Message */}
               <div className="flex justify-start">
                 <div className="bg-white rounded-2xl rounded-tl-md p-3 max-w-[200px] shadow-sm border border-gray-100">

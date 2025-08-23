@@ -92,50 +92,89 @@ export default function Index() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-secondary/30 to-background py-8 lg:py-16">
+      <section className="relative overflow-hidden bg-gradient-to-br from-background via-secondary/30 to-background py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-tight">
-                  <span className="text-brand-blue">Gênio Financeiro</span>
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8 animate-fade-in-up">
+              
+              {/* Logo/Brand */}
+              <div className="animate-fade-in-down" style={{ animationDelay: '0.2s' }}>
+                <h1 className="font-poppins text-5xl lg:text-6xl xl:text-7xl font-black leading-tight">
+                  <span 
+                    className="bg-gradient-to-r from-brand-blue via-brand-orange to-brand-green bg-clip-text text-transparent animate-text-gradient"
+                    style={{ 
+                      backgroundSize: '200% 200%',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent'
+                    }}
+                  >
+                    Gênio
+                  </span>
+                  <br />
+                  <span className="text-black font-poppins">Financeiro</span>
                 </h1>
-                <h2 className="text-2xl lg:text-3xl font-semibold text-muted-foreground leading-relaxed">
-                  Seu assistente financeiro que trabalha para você 24h por dia
+              </div>
+
+              {/* Tagline */}
+              <div className="animate-fade-in-left" style={{ animationDelay: '0.4s' }}>
+                <h2 className="font-poppins text-xl lg:text-2xl xl:text-3xl font-semibold text-black leading-relaxed">
+                  Seu assistente financeiro inteligente que trabalha 24h por dia
                 </h2>
-                <div className="space-y-3 text-lg text-muted-foreground">
-                  <p>• Controle completo de entradas, saídas e dívidas</p>
-                  <p>• Relatórios automáticos e inteligentes</p>
-                  <p>• Lembretes para não esquecer prazos e compromissos</p>
-                  <p>• Integração direta com WhatsApp</p>
-                  <p>• Gestão pessoal e empresarial em um só lugar</p>
+              </div>
+
+              {/* Features Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+                <div className="flex items-start gap-3 group hover:scale-105 transition-transform duration-200">
+                  <div className="flex-shrink-0 w-2 h-2 rounded-full bg-brand-blue mt-2"></div>
+                  <p className="font-poppins text-black font-medium">Controle total de entradas e saídas</p>
                 </div>
-                <p className="text-xl font-medium text-foreground">
+                <div className="flex items-start gap-3 group hover:scale-105 transition-transform duration-200">
+                  <div className="flex-shrink-0 w-2 h-2 rounded-full bg-brand-green mt-2"></div>
+                  <p className="font-poppins text-black font-medium">Relatórios automáticos e inteligentes</p>
+                </div>
+                <div className="flex items-start gap-3 group hover:scale-105 transition-transform duration-200">
+                  <div className="flex-shrink-0 w-2 h-2 rounded-full bg-brand-orange mt-2"></div>
+                  <p className="font-poppins text-black font-medium">Lembretes para não esquecer prazos</p>
+                </div>
+                <div className="flex items-start gap-3 group hover:scale-105 transition-transform duration-200">
+                  <div className="flex-shrink-0 w-2 h-2 rounded-full bg-brand-blue mt-2"></div>
+                  <p className="font-poppins text-black font-medium">Integração direta com WhatsApp</p>
+                </div>
+                <div className="flex items-start gap-3 group hover:scale-105 transition-transform duration-200 sm:col-span-2">
+                  <div className="flex-shrink-0 w-2 h-2 rounded-full bg-brand-green mt-2"></div>
+                  <p className="font-poppins text-black font-medium">Gestão pessoal e empresarial em um só lugar</p>
+                </div>
+              </div>
+
+              {/* CTA Statement */}
+              <div className="animate-fade-in-right" style={{ animationDelay: '0.8s' }}>
+                <p className="font-poppins text-lg lg:text-xl text-black font-bold border-l-4 border-brand-orange pl-6 py-2 bg-gradient-to-r from-brand-orange/5 to-transparent rounded">
                   Mais do que uma ferramenta: um parceiro financeiro que nunca descansa.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4">
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 animate-scale-in-bounce" style={{ animationDelay: '1s' }}>
                 <Link to="/payment?plan=basico&cycle=monthly">
                   <Button 
                     size="lg" 
-                    className="bg-brand-blue hover:bg-brand-blue-glow text-white font-medium px-8 py-4 text-lg transition-all hover-scale rounded-lg"
+                    className="bg-black hover:bg-gray-800 text-white font-poppins font-semibold px-8 py-4 text-lg transition-all hover-scale rounded-lg shadow-xl"
                   >
-                    Começar Agora
+                    Começar por R$ 14,90/mês
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="px-8 py-4 text-lg hover-scale rounded-lg border-border"
+                  className="px-8 py-4 text-lg hover-scale rounded-lg border-2 border-black text-black hover:bg-black hover:text-white font-poppins font-semibold transition-all"
                 >
                   Ver Demonstração
                 </Button>
               </div>
             </div>
             
-            <div className="relative">
-              {/* WhatsApp Animation */}
+            <div className="relative animate-fade-in-right" style={{ animationDelay: '0.3s' }}>
               <WhatsAppAnimation />
             </div>
           </div>
