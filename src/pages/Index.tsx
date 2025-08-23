@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Star, Users, Shield, TrendingUp, 
          Smartphone, Calendar, MessageSquare, CreditCard, 
@@ -40,8 +40,8 @@ export default function Index() {
               <a href="#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
                 Como Funciona
               </a>
-              <a href="#dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-                Dashboard
+              <a href="#planos" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                Planos
               </a>
               <a href="#contato" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
                 Contato
@@ -76,8 +76,8 @@ export default function Index() {
                 <a href="#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-primary">
                   Como Funciona
                 </a>
-                <a href="#dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary">
-                  Dashboard
+                <a href="#planos" className="text-sm font-medium text-muted-foreground hover:text-primary">
+                  Planos
                 </a>
                 <Button onClick={handleCTAClick} className="bg-brand-blue text-white w-full">
                   Começar Agora
@@ -554,6 +554,151 @@ export default function Index() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="planos" className="py-20 bg-gradient-to-br from-secondary/5 to-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
+              Escolha o plano ideal para você
+            </h2>
+            <p className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Transforme sua gestão financeira com os recursos que você precisa
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Plano Básico */}
+            <Card className="relative hover-scale group border-2 border-border">
+              <CardHeader className="text-center pb-8">
+                <CardTitle className="text-2xl font-bold text-foreground">Básico</CardTitle>
+                <div className="space-y-2">
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-3xl font-bold text-foreground">R$ 19,99</span>
+                    <span className="text-muted-foreground">/mês</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">ou R$ 179,90/ano (25% desconto)</p>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Sistema web com gráficos interativos</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Controle via WhatsApp (texto, áudio, imagem)</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Transações ilimitadas via WhatsApp</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Até 3 contas bancárias vinculadas</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Lembretes automáticos</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Exportação de dados (Excel, PDF)</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Suporte prioritário</span>
+                  </div>
+                </div>
+                <div className="space-y-3 pt-4">
+                  <Link to="/payment?plan=basico&cycle=monthly">
+                    <Button className="w-full bg-brand-blue hover:bg-brand-blue-glow text-white font-medium">
+                      Começar com Plano Mensal
+                    </Button>
+                  </Link>
+                  <Link to="/payment?plan=basico&cycle=yearly">
+                    <Button variant="outline" className="w-full border-brand-green text-brand-green hover:bg-brand-green/10">
+                      Economizar com Plano Anual
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Plano Gênio */}
+            <Card className="relative hover-scale group border-2 border-brand-orange shadow-xl">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <Badge className="bg-brand-orange text-white px-4 py-1">Mais Popular</Badge>
+              </div>
+              <CardHeader className="text-center pb-8 pt-8">
+                <CardTitle className="text-2xl font-bold text-foreground">Gênio</CardTitle>
+                <div className="space-y-2">
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-3xl font-bold text-foreground">R$ 45,99</span>
+                    <span className="text-muted-foreground">/mês</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">ou R$ 413,90/ano (25% desconto)</p>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Tudo do Plano Básico</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Contas bancárias ilimitadas</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Gestão compartilhada avançada</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">+1 usuário grátis</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Alertas personalizados por membro</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Dashboard em tempo real</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-brand-green" />
+                    <span className="text-foreground">Suporte humanizado VIP</span>
+                  </div>
+                </div>
+                <div className="space-y-3 pt-4">
+                  <Link to="/payment?plan=genio&cycle=monthly">
+                    <Button className="w-full bg-brand-orange hover:bg-brand-orange/90 text-white font-medium">
+                      Começar com Plano Mensal
+                    </Button>
+                  </Link>
+                  <Link to="/payment?plan=genio&cycle=yearly">
+                    <Button variant="outline" className="w-full border-brand-green text-brand-green hover:bg-brand-green/10">
+                      Economizar com Plano Anual
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground mb-4">
+              Todos os planos incluem 7 dias de teste gratuito
+            </p>
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Shield className="w-4 h-4" />
+              <span>Pagamento 100% seguro • Cancele quando quiser</span>
+            </div>
           </div>
         </div>
       </section>
