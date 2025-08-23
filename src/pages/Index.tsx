@@ -9,6 +9,7 @@ import { ArrowRight, Star, Users, Shield, TrendingUp,
          Youtube, Mail, MapPin, Phone, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { WhatsAppAnimation } from "@/components/WhatsAppAnimation";
 
 export default function Index() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -128,20 +129,8 @@ export default function Index() {
             </div>
             
             <div className="relative">
-              {/* Placeholder for hero image/screenshot */}
-              <div className="bg-gradient-to-br from-secondary/20 to-secondary/40 rounded-2xl p-8 border border-border aspect-[4/3] flex items-center justify-center shadow-2xl">
-                <div className="text-center space-y-4">
-                  <div className="w-20 h-20 bg-brand-blue/10 rounded-2xl flex items-center justify-center mx-auto">
-                    <BarChart3 className="w-10 h-10 text-brand-blue" />
-                  </div>
-                  <p className="text-muted-foreground font-medium">
-                    [Placeholder para imagem do aplicativo]
-                  </p>
-                  <p className="text-sm text-muted-foreground opacity-70">
-                    Screenshot principal do dashboard
-                  </p>
-                </div>
-              </div>
+              {/* WhatsApp Animation */}
+              <WhatsAppAnimation />
             </div>
           </div>
         </div>
