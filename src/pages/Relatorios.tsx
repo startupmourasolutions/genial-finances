@@ -169,11 +169,10 @@ const Relatorios = () => {
 
       {/* Abas de Relatórios */}
       <Tabs defaultValue="overview" className="space-y-4 lg:space-y-6">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+        <TabsList className="grid w-full grid-cols-3 h-auto">
           <TabsTrigger value="overview" className="text-xs sm:text-sm">Visão Geral</TabsTrigger>
           <TabsTrigger value="receitas" className="text-xs sm:text-sm">Receitas</TabsTrigger>
           <TabsTrigger value="despesas" className="text-xs sm:text-sm">Despesas</TabsTrigger>
-          <TabsTrigger value="patrimonio" className="text-xs sm:text-sm">Patrimônio</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4 lg:space-y-6">
@@ -383,39 +382,6 @@ const Relatorios = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="patrimonio" className="space-y-4 lg:space-y-6">
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle>Evolução do Patrimônio</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 sm:h-80">
-                <ChartContainer config={{
-                  valor: {
-                    label: "Patrimônio",
-                    color: "hsl(var(--brand-orange))",
-                  },
-                }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RechartsLineChart data={patrimonyData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Line 
-                        type="monotone" 
-                        dataKey="value" 
-                        stroke="hsl(var(--brand-orange))" 
-                        strokeWidth={3}
-                        dot={{ fill: "hsl(var(--brand-orange))", strokeWidth: 2, r: 4 }}
-                      />
-                    </RechartsLineChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
 
       <FloatingActionButton 
