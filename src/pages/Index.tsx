@@ -99,7 +99,7 @@ export default function Index() {
               
               {/* Logo/Brand */}
               <div className="animate-fade-in-down" style={{ animationDelay: '0.2s' }}>
-                <h1 className="font-poppins text-5xl lg:text-6xl xl:text-7xl font-black leading-tight">
+                <h1 className="font-poppins text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                   <span 
                     className="bg-gradient-to-r from-brand-blue via-brand-orange to-brand-green bg-clip-text text-transparent animate-text-gradient"
                     style={{ 
@@ -111,14 +111,14 @@ export default function Index() {
                     Gênio
                   </span>
                   <br />
-                  <span className="text-black font-poppins">Financeiro</span>
+                  <span className="text-black font-poppins font-bold">Financeiro</span>
                 </h1>
               </div>
 
               {/* Tagline */}
               <div className="animate-fade-in-left" style={{ animationDelay: '0.4s' }}>
-                <h2 className="font-poppins text-xl lg:text-2xl xl:text-3xl font-semibold text-black leading-relaxed">
-                  Seu assistente financeiro inteligente que trabalha 24h por dia
+                <h2 className="font-poppins text-xl lg:text-2xl xl:text-3xl font-normal text-black leading-relaxed">
+                  Simples de usar, poderoso nos resultados
                 </h2>
               </div>
 
@@ -155,26 +155,19 @@ export default function Index() {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 animate-scale-in-bounce" style={{ animationDelay: '1s' }}>
-                <Link to="/payment?plan=basico&cycle=monthly">
+                <Link to="#planos">
                   <Button 
                     size="lg" 
-                    className="bg-black hover:bg-gray-800 text-white font-poppins font-semibold px-8 py-4 text-lg transition-all hover-scale rounded-lg shadow-xl"
+                    className="bg-black hover:bg-gray-800 text-white font-poppins font-normal px-8 py-4 text-lg transition-all hover-scale rounded-lg shadow-xl"
                   >
-                    Começar por R$ 14,90/mês
+                    Ver Planos
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="px-8 py-4 text-lg hover-scale rounded-lg border-2 border-black text-black hover:bg-black hover:text-white font-poppins font-semibold transition-all"
-                >
-                  Ver Demonstração
-                </Button>
               </div>
             </div>
             
-            <div className="relative animate-fade-in-right" style={{ animationDelay: '0.3s' }}>
+            <div className="relative animate-fade-in-right scale-75" style={{ animationDelay: '0.3s' }}>
               <WhatsAppAnimation />
             </div>
           </div>
