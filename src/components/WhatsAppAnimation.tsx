@@ -21,7 +21,7 @@ export const WhatsAppAnimation = () => {
     <div className="relative max-w-xs mx-auto">
       {/* Phone Frame */}
       <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-[2.5rem] p-px shadow-2xl">
-        <div className="bg-black rounded-[2.2rem] p-px">
+        <div className="bg-white rounded-[2.2rem] p-px">
           <div className="bg-white rounded-[2rem] overflow-hidden h-[520px] w-[260px] mx-auto relative">
             
             {/* Notch */}
