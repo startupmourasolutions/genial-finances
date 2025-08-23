@@ -22,7 +22,7 @@ export const WhatsAppAnimation = () => {
       {/* Phone Frame */}
       <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-[2.5rem] p-1 shadow-2xl">
         <div className="bg-black rounded-[2.2rem] p-0.5">
-          <div className="bg-white rounded-[2rem] overflow-hidden h-[520px] w-[260px] relative">
+          <div className="bg-white rounded-[2rem] overflow-hidden h-[520px] w-[260px] mx-auto relative">
             
             {/* Notch */}
             <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-10 flex items-center justify-center">
@@ -44,7 +44,7 @@ export const WhatsAppAnimation = () => {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 bg-gradient-to-b from-gray-50 to-gray-100 p-4 space-y-4 h-[420px] overflow-hidden relative">
+            <div className="flex-1 bg-gradient-to-b from-gray-50 to-gray-100 p-4 space-y-4 h-[360px] overflow-hidden relative">
               {/* Welcome Message */}
               <div className="flex justify-start">
                 <div className="bg-white rounded-2xl rounded-tl-md p-3 max-w-[200px] shadow-sm border border-gray-100">
@@ -117,8 +117,22 @@ export const WhatsAppAnimation = () => {
               )}
             </div>
 
+            {/* Typing Area - Shows when user is typing */}
+            {step === 1 && (
+              <div className="absolute bottom-16 left-4 right-4 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 shadow-sm">
+                <div className="flex items-center space-x-2">
+                  <p className="text-xs text-gray-600 animate-pulse">digitando mensagem...</p>
+                  <div className="flex space-x-1">
+                    <div className="w-1 h-1 bg-brand-green rounded-full animate-bounce"></div>
+                    <div className="w-1 h-1 bg-brand-green rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-1 h-1 bg-brand-green rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Input Area */}
-            <div className="bg-white border-t border-gray-100 p-4 flex items-center space-x-3">
+            <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 flex items-center space-x-3">
               <div className="flex-1 bg-gray-50 rounded-full px-4 py-2.5 border border-gray-200">
                 <p className="text-xs text-gray-500 truncate">
                   {step === 1 ? "ganhei 1000 agora|" : "Mensagem..."}
