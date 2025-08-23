@@ -599,6 +599,32 @@ export default function Index() {
                 </p>
               </CardContent>
             </Card>
+            
+            <Card className="hover-scale group">
+              <CardContent className="p-8 space-y-4">
+                <div className="w-14 h-14 bg-brand-blue/10 rounded-xl flex items-center justify-center group-hover:bg-brand-blue/20 transition-colors">
+                  <CreditCard className="w-7 h-7 text-brand-blue" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">Registro de Dívida</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Registre e acompanhe suas dívidas através do WhatsApp 
+                  ou dashboard com controle total de vencimentos.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="hover-scale group">
+              <CardContent className="p-8 space-y-4">
+                <div className="w-14 h-14 bg-brand-green/10 rounded-xl flex items-center justify-center group-hover:bg-brand-green/20 transition-colors">
+                  <Calendar className="w-7 h-7 text-brand-green" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">Lembretes Inteligentes</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Receba lembretes automáticos de pagamentos e 
+                  vencimentos através do WhatsApp e dashboard.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
