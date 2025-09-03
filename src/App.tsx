@@ -59,7 +59,8 @@ function App() {
               <ProfileProvider>
               
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<Navigate to="/auth" replace />} />
+                <Route path="/home" element={<Index />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/dashboard" element={
