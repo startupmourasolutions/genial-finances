@@ -111,13 +111,12 @@ export default function DashboardPessoal() {
       />
       
       {/* Month Navigator */}
-      <div className="border-t pt-4 px-6 bg-background rounded-lg border shadow-card">
-        <MonthNavigator
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          onMonthChange={handleMonthChange}
-        />
-      </div>
+      <MonthNavigator
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        onMonthChange={handleMonthChange}
+        className="mb-4"
+      />
 
       {/* Summary Cards with stagger animation */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
