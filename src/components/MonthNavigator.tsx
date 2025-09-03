@@ -52,24 +52,24 @@ export function MonthNavigator({ selectedMonth, selectedYear, onMonthChange, cla
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i)
 
   return (
-    <div className={`flex items-center justify-between gap-4 ${className}`}>
-      <div className="flex items-center gap-2">
+    <div className={`flex items-center justify-between ${className}`}>
+      <div className="flex items-center gap-4 bg-background p-3 rounded-lg border">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           onClick={() => navigateMonth('prev')}
-          className="h-8 w-8"
+          className="h-10 w-10 hover:bg-muted"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-5 w-5" />
         </Button>
         
-        <div className="flex items-center gap-2 min-w-[200px]">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
+        <div className="flex items-center gap-3">
+          <Calendar className="h-5 w-5 text-primary" />
           <Select
             value={`${selectedMonth}`}
             onValueChange={(value) => onMonthChange(parseInt(value), selectedYear)}
           >
-            <SelectTrigger className="w-[120px] h-8">
+            <SelectTrigger className="w-[140px] h-10 font-medium">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -92,7 +92,7 @@ export function MonthNavigator({ selectedMonth, selectedYear, onMonthChange, cla
             value={`${selectedYear}`}
             onValueChange={(value) => onMonthChange(selectedMonth, parseInt(value))}
           >
-            <SelectTrigger className="w-[80px] h-8">
+            <SelectTrigger className="w-[100px] h-10 font-medium">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -106,22 +106,22 @@ export function MonthNavigator({ selectedMonth, selectedYear, onMonthChange, cla
         </div>
 
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           onClick={() => navigateMonth('next')}
           disabled={isFutureMonth}
-          className="h-8 w-8"
+          className="h-10 w-10 hover:bg-muted"
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-5 w-5" />
         </Button>
       </div>
 
       {!isCurrentMonth && (
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => onMonthChange(currentMonth, currentYear)}
-          className="text-sm"
+          className="text-sm font-medium"
         >
           Voltar ao mês atual
         </Button>

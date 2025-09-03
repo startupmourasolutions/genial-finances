@@ -102,8 +102,8 @@ export function DynamicHeader({
           </p>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+        {/* Action buttons - Comentados temporariamente */}
+        {/* <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
           <Button 
             onClick={onNewTransaction}
             className="bg-primary text-primary-foreground hover:bg-primary/90 font-inter font-medium"
@@ -123,7 +123,6 @@ export function DynamicHeader({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2"
             >
-              {/* WhatsApp SVG icon */}
               <svg
                 width="16"
                 height="16"
@@ -137,7 +136,7 @@ export function DynamicHeader({
               Gênio Whatsapp
             </a>
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
