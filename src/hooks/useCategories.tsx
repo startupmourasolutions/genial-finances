@@ -45,11 +45,18 @@ export function useCategories() {
 
   const createCategory = async (category: Omit<Category, 'id' | 'created_at' | 'updated_at' | 'is_system'>) => {
     try {
+      // Garante que o usuário tenha um client_id
+      await supabase.rpc('ensure_user_has_client')
+
       // Obter client_id do usuário
       const { data: clientData, error: clientError } = await supabase
         .rpc('get_user_client_id')
-      
       if (clientError) throw clientError
+
+      if (!clientData) {
+        toast.error('Conta do cliente não está configurada. Tente novamente.')
+        return false
+      }
       
       const { error } = await supabase
         .from('categories')

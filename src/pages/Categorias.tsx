@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const Categorias = () => {
   const { categories, loading, createCategory, updateCategory, deleteCategory } = useCategories()
@@ -130,14 +131,16 @@ const Categorias = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {incomeCategories.map((category) => (
-                <CategoryItem key={category.id} category={category} />
-              ))}
-              {userIncomeCategories.map((category) => (
-                <CategoryItem key={category.id} category={category} />
-              ))}
-            </div>
+            <ScrollArea className="max-h-80 pr-2">
+              <div className="space-y-3">
+                {incomeCategories.map((category) => (
+                  <CategoryItem key={category.id} category={category} />
+                ))}
+                {userIncomeCategories.map((category) => (
+                  <CategoryItem key={category.id} category={category} />
+                ))}
+              </div>
+            </ScrollArea>
           </CardContent>
         </Card>
 
@@ -150,14 +153,16 @@ const Categorias = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {expenseCategories.map((category) => (
-                <CategoryItem key={category.id} category={category} />
-              ))}
-              {userExpenseCategories.map((category) => (
-                <CategoryItem key={category.id} category={category} />
-              ))}
-            </div>
+            <ScrollArea className="max-h-80 pr-2">
+              <div className="space-y-3">
+                {expenseCategories.map((category) => (
+                  <CategoryItem key={category.id} category={category} />
+                ))}
+                {userExpenseCategories.map((category) => (
+                  <CategoryItem key={category.id} category={category} />
+                ))}
+              </div>
+            </ScrollArea>
           </CardContent>
         </Card>
       </div>
