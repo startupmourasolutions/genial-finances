@@ -1,39 +1,43 @@
 import { useEffect, useState } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { Clock } from 'lucide-react'
+import { Clock, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useTrialStatus } from '@/hooks/useTrialStatus'
 
 export function TrialBadge() {
-  const { profile } = useAuth()
-  const [daysLeft, setDaysLeft] = useState<number | null>(null)
+  const trialStatus = useTrialStatus()
 
-  useEffect(() => {
-    if (profile?.clients?.[0]?.trial_end_date && !profile?.clients?.[0]?.subscription_active) {
-      const trialEndDate = new Date(profile.clients[0].trial_end_date)
-      const today = new Date()
-      const diffTime = trialEndDate.getTime() - today.getTime()
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-      
-      setDaysLeft(Math.max(0, diffDays))
-    }
-  }, [profile])
-
-  if (!profile?.clients?.[0] || profile?.clients?.[0]?.subscription_active || daysLeft === null) {
+  if (!trialStatus.isInTrial) {
     return null
   }
 
+  const variant = trialStatus.isExpired 
+    ? "destructive" 
+    : trialStatus.daysLeft <= 0 
+    ? "destructive" 
+    : trialStatus.daysLeft === 1 
+    ? "secondary" 
+    : "outline"
+
+  const icon = trialStatus.isExpired || trialStatus.daysLeft <= 0 
+    ? <AlertCircle className="w-3 h-3" />
+    : <Clock className="w-3 h-3" />
+
+  const text = trialStatus.isExpired 
+    ? "Trial expirado - Assine para continuar" 
+    : trialStatus.daysLeft === 0 
+    ? "Último dia de trial" 
+    : trialStatus.daysLeft === 1 
+    ? "1 dia restante" 
+    : `${trialStatus.daysLeft} dias restantes`
+
   return (
     <Badge 
-      variant={daysLeft <= 2 ? "destructive" : daysLeft <= 5 ? "secondary" : "outline"}
+      variant={variant}
       className="flex items-center gap-1 px-3 py-1"
     >
-      <Clock className="w-3 h-3" />
-      {daysLeft === 0 
-        ? "Trial expirado" 
-        : daysLeft === 1 
-        ? "1 dia restante" 
-        : `${daysLeft} dias restantes`
-      }
+      {icon}
+      {text}
     </Badge>
   )
 }
