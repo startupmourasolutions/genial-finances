@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           icon: string | null
           id: string
+          is_system: boolean | null
           name: string
           type: string
           updated_at: string
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           icon?: string | null
           id?: string
+          is_system?: boolean | null
           name: string
           type: string
           updated_at?: string
@@ -41,6 +43,7 @@ export type Database = {
           created_at?: string
           icon?: string | null
           id?: string
+          is_system?: boolean | null
           name?: string
           type?: string
           updated_at?: string
@@ -214,6 +217,7 @@ export type Database = {
           description: string | null
           due_date: string | null
           id: string
+          idproprio: string | null
           original_amount: number | null
           payment_frequency: string | null
           profile_type: string
@@ -230,6 +234,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          idproprio?: string | null
           original_amount?: number | null
           payment_frequency?: string | null
           profile_type?: string
@@ -246,6 +251,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           id?: string
+          idproprio?: string | null
           original_amount?: number | null
           payment_frequency?: string | null
           profile_type?: string
@@ -687,6 +693,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           name: string
+          number_2: string | null
           profile_type: string
           updated_at: string
           whatsapp_number: string
@@ -697,6 +704,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name: string
+          number_2?: string | null
           profile_type?: string
           updated_at?: string
           whatsapp_number: string
@@ -707,6 +715,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name?: string
+          number_2?: string | null
           profile_type?: string
           updated_at?: string
           whatsapp_number?: string
