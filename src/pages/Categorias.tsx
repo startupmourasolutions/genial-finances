@@ -131,8 +131,8 @@ const Categorias = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="max-h-80 pr-2">
-              <div className="space-y-3">
+            <ScrollArea className="h-[420px] pr-4">
+              <div className="space-y-3 pr-2">
                 {incomeCategories.map((category) => (
                   <CategoryItem key={category.id} category={category} />
                 ))}
@@ -153,8 +153,8 @@ const Categorias = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="max-h-80 pr-2">
-              <div className="space-y-3">
+            <ScrollArea className="h-[420px] pr-4">
+              <div className="space-y-3 pr-2">
                 {expenseCategories.map((category) => (
                   <CategoryItem key={category.id} category={category} />
                 ))}
