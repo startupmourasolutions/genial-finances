@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,23 +9,28 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, subDays, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Plus, Search, Edit, Trash2, CalendarIcon, Receipt, DollarSign, Calendar as CalendarCheck, Users, FileText, CreditCard, Mail, Clock, Eye } from "lucide-react";
+import { Plus, Search, Edit, Trash2, CalendarIcon, Receipt, DollarSign, Calendar as CalendarCheck, Users, FileText, CreditCard, Mail, Clock, Eye, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Client {
   id: string;
   full_name: string;
   email: string;
-  company_name: string;
-  phone: string;
-  subscription_plan: string;
-  monthly_fee: number;
-  status: string;
-  payment_method: string;
-  billing_email: string;
-  due_day: number;
+  company_name: string | null;
+  phone: string | null;
+  subscription_plan: string | null;
+  monthly_fee: number | null;
+  subscription_status: string;
+  subscription_active: boolean;
+  trial_start_date: string | null;
+  trial_end_date: string | null;
+  created_at: string;
+  payment_method?: string;
+  billing_email?: string;
+  due_day?: number;
 }
 
 interface Invoice {
@@ -40,154 +45,12 @@ interface Invoice {
   payment_date?: string;
   description?: string;
   client_id: string;
+  client_name?: string;
+  client_email?: string;
+  client_company?: string;
+  client_plan?: string;
 }
 
-// Dados mockados de clientes
-const mockClients: Client[] = [
-  {
-    id: "1",
-    full_name: "João Silva Santos",
-    email: "joao.silva@empresa1.com.br",
-    company_name: "Empresa ABC Ltda",
-    phone: "+55 11 99999-1111",
-    subscription_plan: "Premium",
-    monthly_fee: 59.90,
-    status: "ativo",
-    payment_method: "PIX",
-    billing_email: "financeiro@empresa1.com.br",
-    due_day: 10
-  },
-  {
-    id: "2", 
-    full_name: "Maria Oliveira Lima",
-    email: "maria.oliveira@empresa2.com.br",
-    company_name: "Tech Solutions S.A.",
-    phone: "+55 11 99999-2222",
-    subscription_plan: "Basic",
-    monthly_fee: 29.90,
-    status: "ativo",
-    payment_method: "Boleto",
-    billing_email: "cobranca@techsolutions.com.br",
-    due_day: 5
-  },
-  {
-    id: "3",
-    full_name: "Carlos Roberto Souza", 
-    email: "carlos.souza@empresa3.com.br",
-    company_name: "Consultoria XYZ",
-    phone: "+55 11 99999-3333",
-    subscription_plan: "Premium",
-    monthly_fee: 59.90,
-    status: "suspenso",
-    payment_method: "Cartão de Crédito",
-    billing_email: "carlos.souza@empresa3.com.br",
-    due_day: 15
-  },
-  {
-    id: "4",
-    full_name: "Ana Paula Costa",
-    email: "ana.costa@empresa4.com.br", 
-    company_name: "Digital Marketing Pro",
-    phone: "+55 11 99999-4444",
-    subscription_plan: "Basic",
-    monthly_fee: 29.90,
-    status: "trial",
-    payment_method: "PIX",
-    billing_email: "ana.costa@empresa4.com.br",
-    due_day: 20
-  },
-  {
-    id: "5",
-    full_name: "Pedro Henrique Alves",
-    email: "pedro.alves@empresa5.com.br",
-    company_name: "Construções PDH", 
-    phone: "+55 11 99999-5555",
-    subscription_plan: "Premium",
-    monthly_fee: 59.90,
-    status: "ativo",
-    payment_method: "Boleto",
-    billing_email: "financeiro@construcoespdh.com.br",
-    due_day: 1
-  }
-];
-
-// Dados mockados de faturas
-const mockInvoices: Invoice[] = [
-  {
-    id: "inv1",
-    invoice_number: "FAT-202401-0001",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2024-03-10",
-    issue_date: "2024-02-10",
-    status: "pendente",
-    payment_method: "PIX",
-    description: "Mensalidade Premium - Fevereiro/2024",
-    client_id: "1"
-  },
-  {
-    id: "inv2", 
-    invoice_number: "FAT-202401-0002",
-    amount: 29.90,
-    currency: "BRL",
-    due_date: "2024-03-05",
-    issue_date: "2024-02-05",
-    status: "paga",
-    payment_method: "Boleto",
-    payment_date: "2024-03-03",
-    description: "Mensalidade Basic - Fevereiro/2024",
-    client_id: "2"
-  },
-  {
-    id: "inv3",
-    invoice_number: "FAT-202401-0003", 
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2024-02-15",
-    issue_date: "2024-01-15",
-    status: "vencida",
-    payment_method: "Cartão de Crédito",
-    description: "Mensalidade Premium - Janeiro/2024",
-    client_id: "3"
-  },
-  {
-    id: "inv4",
-    invoice_number: "FAT-202401-0004",
-    amount: 29.90,
-    currency: "BRL", 
-    due_date: "2024-03-20",
-    issue_date: "2024-02-20",
-    status: "pendente",
-    payment_method: "PIX",
-    description: "Mensalidade Basic - Fevereiro/2024",
-    client_id: "4"
-  },
-  {
-    id: "inv5",
-    invoice_number: "FAT-202401-0005",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2024-03-01",
-    issue_date: "2024-02-01", 
-    status: "paga",
-    payment_method: "Boleto",
-    payment_date: "2024-02-28",
-    description: "Mensalidade Premium - Fevereiro/2024",
-    client_id: "5"
-  },
-  {
-    id: "inv6",
-    invoice_number: "FAT-202401-0006",
-    amount: 59.90,
-    currency: "BRL",
-    due_date: "2024-04-10",
-    issue_date: "2024-03-10",
-    status: "pendente",
-    payment_method: "PIX", 
-    description: "Mensalidade Premium - Março/2024",
-    client_id: "1"
-  }
-];
 
 export default function Faturas() {
   const [view, setView] = useState<"faturas" | "clientes">("faturas");
@@ -203,28 +66,152 @@ export default function Faturas() {
   const [newPaymentMethod, setNewPaymentMethod] = useState("");
   const [newBillingEmail, setNewBillingEmail] = useState("");
   const [newDueDay, setNewDueDay] = useState<number>(1);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    
+    // Buscar clientes reais
+    const { data: clientsData, error: clientsError } = await supabase
+      .from('clients')
+      .select(`
+        id,
+        company_name,
+        subscription_plan,
+        subscription_status,
+        subscription_active,
+        monthly_fee,
+        trial_start_date,
+        trial_end_date,
+        created_at,
+        profiles!clients_profile_id_fkey(
+          full_name,
+          email,
+          phone
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (clientsError) {
+      console.error('Erro ao buscar clientes:', clientsError);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar clientes",
+        variant: "destructive"
+      });
+    } else if (clientsData) {
+      const formattedClients = clientsData.map(client => ({
+        id: client.id,
+        full_name: client.profiles?.full_name || 'Sem nome',
+        email: client.profiles?.email || '',
+        phone: client.profiles?.phone || null,
+        company_name: client.company_name,
+        subscription_plan: client.subscription_plan,
+        monthly_fee: client.monthly_fee,
+        subscription_status: client.subscription_status || 'trial',
+        subscription_active: client.subscription_active || false,
+        trial_start_date: client.trial_start_date,
+        trial_end_date: client.trial_end_date,
+        created_at: client.created_at,
+        payment_method: 'PIX', // Default
+        billing_email: client.profiles?.email || '',
+        due_day: 10 // Default
+      }));
+      setClients(formattedClients);
+    }
+
+    // Buscar faturas reais
+    const { data: invoicesData, error: invoicesError } = await supabase
+      .from('invoices')
+      .select(`
+        *,
+        clients!invoices_client_id_fkey(
+          id,
+          company_name,
+          subscription_plan,
+          profiles!clients_profile_id_fkey(
+            full_name,
+            email
+          )
+        )
+      `)
+      .order('issue_date', { ascending: false });
+
+    if (invoicesError) {
+      console.error('Erro ao buscar faturas:', invoicesError);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar faturas",
+        variant: "destructive"
+      });
+    } else if (invoicesData) {
+      const formattedInvoices = invoicesData.map(invoice => ({
+        id: invoice.id,
+        invoice_number: invoice.invoice_number,
+        amount: typeof invoice.amount === 'string' ? parseFloat(invoice.amount) : invoice.amount,
+        currency: invoice.currency || 'BRL',
+        due_date: invoice.due_date,
+        issue_date: invoice.issue_date,
+        status: invoice.status || 'pendente',
+        payment_method: invoice.payment_method,
+        payment_date: invoice.payment_date,
+        description: invoice.description,
+        client_id: invoice.client_id,
+        client_name: invoice.clients?.profiles?.full_name || 'Sem nome',
+        client_email: invoice.clients?.profiles?.email || '',
+        client_company: invoice.clients?.company_name || 'Sem empresa',
+        client_plan: invoice.clients?.subscription_plan || 'Sem plano'
+      }));
+      setInvoices(formattedInvoices);
+    }
+
+    setLoading(false);
+  };
+
+  // Função para verificar status do trial
+  const getTrialStatus = (client: Client) => {
+    if (!client.trial_end_date) return null;
+    
+    const now = new Date();
+    const trialEnd = new Date(client.trial_end_date);
+    const daysLeft = differenceInDays(trialEnd, now);
+    
+    if (daysLeft < 0) {
+      return { expired: true, daysLeft: 0 };
+    }
+    
+    return { expired: false, daysLeft };
+  };
+
   const getClient = (clientId: string) => {
-    return mockClients.find(c => c.id === clientId);
+    return clients.find(c => c.id === clientId);
   };
 
   const getClientInvoices = (clientId: string) => {
-    return mockInvoices.filter(inv => inv.client_id === clientId);
+    return invoices.filter(inv => inv.client_id === clientId);
   };
 
-  const filteredInvoices = mockInvoices.filter(invoice => {
-    const client = getClient(invoice.client_id);
-    return invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           client?.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           client?.company_name.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredInvoices = invoices.filter(invoice => {
+    const searchLower = searchTerm.toLowerCase();
+    return invoice.invoice_number?.toLowerCase().includes(searchLower) ||
+           invoice.client_name?.toLowerCase().includes(searchLower) ||
+           invoice.client_company?.toLowerCase().includes(searchLower) ||
+           invoice.client_email?.toLowerCase().includes(searchLower);
   });
 
-  const filteredClients = mockClients.filter(client =>
-    client.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredClients = clients.filter(client => {
+    const searchLower = searchTerm.toLowerCase();
+    return client.full_name?.toLowerCase().includes(searchLower) ||
+           (client.company_name?.toLowerCase() || '').includes(searchLower) ||
+           client.email?.toLowerCase().includes(searchLower);
+  });
 
   const handlePayForClient = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
@@ -233,9 +220,9 @@ export default function Faturas() {
 
   const handleManageClient = (client: Client) => {
     setSelectedClient(client);
-    setNewPaymentMethod(client.payment_method);
-    setNewBillingEmail(client.billing_email);
-    setNewDueDay(client.due_day);
+    setNewPaymentMethod(client.payment_method || 'PIX');
+    setNewBillingEmail(client.billing_email || client.email);
+    setNewDueDay(client.due_day || 10);
     setIsClientDialogOpen(true);
   };
 
@@ -252,13 +239,33 @@ export default function Faturas() {
     setSelectedInvoiceInDetail(latestInvoice || null);
   };
 
-  const processPayment = () => {
-    toast({
-      title: "Pagamento Processado", 
-      description: `Fatura ${selectedInvoice?.invoice_number} paga com sucesso pelo administrador`
-    });
-    setIsPaymentDialogOpen(false);
-    setSelectedInvoice(null);
+  const processPayment = async () => {
+    if (!selectedInvoice) return;
+    
+    const { error } = await supabase
+      .from('invoices')
+      .update({
+        status: 'paga',
+        payment_date: new Date().toISOString().split('T')[0],
+        payment_method: 'Administrador'
+      })
+      .eq('id', selectedInvoice.id);
+
+    if (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao processar pagamento",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Pagamento Processado", 
+        description: `Fatura ${selectedInvoice?.invoice_number} paga com sucesso pelo administrador`
+      });
+      setIsPaymentDialogOpen(false);
+      setSelectedInvoice(null);
+      fetchData(); // Recarregar dados
+    }
   };
 
   const updateClientSettings = () => {
@@ -276,8 +283,8 @@ export default function Faturas() {
       case 'paga': return 'bg-green-100 text-green-800';
       case 'vencida': return 'bg-red-100 text-red-800';
       case 'cancelada': return 'bg-gray-100 text-gray-800';
-      case 'ativo': return 'bg-green-100 text-green-800';
-      case 'suspenso': return 'bg-red-100 text-red-800';
+      case 'active': case 'ativo': return 'bg-green-100 text-green-800';
+      case 'suspended': case 'suspenso': return 'bg-red-100 text-red-800';
       case 'trial': return 'bg-blue-100 text-blue-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -289,12 +296,25 @@ export default function Faturas() {
       case 'paga': return 'Paga';
       case 'vencida': return 'Vencida';
       case 'cancelada': return 'Cancelada';
-      case 'ativo': return 'Ativo';
-      case 'suspenso': return 'Suspenso';
+      case 'active': case 'ativo': return 'Ativo';
+      case 'suspended': case 'suspenso': return 'Suspenso';
       case 'trial': return 'Trial';
       default: return status;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="w-full space-y-6 p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Carregando dados...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-6 p-6">
@@ -337,7 +357,10 @@ export default function Faturas() {
                 <TableRow>
                   <TableHead>Número</TableHead>
                   <TableHead>Cliente</TableHead>
+                  <TableHead>Plano</TableHead>
+                  <TableHead>Forma Pagamento</TableHead>
                   <TableHead>Valor</TableHead>
+                  <TableHead>Fechamento</TableHead>
                   <TableHead>Vencimento</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Ações</TableHead>
@@ -345,16 +368,22 @@ export default function Faturas() {
               </TableHeader>
               <TableBody>
                 {filteredInvoices.map((invoice) => {
-                  const client = getClient(invoice.client_id);
+                  const closingDate = subDays(new Date(invoice.due_date), 5);
                   return (
                     <TableRow key={invoice.id}>
                       <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{client?.company_name}</div>
-                          <div className="text-sm text-muted-foreground">{client?.full_name}</div>
-                          <div className="text-sm text-muted-foreground">{client?.email}</div>
+                          <div className="font-medium">{invoice.client_company || 'Sem empresa'}</div>
+                          <div className="text-sm text-muted-foreground">{invoice.client_name}</div>
+                          <div className="text-sm text-muted-foreground">{invoice.client_email}</div>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{invoice.client_plan || 'Sem plano'}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{invoice.payment_method || 'Não definido'}</Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center">
@@ -366,7 +395,14 @@ export default function Faturas() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {format(new Date(invoice.due_date), "dd/MM/yyyy")}
+                        <div className="text-sm">
+                          {format(closingDate, "dd/MM/yyyy")}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          {format(new Date(invoice.due_date), "dd/MM/yyyy")}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <Badge className={getStatusBadgeColor(invoice.status)}>
@@ -413,56 +449,73 @@ export default function Faturas() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredClients.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{client.company_name}</div>
-                        <div className="text-sm text-muted-foreground">{client.email}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{client.full_name}</div>
-                        <div className="text-sm text-muted-foreground">{client.phone}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{client.subscription_plan}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      }).format(client.monthly_fee)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusBadgeColor(client.status)}>
-                        {getStatusLabel(client.status)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleViewClientDetails(client)}
-                          title="Ver detalhes"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleManageClient(client)}
-                          title="Gerenciar"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {filteredClients.map((client) => {
+                  const trialStatus = getTrialStatus(client);
+                  return (
+                    <TableRow key={client.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{client.company_name || 'Pessoa Física'}</div>
+                          <div className="text-sm text-muted-foreground">{client.email}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{client.full_name}</div>
+                          <div className="text-sm text-muted-foreground">{client.phone || 'Sem telefone'}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{client.subscription_plan || 'Sem plano'}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {client.monthly_fee ? new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL'
+                        }).format(client.monthly_fee) : '-'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <Badge className={getStatusBadgeColor(client.subscription_status)}>
+                            {getStatusLabel(client.subscription_status)}
+                          </Badge>
+                          {trialStatus && client.subscription_status === 'trial' && (
+                            <div className="flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3 text-yellow-600" />
+                              <span className={`text-xs ${trialStatus.expired ? 'text-red-600 font-semibold' : trialStatus.daysLeft <= 1 ? 'text-yellow-600' : 'text-muted-foreground'}`}>
+                                {trialStatus.expired 
+                                  ? 'Trial Expirado!' 
+                                  : trialStatus.daysLeft === 0 
+                                  ? 'Último dia de trial'
+                                  : `${trialStatus.daysLeft} dias restantes`}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleViewClientDetails(client)}
+                            title="Ver detalhes"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleManageClient(client)}
+                            title="Gerenciar"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           )}
@@ -479,7 +532,13 @@ export default function Faturas() {
             <div className="p-4 bg-muted rounded-lg">
               <h3 className="font-medium">Fatura: {selectedInvoice?.invoice_number}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Cliente: {getClient(selectedInvoice?.client_id || "")?.company_name}
+                Cliente: {selectedInvoice?.client_company || selectedInvoice?.client_name}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Plano: {selectedInvoice?.client_plan || 'Sem plano'}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Forma de Pagamento: {selectedInvoice?.payment_method || 'Não definido'}
               </p>
               <p className="text-lg font-bold mt-2">
                 {selectedInvoice && new Intl.NumberFormat('pt-BR', {
@@ -579,33 +638,51 @@ export default function Faturas() {
                 <CardHeader>
                   <CardTitle className="text-lg">Informações do Cliente</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div><span className="font-medium">Empresa:</span> {selectedClientForView?.company_name}</div>
-                  <div><span className="font-medium">Responsável:</span> {selectedClientForView?.full_name}</div>
-                  <div><span className="font-medium">Email:</span> {selectedClientForView?.email}</div>
-                  <div><span className="font-medium">Telefone:</span> {selectedClientForView?.phone}</div>
-                  <div><span className="font-medium">Plano:</span> {selectedClientForView?.subscription_plan}</div>
-                  <div><span className="font-medium">Mensalidade:</span> {selectedClientForView && new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  }).format(selectedClientForView.monthly_fee)}</div>
-                </CardContent>
+                  <CardContent className="space-y-2">
+                    <div><span className="font-medium">Empresa:</span> {selectedClientForView?.company_name || 'Pessoa Física'}</div>
+                    <div><span className="font-medium">Responsável:</span> {selectedClientForView?.full_name}</div>
+                    <div><span className="font-medium">Email:</span> {selectedClientForView?.email}</div>
+                    <div><span className="font-medium">Telefone:</span> {selectedClientForView?.phone || 'Não informado'}</div>
+                    <div><span className="font-medium">Plano:</span> {selectedClientForView?.subscription_plan || 'Sem plano'}</div>
+                    <div><span className="font-medium">Mensalidade:</span> {selectedClientForView?.monthly_fee ? new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(selectedClientForView.monthly_fee) : '-'}</div>
+                    {(() => {
+                      const trialStatus = selectedClientForView ? getTrialStatus(selectedClientForView) : null;
+                      if (trialStatus && selectedClientForView?.subscription_status === 'trial') {
+                        return (
+                          <div className="pt-2 border-t">
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className={`w-4 h-4 ${trialStatus.expired ? 'text-red-600' : 'text-yellow-600'}`} />
+                              <span className={`font-medium ${trialStatus.expired ? 'text-red-600' : 'text-yellow-600'}`}>
+                                {trialStatus.expired 
+                                  ? 'Trial Expirado!' 
+                                  : `Trial: ${trialStatus.daysLeft} dias restantes`}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Configurações de Cobrança</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div><span className="font-medium">Forma de Pagamento:</span> {selectedClientForView?.payment_method}</div>
-                  <div><span className="font-medium">Email de Cobrança:</span> {selectedClientForView?.billing_email}</div>
-                  <div><span className="font-medium">Dia de Vencimento:</span> Dia {selectedClientForView?.due_day}</div>
-                  <div><span className="font-medium">Status:</span> 
-                    <Badge className={`ml-2 ${getStatusBadgeColor(selectedClientForView?.status || "")}`}>
-                      {getStatusLabel(selectedClientForView?.status || "")}
-                    </Badge>
-                  </div>
-                </CardContent>
+                  <CardContent className="space-y-2">
+                    <div><span className="font-medium">Forma de Pagamento:</span> {selectedClientForView?.payment_method || 'Não definido'}</div>
+                    <div><span className="font-medium">Email de Cobrança:</span> {selectedClientForView?.billing_email || selectedClientForView?.email}</div>
+                    <div><span className="font-medium">Dia de Vencimento:</span> Dia {selectedClientForView?.due_day || 10}</div>
+                    <div><span className="font-medium">Status:</span> 
+                      <Badge className={`ml-2 ${getStatusBadgeColor(selectedClientForView?.subscription_status || "")}`}>
+                        {getStatusLabel(selectedClientForView?.subscription_status || "")}
+                      </Badge>
+                    </div>
+                  </CardContent>
               </Card>
             </div>
 
@@ -727,7 +804,7 @@ export default function Faturas() {
                       style: 'currency',
                       currency: 'BRL'
                     }).format(selectedInvoiceForDetail.amount)}</div>
-                    <div><span className="font-medium">Emissão:</span> {format(new Date(selectedInvoiceForDetail.issue_date), "dd/MM/yyyy")}</div>
+                    <div><span className="font-medium">Fechamento:</span> {format(subDays(new Date(selectedInvoiceForDetail.due_date), 5), "dd/MM/yyyy")}</div>
                     <div><span className="font-medium">Vencimento:</span> {format(new Date(selectedInvoiceForDetail.due_date), "dd/MM/yyyy")}</div>
                     <div><span className="font-medium">Status:</span> 
                       <Badge className={`ml-2 ${getStatusBadgeColor(selectedInvoiceForDetail.status)}`}>
@@ -746,18 +823,10 @@ export default function Faturas() {
                     <CardTitle className="text-lg">Cliente</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {(() => {
-                      const client = getClient(selectedInvoiceForDetail.client_id);
-                      return (
-                        <>
-                          <div><span className="font-medium">Empresa:</span> {client?.company_name}</div>
-                          <div><span className="font-medium">Responsável:</span> {client?.full_name}</div>
-                          <div><span className="font-medium">Email:</span> {client?.email}</div>
-                          <div><span className="font-medium">Telefone:</span> {client?.phone}</div>
-                          <div><span className="font-medium">Plano:</span> {client?.subscription_plan}</div>
-                        </>
-                      );
-                    })()}
+                    <div><span className="font-medium">Empresa:</span> {selectedInvoiceForDetail.client_company || 'Pessoa Física'}</div>
+                    <div><span className="font-medium">Responsável:</span> {selectedInvoiceForDetail.client_name}</div>
+                    <div><span className="font-medium">Email:</span> {selectedInvoiceForDetail.client_email}</div>
+                    <div><span className="font-medium">Plano:</span> {selectedInvoiceForDetail.client_plan || 'Sem plano'}</div>
                   </CardContent>
                 </Card>
               </div>
