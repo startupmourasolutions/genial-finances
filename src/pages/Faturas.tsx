@@ -602,6 +602,13 @@ export default function Faturas() {
                   <p className="text-sm text-muted-foreground">
                     Você será redirecionado para o ambiente seguro de pagamento
                   </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Modal de Configurações de Pagamento */}
       <PaymentSettingsModal
         isOpen={isSettingsModalOpen}
@@ -609,12 +616,6 @@ export default function Faturas() {
         currentSettings={paymentSettings}
         onSave={handleSaveSettings}
       />
-    </div>
-              )}
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
