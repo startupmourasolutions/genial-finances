@@ -141,12 +141,6 @@ export default function Faturas() {
     setSelectedInvoice(null);
   };
 
-  const updatePaymentSettings = () => {
-    toast({
-      title: "Configurações Atualizadas",
-      description: "Método de pagamento e email de cobrança atualizados com sucesso"
-    });
-  };
 
   const generatePIXQRCode = () => {
     toast({
@@ -212,40 +206,6 @@ export default function Faturas() {
           Configurações de Pagamento
         </Button>
       </div>
-
-      {/* Card informativo sobre geração de faturas */}
-      <Card className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-full">
-              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100">Informações sobre Faturas</h3>
-              <div className="mt-2 space-y-1 text-sm text-blue-800 dark:text-blue-200">
-                <p>• <strong>Fechamento:</strong> Todo dia {closeDate.getDate()} de cada mês</p>
-                <p>• <strong>Vencimento:</strong> Todo dia {dueDate.getDate()} de cada mês (5 dias após o fechamento)</p>
-                <p>• <strong>Geração:</strong> A fatura é gerada automaticamente no dia do fechamento</p>
-                {daysUntilDue <= 5 && daysUntilDue > 0 && (
-                  <p className="text-orange-600 dark:text-orange-400 font-medium mt-2">
-                    ⚠️ Sua próxima fatura vence em {daysUntilDue} {daysUntilDue === 1 ? 'dia' : 'dias'}
-                  </p>
-                )}
-                {paymentMethod === 'Cartão de Crédito' && subscriberData?.subscribed && (
-                  <p className="text-green-600 dark:text-green-400 mt-2">
-                    ✓ Pagamento automático configurado no cartão de crédito
-                  </p>
-                )}
-                {(paymentMethod === 'PIX' || paymentMethod === 'Boleto') && (
-                  <p className="text-yellow-600 dark:text-yellow-400 mt-2">
-                    📱 Você pode pagar sua fatura a qualquer momento usando {paymentMethod}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Fatura em Destaque */}
       {currentInvoice && (
@@ -331,47 +291,6 @@ export default function Faturas() {
         </Card>
       )}
 
-      {/* Configurações de Pagamento - Só mostra se não for cartão de crédito */}
-      {subscriberData && !subscriberData.subscribed && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Configurações de Pagamento</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-6'}`}>
-              <div className="space-y-2">
-                <Label htmlFor="payment-method">Método de Pagamento</Label>
-                <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PIX">PIX</SelectItem>
-                    <SelectItem value="Boleto">Boleto Bancário</SelectItem>
-                    <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {paymentMethod === 'Boleto' && (
-                <div className="space-y-2">
-                  <Label htmlFor="billing-email">Email para Cobrança</Label>
-                  <div className="flex items-center">
-                    <Mail className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span className="text-sm">{billingEmail}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <div className="mt-4">
-              <Button onClick={updatePaymentSettings} variant="outline">
-                Atualizar Configurações
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Status da Assinatura para usuários com cartão de crédito */}
       {subscriberData && subscriberData.subscribed && (
