@@ -7,11 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, ArrowLeft, ArrowRight } from "lucide-react"
+import { CalendarIcon, ArrowLeft, ArrowRight, Info, Infinity, Clock } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { Switch } from "@/components/ui/switch"
 
 interface DebtFormModalProps {
   open: boolean
@@ -22,7 +23,7 @@ interface DebtFormModalProps {
   mode: 'create' | 'edit'
 }
 
-type FormStep = 'basic' | 'frequency' | 'date'
+type FormStep = 'basic' | 'frequency' | 'date' | 'duration'
 
 export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initialData, mode }: DebtFormModalProps) {
   const [currentStep, setCurrentStep] = useState<FormStep>('basic')
@@ -32,10 +33,16 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
     category_id: '',
     total_amount: '',
     due_date: '',
-    payment_frequency: 'monthly'
+    payment_frequency: 'monthly',
+    is_recurring: true,
+    installments: '',
+    end_date: ''
   })
   const [selectedDate, setSelectedDate] = useState<Date>()
   const [loading, setLoading] = useState(false)
+
+  // Filter only expense categories
+  const expenseCategories = categories.filter(cat => cat.type === 'expense')
 
   useEffect(() => {
     if (initialData && mode === 'edit') {
@@ -52,7 +59,10 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
         category_id: initialData.category_id || '',
         total_amount: amountValue,
         due_date: initialData.due_date || '',
-        payment_frequency: initialData.payment_frequency || 'monthly'
+        payment_frequency: initialData.payment_frequency || 'monthly',
+        is_recurring: initialData.is_recurring ?? true,
+        installments: initialData.installments || '',
+        end_date: initialData.end_date || ''
       })
       if (initialData.due_date) {
         setSelectedDate(new Date(initialData.due_date))
@@ -64,7 +74,10 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
         category_id: '',
         total_amount: '',
         due_date: '',
-        payment_frequency: 'monthly'
+        payment_frequency: 'monthly',
+        is_recurring: true,
+        installments: '',
+        end_date: ''
       })
       setSelectedDate(undefined)
     }
@@ -79,12 +92,16 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
       }
       setCurrentStep('frequency')
     } else if (currentStep === 'frequency') {
+      setCurrentStep('duration')
+    } else if (currentStep === 'duration') {
       setCurrentStep('date')
     }
   }
 
   const handleBack = () => {
     if (currentStep === 'date') {
+      setCurrentStep('duration')
+    } else if (currentStep === 'duration') {
       setCurrentStep('frequency')
     } else if (currentStep === 'frequency') {
       setCurrentStep('basic')
@@ -109,7 +126,10 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
     const submitData = {
       ...formData,
       total_amount: amount,
-      due_date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null
+      due_date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null,
+      is_recurring: formData.is_recurring,
+      installments: formData.installments ? parseInt(formData.installments) : null,
+      end_date: formData.end_date || null
     }
     
     const { error } = await onSubmit(submitData)
@@ -138,18 +158,18 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
         <Label htmlFor="category_id">Categoria</Label>
         <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
           <SelectTrigger className="mt-2">
-            <SelectValue placeholder="Selecione uma categoria..." />
+            <SelectValue placeholder="Selecione uma categoria de despesa..." />
           </SelectTrigger>
           <SelectContent>
-            {categories && categories.length > 0 ? (
-              categories.map((category) => (
+            {expenseCategories && expenseCategories.length > 0 ? (
+              expenseCategories.map((category) => (
                 <SelectItem key={category.id} value={category.id}>
                   {category.name}
                 </SelectItem>
               ))
             ) : (
               <SelectItem value="no-categories" disabled>
-                {categories ? 'Nenhuma categoria disponível' : 'Carregando categorias...'}
+                {expenseCategories ? 'Nenhuma categoria de despesa disponível' : 'Carregando categorias...'}
               </SelectItem>
             )}
           </SelectContent>
@@ -196,7 +216,7 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
     <div className="space-y-6">
       <div className="text-center">
         <h3 className="text-lg font-medium mb-2">Como você quer configurar o pagamento?</h3>
-        <p className="text-sm text-muted-foreground">Escolha se é um pagamento recorrente ou uma data específica</p>
+        <p className="text-sm text-muted-foreground">Escolha a frequência do pagamento</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -207,8 +227,20 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
           className="h-16 text-left justify-start"
         >
           <div>
-            <div className="font-medium">Todo mês</div>
-            <div className="text-sm text-muted-foreground">Pagamento recorrente mensal</div>
+            <div className="font-medium">Mensal</div>
+            <div className="text-sm text-muted-foreground">Pagamento todo mês no mesmo dia</div>
+          </div>
+        </Button>
+
+        <Button
+          type="button"
+          variant={formData.payment_frequency === 'weekly' ? 'default' : 'outline'}
+          onClick={() => setFormData(prev => ({ ...prev, payment_frequency: 'weekly' }))}
+          className="h-16 text-left justify-start"
+        >
+          <div>
+            <div className="font-medium">Semanal</div>
+            <div className="text-sm text-muted-foreground">Pagamento toda semana</div>
           </div>
         </Button>
 
@@ -219,11 +251,93 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
           className="h-16 text-left justify-start"
         >
           <div>
-            <div className="font-medium">Data específica</div>
-            <div className="text-sm text-muted-foreground">Pagamento único em uma data</div>
+            <div className="font-medium">Única</div>
+            <div className="text-sm text-muted-foreground">Pagamento único em data específica</div>
           </div>
         </Button>
       </div>
+    </div>
+  )
+
+  const renderDurationStep = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h3 className="text-lg font-medium mb-2">Por quanto tempo?</h3>
+        <p className="text-sm text-muted-foreground">
+          {formData.payment_frequency === 'one-time' 
+            ? 'Defina quando será pago' 
+            : 'Defina se a dívida é recorrente ou tem prazo'}
+        </p>
+      </div>
+
+      {formData.payment_frequency !== 'one-time' && (
+        <div className="space-y-6">
+          {/* Toggle para recorrência */}
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="space-y-1">
+              <Label htmlFor="recurring" className="font-medium">Dívida recorrente</Label>
+              <p className="text-sm text-muted-foreground">
+                {formData.is_recurring ? 'Será cobrada sempre' : 'Tem prazo para terminar'}
+              </p>
+            </div>
+            <Switch
+              id="recurring"
+              checked={formData.is_recurring}
+              onCheckedChange={(checked) => setFormData(prev => ({ 
+                ...prev, 
+                is_recurring: checked,
+                installments: checked ? '' : prev.installments 
+              }))}
+            />
+          </div>
+
+          {/* Número de parcelas se não for recorrente */}
+          {!formData.is_recurring && (
+            <div className="space-y-2">
+              <Label htmlFor="installments">Número de parcelas</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="installments"
+                  type="number"
+                  min="1"
+                  placeholder="Ex: 12"
+                  value={formData.installments}
+                  onChange={(e) => setFormData(prev => ({ ...prev, installments: e.target.value }))}
+                  className="flex-1"
+                />
+                <span className="text-sm text-muted-foreground">
+                  {formData.payment_frequency === 'monthly' ? 'meses' : 'semanas'}
+                </span>
+              </div>
+              {formData.installments && Number(formData.installments) > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  <Info className="w-3 h-3 inline mr-1" />
+                  Será cobrada por {formData.installments} {formData.payment_frequency === 'monthly' ? 'meses' : 'semanas'}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Indicador visual */}
+          <div className="p-4 bg-muted/50 rounded-lg">
+            <div className="flex items-center gap-2">
+              {formData.is_recurring ? (
+                <>
+                  <Infinity className="w-5 h-5 text-primary" />
+                  <span className="text-sm font-medium">Cobrança contínua</span>
+                </>
+              ) : (
+                <>
+                  <Clock className="w-5 h-5 text-primary" />
+                  <span className="text-sm font-medium">
+                    {formData.installments ? `${formData.installments} parcelas` : 'Defina o número de parcelas'}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 
@@ -231,15 +345,19 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
     <div className="space-y-6">
       <div className="text-center">
         <h3 className="text-lg font-medium mb-2">
-          {formData.payment_frequency === 'monthly' 
-            ? 'Escolha o dia do mês para pagamento' 
-            : 'Escolha a data do pagamento'
+          {formData.payment_frequency === 'one-time' 
+            ? 'Quando será o pagamento?' 
+            : formData.payment_frequency === 'monthly'
+            ? 'Escolha o dia do mês'
+            : 'Escolha o dia da semana'
           }
         </h3>
         <p className="text-sm text-muted-foreground">
-          {formData.payment_frequency === 'monthly' 
-            ? 'Selecione o dia que você quer pagar todo mês' 
-            : 'Selecione quando você vai quitar esta dívida'
+          {formData.payment_frequency === 'one-time' 
+            ? 'Data única de vencimento' 
+            : formData.is_recurring
+            ? `Vencimento ${formData.payment_frequency === 'monthly' ? 'mensal' : 'semanal'} recorrente`
+            : `Primeira parcela de ${formData.installments || '?'}`
           }
         </p>
       </div>
@@ -258,6 +376,8 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
               {selectedDate ? (
                 formData.payment_frequency === 'monthly' 
                   ? `Todo dia ${format(selectedDate, 'd')}`
+                  : formData.payment_frequency === 'weekly'
+                  ? `Toda ${format(selectedDate, 'EEEE', { locale: ptBR })}`
                   : format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
               ) : (
                 <span>Selecione uma data</span>
@@ -275,6 +395,43 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
           </PopoverContent>
         </Popover>
       </div>
+
+      {/* Resumo da configuração */}
+      {selectedDate && (
+        <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+          <h4 className="text-sm font-medium">Resumo da dívida:</h4>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• Valor: {formData.total_amount || 'Não informado'}</li>
+            <li>• Frequência: {
+              formData.payment_frequency === 'monthly' ? 'Mensal' : 
+              formData.payment_frequency === 'weekly' ? 'Semanal' : 'Única'
+            }</li>
+            {formData.payment_frequency !== 'one-time' && (
+              <li>• Duração: {
+                formData.is_recurring ? 'Recorrente (sem prazo)' : 
+                `${formData.installments} parcelas`
+              }</li>
+            )}
+            <li>• {formData.payment_frequency === 'one-time' ? 'Vencimento' : 'Primeiro vencimento'}: {
+              format(selectedDate, "dd/MM/yyyy")
+            }</li>
+            {!formData.is_recurring && formData.installments && formData.payment_frequency !== 'one-time' && (
+              <li>• Último vencimento: {
+                (() => {
+                  const months = parseInt(formData.installments) - 1;
+                  const lastDate = new Date(selectedDate);
+                  if (formData.payment_frequency === 'monthly') {
+                    lastDate.setMonth(lastDate.getMonth() + months);
+                  } else {
+                    lastDate.setDate(lastDate.getDate() + (months * 7));
+                  }
+                  return format(lastDate, "dd/MM/yyyy");
+                })()
+              }</li>
+            )}
+          </ul>
+        </div>
+      )}
     </div>
   )
 
@@ -301,6 +458,7 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
         <div className="py-4">
           {currentStep === 'basic' && renderBasicStep()}
           {currentStep === 'frequency' && renderFrequencyStep()}
+          {currentStep === 'duration' && renderDurationStep()}
           {currentStep === 'date' && renderDateStep()}
         </div>
 
