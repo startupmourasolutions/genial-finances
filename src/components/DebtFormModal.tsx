@@ -11,7 +11,6 @@ import { CalendarIcon, ArrowLeft, ArrowRight } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { cn } from "@/lib/utils"
-import CurrencyInput from 'react-currency-input-field'
 import { toast } from "sonner"
 
 interface DebtFormModalProps {
@@ -31,7 +30,7 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
     title: '',
     description: '',
     category_id: '',
-    total_amount: 0,
+    total_amount: '',
     due_date: '',
     payment_frequency: 'monthly'
   })
@@ -40,11 +39,18 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
 
   useEffect(() => {
     if (initialData && mode === 'edit') {
+      let amountValue = '';
+      if (initialData.total_amount) {
+        const value = initialData.total_amount.toFixed(2);
+        const parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        amountValue = 'R$ ' + parts.join(',');
+      }
       setFormData({
         title: initialData.title || '',
         description: initialData.description || '',
         category_id: initialData.category_id || '',
-        total_amount: initialData.total_amount || 0,
+        total_amount: amountValue,
         due_date: initialData.due_date || '',
         payment_frequency: initialData.payment_frequency || 'monthly'
       })
@@ -56,7 +62,7 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
         title: '',
         description: '',
         category_id: '',
-        total_amount: 0,
+        total_amount: '',
         due_date: '',
         payment_frequency: 'monthly'
       })
@@ -93,8 +99,16 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
 
     setLoading(true)
     
+    // Parse the amount from formatted string to number
+    let amount = 0;
+    if (formData.total_amount) {
+      const cleanValue = formData.total_amount.replace(/[^\d,]/g, '').replace(',', '.');
+      amount = parseFloat(cleanValue) || 0;
+    }
+    
     const submitData = {
       ...formData,
+      total_amount: amount,
       due_date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null
     }
     
@@ -144,20 +158,23 @@ export function DebtFormModal({ open, onOpenChange, onSubmit, categories, initia
 
       <div>
         <Label htmlFor="total_amount">Valor (opcional)</Label>
-        <CurrencyInput
+        <Input
           id="total_amount"
+          type="text"
           placeholder="R$ 0,00"
           value={formData.total_amount}
-          decimalsLimit={2}
-          decimalSeparator=","
-          groupSeparator="."
-          prefix="R$ "
-          allowDecimals={true}
-          allowNegativeValue={false}
-          defaultValue={0}
-          step={0.01}
-          onValueChange={(value) => setFormData(prev => ({ ...prev, total_amount: parseFloat(value || '0') }))}
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-2"
+          onChange={(e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value) {
+              value = (parseInt(value) / 100).toFixed(2);
+              const parts = value.split('.');
+              parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+              value = parts.join(',');
+              value = 'R$ ' + value;
+            }
+            setFormData(prev => ({ ...prev, total_amount: value }));
+          }}
+          className="mt-2"
         />
       </div>
 
