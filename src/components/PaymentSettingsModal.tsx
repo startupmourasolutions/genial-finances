@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Settings, CreditCard, QrCode, FileText, Calendar, Info, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface PaymentSettingsModalProps {
@@ -116,14 +115,26 @@ export function PaymentSettingsModal({
             {/* Forma de Pagamento */}
             <div className="space-y-3">
               <Label className="text-base font-semibold">Forma de Pagamento</Label>
-              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                <Card className={paymentMethod === "Cartão de Crédito" ? "border-primary" : ""}>
+              <div className="space-y-3">
+                <Card 
+                  className={`cursor-pointer transition-all hover:border-primary/50 ${
+                    paymentMethod === "Cartão de Crédito" 
+                      ? "border-primary bg-primary/5 dark:bg-primary/10" 
+                      : ""
+                  }`}
+                  onClick={() => setPaymentMethod("Cartão de Crédito")}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-3">
-                      <RadioGroupItem value="Cartão de Crédito" id="card" />
+                      <div className={`p-2 rounded-full ${
+                        paymentMethod === "Cartão de Crédito" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-muted"
+                      }`}>
+                        <CreditCard className="w-4 h-4" />
+                      </div>
                       <div className="flex-1">
-                        <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer">
-                          <CreditCard className="w-4 h-4" />
+                        <Label className="text-base cursor-pointer">
                           Cartão de Crédito
                         </Label>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -134,13 +145,25 @@ export function PaymentSettingsModal({
                   </CardContent>
                 </Card>
 
-                <Card className={paymentMethod === "PIX" ? "border-primary" : ""}>
+                <Card 
+                  className={`cursor-pointer transition-all hover:border-primary/50 ${
+                    paymentMethod === "PIX" 
+                      ? "border-primary bg-primary/5 dark:bg-primary/10" 
+                      : ""
+                  }`}
+                  onClick={() => setPaymentMethod("PIX")}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-3">
-                      <RadioGroupItem value="PIX" id="pix" />
+                      <div className={`p-2 rounded-full ${
+                        paymentMethod === "PIX" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-muted"
+                      }`}>
+                        <QrCode className="w-4 h-4" />
+                      </div>
                       <div className="flex-1">
-                        <Label htmlFor="pix" className="flex items-center gap-2 cursor-pointer">
-                          <QrCode className="w-4 h-4" />
+                        <Label className="text-base cursor-pointer">
                           PIX
                         </Label>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -151,13 +174,25 @@ export function PaymentSettingsModal({
                   </CardContent>
                 </Card>
 
-                <Card className={paymentMethod === "Boleto" ? "border-primary" : ""}>
+                <Card 
+                  className={`cursor-pointer transition-all hover:border-primary/50 ${
+                    paymentMethod === "Boleto" 
+                      ? "border-primary bg-primary/5 dark:bg-primary/10" 
+                      : ""
+                  }`}
+                  onClick={() => setPaymentMethod("Boleto")}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-3">
-                      <RadioGroupItem value="Boleto" id="boleto" />
+                      <div className={`p-2 rounded-full ${
+                        paymentMethod === "Boleto" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-muted"
+                      }`}>
+                        <FileText className="w-4 h-4" />
+                      </div>
                       <div className="flex-1">
-                        <Label htmlFor="boleto" className="flex items-center gap-2 cursor-pointer">
-                          <FileText className="w-4 h-4" />
+                        <Label className="text-base cursor-pointer">
                           Boleto Bancário
                         </Label>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -167,7 +202,7 @@ export function PaymentSettingsModal({
                     </div>
                   </CardContent>
                 </Card>
-              </RadioGroup>
+              </div>
             </div>
 
             {/* Data de Vencimento */}
@@ -178,7 +213,7 @@ export function PaymentSettingsModal({
               </Label>
               <Select value={dueDay} onValueChange={handleDueDayChange}>
                 <SelectTrigger id="due-day">
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione o dia de vencimento" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableDueDays.map(day => (
