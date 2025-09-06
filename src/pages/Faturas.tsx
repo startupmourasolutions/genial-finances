@@ -8,11 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { DollarSign, Calendar, CreditCard, Mail, QrCode, FileText, Download, Eye, Loader2 } from "lucide-react";
+import { DollarSign, Calendar, CreditCard, Mail, QrCode, FileText, Download, Eye, Loader2, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscriberData } from "@/hooks/useSubscriberData";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { PaymentSettingsModal } from "@/components/PaymentSettingsModal";
 
 interface Invoice {
   id: string;
@@ -33,13 +34,20 @@ export default function Faturas() {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const { toast } = useToast();
   const { user, profile } = useAuth();
   const { subscriberData, invoices, loading, error, refreshData } = useSubscriberData();
   const isMobile = useIsMobile();
 
+  // Configurações de pagamento (em produção viriam do banco)
+  const [paymentSettings, setPaymentSettings] = useState({
+    paymentMethod: "Cartão de Crédito",
+    dueDay: 11
+  });
+
   // Definir método de pagamento com base na assinatura
-  const [paymentMethod, setPaymentMethod] = useState("Cartão de Crédito");
+  const [paymentMethod, setPaymentMethod] = useState(paymentSettings.paymentMethod);
   const [billingEmail, setBillingEmail] = useState("");
 
   useEffect(() => {
@@ -51,21 +59,21 @@ export default function Faturas() {
   // Fatura atual (mais recente com status pendente ou a primeira da lista)
   const currentInvoice = invoices.find(inv => inv.status === 'pendente') || invoices[0];
 
-  // Calcular datas de fechamento e vencimento
+  // Calcular datas de fechamento e vencimento com base nas configurações
   const calculateBillingDates = () => {
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
     
-    // Vencimento sempre no dia 11
-    let dueDate = new Date(currentYear, currentMonth, 11);
+    // Vencimento baseado na configuração do usuário
+    let dueDate = new Date(currentYear, currentMonth, paymentSettings.dueDay);
     
-    // Se já passou o dia 11, próximo vencimento é mês que vem
-    if (today.getDate() > 11) {
-      dueDate = new Date(currentYear, currentMonth + 1, 11);
+    // Se já passou o dia de vencimento, próximo vencimento é mês que vem
+    if (today.getDate() > paymentSettings.dueDay) {
+      dueDate = new Date(currentYear, currentMonth + 1, paymentSettings.dueDay);
     }
     
-    // Fechamento é 5 dias antes do vencimento (dia 6)
+    // Fechamento é 5 dias antes do vencimento
     const closeDate = new Date(dueDate);
     closeDate.setDate(closeDate.getDate() - 5);
     
@@ -79,6 +87,21 @@ export default function Faturas() {
   const last12Invoices = invoices
     .sort((a, b) => new Date(b.issue_date).getTime() - new Date(a.issue_date).getTime())
     .slice(0, 12);
+
+  // Handler para salvar configurações
+  const handleSaveSettings = (settings: { paymentMethod: string; dueDay: number }) => {
+    setPaymentSettings(settings);
+    setPaymentMethod(settings.paymentMethod);
+    
+    // Aqui você faria a chamada para salvar no banco de dados
+    // await supabase.from('user_settings').update({ payment_settings: settings })
+    
+    toast({
+      title: "Configurações atualizadas",
+      description: "Suas preferências foram salvas com sucesso.",
+    });
+  };
+
 
   if (loading) {
     return (
@@ -178,8 +201,16 @@ export default function Faturas() {
 
   return (
     <div className={`w-full space-y-6 ${isMobile ? 'p-4' : 'p-6'}`}>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold`}>Minhas Faturas</h1>
+        <Button 
+          variant="outline" 
+          onClick={() => setIsSettingsModalOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <Settings className="w-4 h-4" />
+          Configurações de Pagamento
+        </Button>
       </div>
 
       {/* Card informativo sobre geração de faturas */}
@@ -652,7 +683,14 @@ export default function Faturas() {
                   <p className="text-sm text-muted-foreground">
                     Você será redirecionado para o ambiente seguro de pagamento
                   </p>
-                </div>
+      {/* Modal de Configurações de Pagamento */}
+      <PaymentSettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        currentSettings={paymentSettings}
+        onSave={handleSaveSettings}
+      />
+    </div>
               )}
             </div>
           </div>
