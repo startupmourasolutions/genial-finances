@@ -35,7 +35,7 @@ export default function Faturas() {
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const { toast } = useToast();
   const { user, profile } = useAuth();
-  const { subscriberData, invoices, loading, error } = useSubscriberData();
+  const { subscriberData, invoices, loading, error, refreshData } = useSubscriberData();
   const isMobile = useIsMobile();
 
   // Definir método de pagamento com base na assinatura
@@ -50,6 +50,30 @@ export default function Faturas() {
 
   // Fatura atual (mais recente com status pendente ou a primeira da lista)
   const currentInvoice = invoices.find(inv => inv.status === 'pendente') || invoices[0];
+
+  // Calcular datas de fechamento e vencimento
+  const calculateBillingDates = () => {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Vencimento sempre no dia 11
+    let dueDate = new Date(currentYear, currentMonth, 11);
+    
+    // Se já passou o dia 11, próximo vencimento é mês que vem
+    if (today.getDate() > 11) {
+      dueDate = new Date(currentYear, currentMonth + 1, 11);
+    }
+    
+    // Fechamento é 5 dias antes do vencimento (dia 6)
+    const closeDate = new Date(dueDate);
+    closeDate.setDate(closeDate.getDate() - 5);
+    
+    return { closeDate, dueDate };
+  };
+
+  const { closeDate, dueDate } = calculateBillingDates();
+  const daysUntilDue = Math.ceil((dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
 
   // Últimas 12 faturas ordenadas por data de emissão (mais recente primeiro)
   const last12Invoices = invoices
@@ -158,13 +182,57 @@ export default function Faturas() {
         <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold`}>Minhas Faturas</h1>
       </div>
 
+      {/* Card informativo sobre geração de faturas */}
+      <Card className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-full">
+              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-blue-900 dark:text-blue-100">Informações sobre Faturas</h3>
+              <div className="mt-2 space-y-1 text-sm text-blue-800 dark:text-blue-200">
+                <p>• <strong>Fechamento:</strong> Todo dia {closeDate.getDate()} de cada mês</p>
+                <p>• <strong>Vencimento:</strong> Todo dia {dueDate.getDate()} de cada mês (5 dias após o fechamento)</p>
+                <p>• <strong>Geração:</strong> A fatura é gerada automaticamente no dia do fechamento</p>
+                {daysUntilDue <= 5 && daysUntilDue > 0 && (
+                  <p className="text-orange-600 dark:text-orange-400 font-medium mt-2">
+                    ⚠️ Sua próxima fatura vence em {daysUntilDue} {daysUntilDue === 1 ? 'dia' : 'dias'}
+                  </p>
+                )}
+                {paymentMethod === 'Cartão de Crédito' && subscriberData?.subscribed && (
+                  <p className="text-green-600 dark:text-green-400 mt-2">
+                    ✓ Pagamento automático configurado no cartão de crédito
+                  </p>
+                )}
+                {(paymentMethod === 'PIX' || paymentMethod === 'Boleto') && (
+                  <p className="text-yellow-600 dark:text-yellow-400 mt-2">
+                    📱 Você pode pagar sua fatura a qualquer momento usando {paymentMethod}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Fatura em Destaque */}
       {currentInvoice && (
         <Card className="border-2 border-primary/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Fatura Atual
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Fatura Atual
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={refreshData}
+              >
+                <Loader2 className="w-4 h-4" />
+                Atualizar
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -205,15 +273,14 @@ export default function Faturas() {
                 )}
               </div>
 
-              {subscriberData?.subscription_end && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-muted-foreground">Próximo Fechamento</Label>
-                  <div className={`flex items-center ${isMobile ? 'text-base' : 'text-lg'}`}>
-                    <Calendar className="w-4 h-4 mr-2" />
-                    {format(new Date(subscriberData.subscription_end), "dd/MM/yyyy", { locale: ptBR })}
-                  </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-muted-foreground">Data de Fechamento</Label>
+                <div className={`flex items-center ${isMobile ? 'text-base' : 'text-lg'}`}>
+                  <Calendar className="w-4 h-4 mr-2" />
+                  {format(new Date(currentInvoice.issue_date), "dd/MM/yyyy", { locale: ptBR })}
                 </div>
-              )}
+                <p className="text-xs text-muted-foreground">Gerada 5 dias antes do vencimento</p>
+              </div>
             </div>
 
             {/* Só mostra botão de pagar se não for cartão de crédito ou se não tiver assinatura ativa */}
