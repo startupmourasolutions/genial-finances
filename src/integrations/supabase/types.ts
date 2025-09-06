@@ -216,8 +216,11 @@ export type Database = {
           created_at: string
           description: string | null
           due_date: string | null
+          end_date: string | null
           id: string
           idproprio: string | null
+          installments: number | null
+          is_recurring: boolean
           original_amount: number | null
           payment_frequency: string | null
           profile_type: string
@@ -233,8 +236,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           due_date?: string | null
+          end_date?: string | null
           id?: string
           idproprio?: string | null
+          installments?: number | null
+          is_recurring?: boolean
           original_amount?: number | null
           payment_frequency?: string | null
           profile_type?: string
@@ -250,8 +256,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           due_date?: string | null
+          end_date?: string | null
           id?: string
           idproprio?: string | null
+          installments?: number | null
+          is_recurring?: boolean
           original_amount?: number | null
           payment_frequency?: string | null
           profile_type?: string

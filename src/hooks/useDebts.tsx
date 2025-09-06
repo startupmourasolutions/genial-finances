@@ -46,6 +46,9 @@ interface CreateDebtData {
   due_date?: string
   original_amount?: number
   payment_frequency?: string
+  is_recurring?: boolean
+  installments?: number | null
+  end_date?: string | null
 }
 
 export function useDebts() {
