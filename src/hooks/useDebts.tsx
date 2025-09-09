@@ -290,6 +290,20 @@ export function useDebts() {
         return { error: 'Client not found' }
       }
 
+      // Idempotency check: avoid duplicate payment for same debt, amount and day
+      const today = new Date().toISOString().split('T')[0];
+      const { data: existingPayments, error: existingPaymentsError } = await supabase
+        .from('debt_payments')
+        .select('id')
+        .eq('debt_id', id)
+        .eq('payment_date', today)
+        .eq('amount', paymentAmount);
+      if (existingPaymentsError) throw existingPaymentsError;
+      if (existingPayments && existingPayments.length > 0) {
+        toast.info('Pagamento já registrado hoje. Evitamos duplicar.');
+        return { data: null, error: null };
+      }
+
       // Registrar o pagamento no histórico
       const { error: paymentError } = await supabase
         .from('debt_payments')
@@ -298,7 +312,7 @@ export function useDebts() {
           user_id: user?.id,
           client_id: clientData.id,
           amount: paymentAmount,
-          payment_date: new Date().toISOString().split('T')[0],
+          payment_date: today,
         })
 
       if (paymentError) throw paymentError

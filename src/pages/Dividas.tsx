@@ -23,7 +23,8 @@ const Dividas = () => {
   const [selectedDebtForHistory, setSelectedDebtForHistory] = useState<any>(null);
   const [searchFilter, setSearchFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+const [statusFilter, setStatusFilter] = useState("all");
+const [payingIds, setPayingIds] = useState<string[]>([]);
   const {
     debts,
     categories,
@@ -136,14 +137,18 @@ const Dividas = () => {
       setDeleteDebtId(null);
     }
   };
-  const handlePayment = async (debtId: string, amount: number) => {
-    try {
-      await makePayment(debtId, amount);
-      toast.success('Pagamento registrado com sucesso!');
-    } catch (error) {
-      console.error('Error making payment:', error);
-    }
-  };
+const handlePayment = async (debtId: string, amount: number) => {
+  if (payingIds.includes(debtId)) return;
+  setPayingIds((prev) => [...prev, debtId]);
+  try {
+    await makePayment(debtId, amount);
+    toast.success('Pagamento registrado com sucesso!');
+  } catch (error) {
+    console.error('Error making payment:', error);
+  } finally {
+    setPayingIds((prev) => prev.filter(id => id !== debtId));
+  }
+};
   const handleViewHistory = (debt: any) => {
     setSelectedDebtForHistory(debt);
     setHistoryModalOpen(true);
@@ -230,8 +235,8 @@ const Dividas = () => {
           
           <div className="flex gap-2">
             {debt.status !== 'paid' && (
-              <Button size="sm" variant="default" className="text-xs px-3" onClick={() => handlePayment(debt.id, Number(debt.total_amount || 0))}>
-                💳 Pagar
+              <Button size="sm" variant="default" className="text-xs px-3" disabled={payingIds.includes(debt.id)} onClick={() => handlePayment(debt.id, Number(debt.total_amount || 0))}>
+                {payingIds.includes(debt.id) ? "⏳ Pagando..." : "💳 Pagar"}
               </Button>
             )}
             <Button size="sm" variant="secondary" className="text-xs px-3" onClick={() => handleViewHistory(debt)}>
