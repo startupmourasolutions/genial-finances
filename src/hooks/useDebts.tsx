@@ -303,6 +303,23 @@ export function useDebts() {
 
       if (paymentError) throw paymentError
 
+      // Registrar como despesa para afetar o saldo
+      const profileType = currentProfile === "Empresarial" ? "business" : "personal";
+      const { error: expenseError } = await supabase
+        .from('expenses')
+        .insert({
+          title: `Pagamento: ${currentDebt.title}`,
+          description: `Pagamento da dívida ${currentDebt.title}`,
+          amount: paymentAmount,
+          date: new Date().toISOString().split('T')[0],
+          user_id: user?.id,
+          client_id: clientData.id,
+          profile_type: profileType,
+          category_id: currentDebt.category_id || null,
+        })
+
+      if (expenseError) throw expenseError
+
       // Lógica baseada na frequência de pagamento
       if (currentDebt.payment_frequency === 'monthly') {
         // Para pagamentos mensais: marcar como pago e criar nova dívida para próximo mês
