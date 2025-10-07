@@ -55,9 +55,10 @@ const Transacoes = () => {
   // Filtrar transações em tempo real
   const filteredTransactions = useMemo(() => {
     return transactions.filter((transaction) => {
-      // Filtro por data
-      if (startDate && new Date(transaction.date) < new Date(startDate)) return false
-      if (endDate && new Date(transaction.date) > new Date(endDate)) return false
+      // Filtro por data - comparação de strings diretas (formato ISO)
+      const transactionDate = transaction.date.split('T')[0] // Pega apenas YYYY-MM-DD
+      if (startDate && transactionDate < startDate) return false
+      if (endDate && transactionDate > endDate) return false
       
       // Filtro por categoria
       if (selectedCategory !== 'all' && transaction.category_id !== selectedCategory) return false

@@ -27,8 +27,9 @@ const Receitas = () => {
   // Filtrar receitas
   const filteredIncomes = useMemo(() => {
     return incomes.filter((income) => {
-      if (startDate && new Date(income.date) < new Date(startDate)) return false
-      if (endDate && new Date(income.date) > new Date(endDate)) return false
+      const incomeDate = income.date.split('T')[0] // Pega apenas YYYY-MM-DD
+      if (startDate && incomeDate < startDate) return false
+      if (endDate && incomeDate > endDate) return false
       if (selectedCategory !== 'all' && income.category_id !== selectedCategory) return false
       return true
     })

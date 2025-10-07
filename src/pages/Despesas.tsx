@@ -29,8 +29,9 @@ const Despesas = () => {
   // Filtrar despesas
   const filteredExpenses = useMemo(() => {
     return expenses.filter((expense) => {
-      if (startDate && new Date(expense.date) < new Date(startDate)) return false
-      if (endDate && new Date(expense.date) > new Date(endDate)) return false
+      const expenseDate = expense.date.split('T')[0] // Pega apenas YYYY-MM-DD
+      if (startDate && expenseDate < startDate) return false
+      if (endDate && expenseDate > endDate) return false
       if (selectedCategory !== 'all' && expense.category_id !== selectedCategory) return false
       return true
     })
