@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -19,10 +19,26 @@ const Despesas = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingExpense, setEditingExpense] = useState<any>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  
+  // Estados dos filtros
+  const [startDate, setStartDate] = useState<string>('')
+  const [endDate, setEndDate] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [selectedType, setSelectedType] = useState<string>('all')
 
-  const totalDespesas = expenses.reduce((sum, expense) => sum + expense.amount, 0)
-  const mediaDespesas = expenses.length > 0 ? totalDespesas / expenses.length : 0
-  const maiorDespesa = expenses.length > 0 ? Math.max(...expenses.map(e => e.amount)) : 0
+  // Filtrar despesas
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter((expense) => {
+      if (startDate && new Date(expense.date) < new Date(startDate)) return false
+      if (endDate && new Date(expense.date) > new Date(endDate)) return false
+      if (selectedCategory !== 'all' && expense.category_id !== selectedCategory) return false
+      return true
+    })
+  }, [expenses, startDate, endDate, selectedCategory])
+
+  const totalDespesas = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0)
+  const mediaDespesas = filteredExpenses.length > 0 ? totalDespesas / filteredExpenses.length : 0
+  const maiorDespesa = filteredExpenses.length > 0 ? Math.max(...filteredExpenses.map(e => e.amount)) : 0
 
   const handleEdit = (expense: any) => {
     setEditingExpense(expense)
@@ -85,7 +101,7 @@ const Despesas = () => {
               R$ {totalDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {expenses.length} despesas este mês
+              {filteredExpenses.length} despesas este mês
             </p>
           </CardContent>
         </Card>
@@ -98,7 +114,7 @@ const Despesas = () => {
             <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-brand-orange" />
           </CardHeader>
           <CardContent className="pb-3">
-            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{expenses.length}</div>
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{filteredExpenses.length}</div>
             <p className="text-xs text-muted-foreground mt-1">
               despesas cadastradas
             </p>
@@ -117,7 +133,7 @@ const Despesas = () => {
               R$ {mediaDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              baseado em {expenses.length} entradas
+              baseado em {filteredExpenses.length} entradas
             </p>
           </CardContent>
         </Card>
@@ -150,9 +166,21 @@ const Despesas = () => {
         </CardHeader>
         <CardContent className="pb-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <Input type="date" placeholder="Data inicial" className="text-sm" />
-            <Input type="date" placeholder="Data final" className="text-sm" />
-            <Select>
+            <Input 
+              type="date" 
+              placeholder="Data inicial" 
+              className="text-sm"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+            <Input 
+              type="date" 
+              placeholder="Data final" 
+              className="text-sm"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="text-sm">
                 <SelectValue placeholder="Categoria" />
               </SelectTrigger>
@@ -165,7 +193,7 @@ const Despesas = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Select>
+            <Select value={selectedType} onValueChange={setSelectedType}>
               <SelectTrigger className="text-sm">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
@@ -186,12 +214,15 @@ const Despesas = () => {
         </CardHeader>
         <CardContent className="pb-3">
           <div className="space-y-2">
-            {expenses.length === 0 ? (
+            {filteredExpenses.length === 0 ? (
               <div className="text-center py-6 text-sm text-muted-foreground">
-                Nenhuma despesa cadastrada ainda.
+                {expenses.length === 0 
+                  ? "Nenhuma despesa cadastrada ainda."
+                  : "Nenhuma despesa encontrada com os filtros aplicados."
+                }
               </div>
             ) : (
-              expenses.map((expense) => (
+              filteredExpenses.map((expense) => (
                 <div key={expense.id} className="flex flex-col gap-2 p-3 bg-destructive/5 rounded-lg border border-destructive/20 hover:bg-destructive/10 transition-smooth">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
