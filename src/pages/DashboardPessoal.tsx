@@ -215,8 +215,8 @@ export default function DashboardPessoal() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-        <MonthlyTrendChart />
-        <ExpensesByCategoryChart />
+        <MonthlyTrendChart selectedMonth={selectedMonth} selectedYear={selectedYear} />
+        <ExpensesByCategoryChart selectedMonth={selectedMonth} selectedYear={selectedYear} />
       </div>
 
       {/* Quick Stats */}

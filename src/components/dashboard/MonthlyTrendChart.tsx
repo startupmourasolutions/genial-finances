@@ -6,14 +6,22 @@ import { useMemo } from "react"
 import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
-export function MonthlyTrendChart() {
+interface MonthlyTrendChartProps {
+  selectedMonth?: number
+  selectedYear?: number
+}
+
+export function MonthlyTrendChart({ selectedMonth, selectedYear }: MonthlyTrendChartProps = {}) {
   const { incomes } = useIncomes()
   const { expenses } = useExpenses()
 
   const chartData = useMemo(() => {
     if (!incomes || !expenses) return []
 
-    const endDate = new Date()
+    // Se um mês específico foi selecionado, mostra 6 meses a partir dele (incluindo os anteriores)
+    const endDate = selectedMonth !== undefined && selectedYear !== undefined 
+      ? new Date(selectedYear, selectedMonth, 1)
+      : new Date()
     const startDate = subMonths(endDate, 5) // Últimos 6 meses
     
     const months = eachMonthOfInterval({ start: startDate, end: endDate })
@@ -43,7 +51,7 @@ export function MonthlyTrendChart() {
         saldo: monthIncomes - monthExpenses
       }
     })
-  }, [incomes, expenses])
+  }, [incomes, expenses, selectedMonth, selectedYear])
 
   return (
     <Card className="shadow-card">

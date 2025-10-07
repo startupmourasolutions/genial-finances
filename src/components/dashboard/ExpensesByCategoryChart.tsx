@@ -6,14 +6,27 @@ import { useMemo } from "react";
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', 'hsl(var(--destructive))', 'hsl(var(--success))', '#8884d8', '#82ca9d', '#ffc658', '#ff7300'];
 
-export function ExpensesByCategoryChart() {
+interface ExpensesByCategoryChartProps {
+  selectedMonth?: number
+  selectedYear?: number
+}
+
+export function ExpensesByCategoryChart({ selectedMonth, selectedYear }: ExpensesByCategoryChartProps = {}) {
   const { expenses } = useExpenses();
   const { categories } = useCategories();
 
   const chartData = useMemo(() => {
     if (!expenses || !categories) return [];
     
-    const expensesByCategory = expenses.reduce((acc: Record<string, number>, expense) => {
+    // Filtrar despesas pelo mês selecionado
+    const filteredExpenses = selectedMonth !== undefined && selectedYear !== undefined
+      ? expenses.filter(expense => {
+          const expenseDate = new Date(expense.date)
+          return expenseDate.getMonth() === selectedMonth && expenseDate.getFullYear() === selectedYear
+        })
+      : expenses;
+    
+    const expensesByCategory = filteredExpenses.reduce((acc: Record<string, number>, expense) => {
       const categoryId = expense.category_id || 'sem-categoria';
       acc[categoryId] = (acc[categoryId] || 0) + Number(expense.amount);
       return acc;
@@ -27,7 +40,7 @@ export function ExpensesByCategoryChart() {
         color: COLORS[Object.keys(expensesByCategory).indexOf(categoryId) % COLORS.length]
       };
     }).sort((a, b) => b.value - a.value);
-  }, [expenses, categories]);
+  }, [expenses, categories, selectedMonth, selectedYear]);
 
   const totalExpenses = chartData.reduce((sum, item) => sum + item.value, 0);
 

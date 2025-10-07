@@ -176,8 +176,8 @@ export default function DashboardEmpresarial() {
 
       {/* Charts Section - Empresarial */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-        <MonthlyTrendChart />
-        <ExpensesByCategoryChart />
+        <MonthlyTrendChart selectedMonth={selectedMonth} selectedYear={selectedYear} />
+        <ExpensesByCategoryChart selectedMonth={selectedMonth} selectedYear={selectedYear} />
       </div>
 
       {/* Business Insights */}
